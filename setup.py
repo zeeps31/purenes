@@ -9,7 +9,6 @@ setup(name='purenes',
       description='A NES emulator in Python',
       author='Stephen Brady',
       author_email='stephen.brady86@gmail.com',
-      install_requires=[],
       setup_requires=["semver>=2.13.0"],
       packages=find_packages(exclude=["tests"]),
       )
