@@ -4,4 +4,8 @@ python:
   - "3.8"
   - "3.9"
 script:
-  - pytest
+  - pytest --cov=tests --cov-report=xml
+
+after_script:
+  - export CODECOV_TOKEN=e84b34b7-becd-439d-918f-138e5ad30321
+  - curl -Os https://uploader.codecov.io/latest/linux/codecov chmod +x codecov ./codecov
