@@ -1,4 +1,8 @@
-from typing import Final
+try:
+    from typing import Final
+except ImportError:
+    # Python 3.7 support
+    from typing_extensions import Final
 
 import numpy as np
 
