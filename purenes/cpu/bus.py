@@ -8,7 +8,7 @@ class CPUBus(object):
 
     The CPU bus is responsible for handling the logic of delegating
     reads and writes to the correct resource connected to the CPU
-    based on the CPU memory map
+    based on the CPU memory map.
 
     https://www.nesdev.org/wiki/CPU_memory_map.
 
@@ -42,7 +42,7 @@ class CPUBus(object):
 
     def __init__(self):
         """
-        'Connects' devices to the CPU and initializes the devices based
+        Connects devices to the CPU and initializes the devices based
         on reset and startup behaviors.
         """
         # Internal memory ($0000-$07FF) has unreliable startup state.
