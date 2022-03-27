@@ -3,6 +3,8 @@ try:
 except ImportError:
     # Python 3.7 support
     from typing_extensions import Final
+# Python 3.7 and 3.8 support
+from typing import List
 
 
 class CPUBus(object):
@@ -40,7 +42,7 @@ class CPUBus(object):
 
     _RAM_ADDRESS_MASK: Final = 0x1FF
 
-    _ram: list[int]
+    _ram: List[int]
 
     def __init__(self):
         """

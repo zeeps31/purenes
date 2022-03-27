@@ -2,7 +2,7 @@ import semver
 from setuptools import setup
 from setuptools import find_packages
 
-version = semver.VersionInfo.parse('0.4.1')
+version = semver.VersionInfo.parse('0.5.0')
 
 setup(name='purenes',
       version=str(version),
