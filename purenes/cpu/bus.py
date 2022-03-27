@@ -29,10 +29,10 @@ class CPUBus(object):
 
     Methods
     -------
-    read(address: np.uint16) -> np.uint8:
+    read(address: int) -> int:
         Reads an address from a device connected to the CPU bus.
 
-    write(address: np.uint16, data: np.uint8) -> None:
+    write(address: int, data: int) -> None:
         Writes to an address and device connected to the CPU bus.
     """
     # TODO: https://github.com/zeeps31/purenes/issues/6
