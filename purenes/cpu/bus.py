@@ -4,8 +4,6 @@ except ImportError:
     # Python 3.7 support
     from typing_extensions import Final
 
-import numpy as np
-
 
 class CPUBus(object):
     """A class to represent the NES CPU bus.
@@ -37,12 +35,12 @@ class CPUBus(object):
     """
     # TODO: https://github.com/zeeps31/purenes/issues/6
     _INVALID_ADDRESS_EXCEPTION: Final = ("Invalid address provided: "
-                                         "{address}. Address should be " 
+                                         "{address}. Address should be "
                                          "between 0x0000 - 0xFFFF")
 
     _RAM_ADDRESS_MASK: Final = 0x1FF
 
-    _ram: np.array(np.uint8)
+    _ram: list[int]
 
     def __init__(self):
         """
@@ -53,21 +51,21 @@ class CPUBus(object):
         # Some machines may have consistent RAM contents at power-on,
         # but others do not. Here, the ram is initialized to a 2KB
         # array of 0x00 values.
-        self._ram = np.zeros(0x07FF, np.uint8)
+        self._ram = [0x00] * 0x0800
 
-    def read(self, address: np.uint16) -> np.uint8:
+    def read(self, address: int) -> int:
         """
         Reads a value from the appropriate resource connected to the
         CPU.
 
         Parameters
         ----------
-            address : np.uint16
+            address : int
                 A 16-bit address
 
         Returns
         -------
-            data (np.unit8): A value from the specified address
+            data (int): An 8-bit value from the specified address
             location.
         """
         if 0x0000 <= address <= 0x1FFF:
@@ -80,17 +78,17 @@ class CPUBus(object):
                 )
             )
 
-    def write(self, address: np.uint16, data: np.uint8) -> None:
+    def write(self, address: int, data: int) -> None:
         """
         Writes a value from the appropriate resource connected to the
         CPU.
 
         Parameters
         ----------
-            address : np.uint16
+            address : int
                 A 16-bit address
 
-            data : np.uint8
+            data : int
                 An 8-bit value
 
         Returns
