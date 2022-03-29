@@ -45,8 +45,7 @@ class CPUBus(object):
     _ram: List[int]
 
     def __init__(self):
-        """
-        Connects devices to the CPU and initializes the devices based
+        """Connects devices to the CPU and initializes the devices based
         on reset and startup behaviors.
         """
         # Internal memory ($0000-$07FF) has unreliable startup state.
@@ -56,8 +55,7 @@ class CPUBus(object):
         self._ram = [0x00] * 0x0800
 
     def read(self, address: int) -> int:
-        """
-        Reads a value from the appropriate resource connected to the
+        """Reads a value from the appropriate resource connected to the
         CPU.
 
         Parameters
@@ -81,8 +79,7 @@ class CPUBus(object):
             )
 
     def write(self, address: int, data: int) -> None:
-        """
-        Writes a value from the appropriate resource connected to the
+        """Writes a value from the appropriate resource connected to the
         CPU.
 
         Parameters

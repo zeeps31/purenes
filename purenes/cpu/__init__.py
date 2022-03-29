@@ -1,1 +1,1 @@
-from purenes.cpu.bus import CPUBus
+from purenes.cpu.cpu_bus import CPUBus
