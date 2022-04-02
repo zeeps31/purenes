@@ -32,7 +32,7 @@ class CPU(object):
     # The internal bus for the CPU
     cpu_bus: CPUBus
 
-    # The lo-byte of the reset vector.
+    # The low byte of the reset vector.
     _RES: int = 0xFFFC
 
     # CPU Internal registers
