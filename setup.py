@@ -15,6 +15,10 @@ setup(name='purenes',
             "pytest-cov==3.0.0",
             "pytest-mock==3.7.0"
       ],
-      setup_requires=["semver>=2.13.0"],
+      setup_requires=[
+            "semver>=2.13.0",
+            "sphinx==4.5.0",
+            "furo==2022.3.4"
+      ],
       packages=find_packages(exclude=["tests"]),
       )
