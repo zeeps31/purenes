@@ -1,4 +1,4 @@
-name: "Pull Request Docs Check"
+name: "docs"
 on: [push, pull_request]
 
 jobs:
@@ -13,8 +13,10 @@ jobs:
       - name: Build docs
         run: |
           cd docs
+          sphinx-apidoc -f -o source ../purenes
           make html
-      - name: Deploy docs
+      if: github.ref == 'refs/heads/main'
+      - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4.2.5
         with:
           branch: gh-pages
