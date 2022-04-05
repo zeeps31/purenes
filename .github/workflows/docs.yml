@@ -15,13 +15,9 @@ jobs:
           cd docs
           sphinx-apidoc -f -o source ../purenes
           make html
-  deploy:
-      runs-on: ubuntu-latest
-      needs: build-docs
-#      if: success() && github.ref == 'refs/heads/main'
-      steps:
       - name: Deploy to GitHub Pages
+        if: success() && github.ref == 'refs/heads/main'
         uses: JamesIves/github-pages-deploy-action@v4.2.5
         with:
           branch: gh-pages
-          folder: docs/build/html
+          folder: docs/build/htmls
