@@ -197,23 +197,6 @@
 <p>A class to represent the NES CPU core.</p>
 <p>The NES CPU is based on the MOS6502 processor and runs at approximately
 1.79 MHz.</p>
-<dl class="simple">
-<dt>A - Accumulator:</dt><dd><p>8-bit register that supports using the status register
-for carrying, overflow detection, and so on.</p>
-</dd>
-<dt>X and Y indexes:</dt><dd><p>8-bit registers used for several addressing modes. They can be used as
-loop counters easily, using INC/DEC and branch instructions.</p>
-</dd>
-<dt>PC - Program Counter:</dt><dd><p>16-bits supports 65536 direct (unbanked) memory locations, however not
-all values are sent to the cartridge. It can be accessed either by
-allowing CPU’s internal fetch logic increment the address bus, an
-interrupt (NMI, Reset, IRQ/BRQ), and using the RTS/JMP/JSR/Branch
-instructions.</p>
-</dd>
-<dt>S  - Stack Pointer:</dt><dd><p>8-bit and can be accessed using interrupts, pulls, pushes and
-transfers.</p>
-</dd>
-</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="purenes.cpu.CPU.clock">
 <span class="sig-name descname"><span class="pre">clock</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/purenes/cpu.html#CPU.clock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.cpu.CPU.clock" title="Permalink to this definition">#</a></dt>
@@ -228,15 +211,11 @@ stored in the program counter.</p></li>
 executed.</p></li>
 </ol>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="purenes.cpu.CPU.cpu_bus">
-<span class="sig-name descname"><span class="pre">cpu_bus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.cpu.CPUBus" title="purenes.cpu.CPUBus"><span class="pre">purenes.cpu.CPUBus</span></a></em><a class="headerlink" href="#purenes.cpu.CPU.cpu_bus" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="purenes.cpu.CPU.reset">
 <span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/purenes/cpu.html#CPU.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.cpu.CPU.reset" title="Permalink to this definition">#</a></dt>
@@ -251,7 +230,7 @@ executed program. (Notably, instructions exist for the initialization
 and loading of all registers, but for the program counter, which is
 provided by the reset vector at $FFFC.)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -262,53 +241,76 @@ provided by the reset vector at $FFFC.)</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">purenes.cpu.</span></span><span class="sig-name descname"><span class="pre">CPUBus</span></span><a class="reference internal" href="_modules/purenes/cpu.html#CPUBus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.cpu.CPUBus" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class to represent the NES CPU bus.</p>
-<p>The CPU bus is responsible for handling the logic of delegating
-reads and writes to the correct resource connected to the CPU
-based on the CPU memory map.</p>
+<p>The CPU bus is responsible for handling the logic of delegating reads and
+writes to the correct resource connected to the CPU based on the CPU
+memory map.</p>
 <p><a class="reference external" href="https://www.nesdev.org/wiki/CPU_memory_map">https://www.nesdev.org/wiki/CPU_memory_map</a>.</p>
-<p>Address range Size  Device
-$0000-$07FF   $0800 2KB internal RAM
-$0800-$0FFF   $0800 Mirrors of $0000-$07FF
-$1000-$17FF   $0800
-$1800-$1FFF   $0800
-$2000-$2007   $0008 NES PPU registers
-$2008-$3FFF   $1FF8 Mirrors of $2000-2007 (repeats every 8 bytes)
-$4000-$4017   $0018 NES APU and I/O registers
-$4018-$401F   $0008 APU and I/O functionality.
-$4020-$FFFF   $BFE0 Cartridge space: PRG ROM, PRG RAM, and mapper</p>
+<div class="table-wrapper"><table class="docutils align-default">
+<colgroup>
+<col style="width: 23%"/>
+<col style="width: 9%"/>
+<col style="width: 68%"/>
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Address range</p></th>
+<th class="head"><p>Size</p></th>
+<th class="head"><p>Device</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>$0000-$07FF</p></td>
+<td><p>$0800</p></td>
+<td><p>2KB internal RAM</p></td>
+</tr>
+<tr class="row-odd"><td><p>$0800-$0FFF
+$1000-$17FF
+$1800-$1FFF</p></td>
+<td><p>$0800
+$0800
+$0800</p></td>
+<td><p>Mirrors of $0000-$07FF</p></td>
+</tr>
+<tr class="row-even"><td><p>$2000-$2007
+$2008-$3FFF</p></td>
+<td><p>$0008
+$1FF8</p></td>
+<td><p>NES PPU registers
+Mirrors of $2000-2007 (repeats every 8 bytes)</p></td>
+</tr>
+<tr class="row-odd"><td><p>$4000-$4017</p></td>
+<td><p>$0018</p></td>
+<td><p>NES APU and I/O registers</p></td>
+</tr>
+<tr class="row-even"><td><p>$4018-$401F</p></td>
+<td><p>$0008</p></td>
+<td><p>APU and I/O functionality.</p></td>
+</tr>
+<tr class="row-odd"><td><p>$4020-$FFFF</p></td>
+<td><p>$BFE0</p></td>
+<td><p>Cartridge space: PRG ROM, PRG RAM, and mapper</p></td>
+</tr>
+</tbody>
+</table></div>
 <dl class="py method">
 <dt class="sig sig-object py" id="purenes.cpu.CPUBus.read">
-<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int:</span></span></span><a class="reference internal" href="_modules/purenes/cpu.html#CPUBus.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.cpu.CPUBus.read" title="Permalink to this definition">#</a></dt>
-<dd><p>Reads an address from a device connected to the CPU bus.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="purenes.cpu.CPUBus.write">
-<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None:</span></span></span><a class="reference internal" href="_modules/purenes/cpu.html#CPUBus.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.cpu.CPUBus.write" title="Permalink to this definition">#</a></dt>
-<dd><p>Writes to an address and device connected to the CPU bus.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/purenes/cpu.html#CPUBus.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition">#</a></dt>
-<dd><p>Reads a value from the appropriate resource connected to the
-CPU.</p>
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/purenes/cpu.html#CPUBus.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.cpu.CPUBus.read" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads a value from the appropriate resource connected to the CPU.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>address</strong> (<em>int</em>) – A 16-bit address</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>data (int)</strong> (<em>An 8-bit value from the specified address</em>)</p></li>
-<li><p><em>location.</em></p></li>
-</ul>
-</p>
+<dd class="field-even"><p>An 8-bit value from the specified address location.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>data (int)</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/purenes/cpu.html#CPUBus.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Permalink to this definition">#</a></dt>
-<dd><p>Writes a value from the appropriate resource connected to the
-CPU.</p>
+<dt class="sig sig-object py" id="purenes.cpu.CPUBus.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/purenes/cpu.html#CPUBus.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.cpu.CPUBus.write" title="Permalink to this definition">#</a></dt>
+<dd><p>Writes a value from the appropriate resource connected to the CPU.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -316,7 +318,7 @@ CPU.</p>
 <li><p><strong>data</strong> (<em>int</em>) – An 8-bit value</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -329,56 +331,79 @@ CPU.</p>
 <dt class="sig sig-object py" id="purenes.ppu.PPUBus">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">purenes.ppu.</span></span><span class="sig-name descname"><span class="pre">PPUBus</span></span><a class="reference internal" href="_modules/purenes/ppu.html#PPUBus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.ppu.PPUBus" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A class to encapsulate the logic of reading and writing to
-devices connected to the PPU.</p>
+<p>A class to encapsulate the logic of reading and writing to devices
+connected to the PPU.</p>
 <p>The PPU has its own bus with a 16kB addressable range, $0000-3FFF,
-completely separate from the CPU’s address bus. The PPU interacts
-with its connected devices directly or via the CPU with memory
-mapped registers at $2006 and $2007.</p>
+completely separate from the CPU’s address bus. The PPU interacts with its
+connected devices directly or via the CPU with memory mapped registers at
+$2006 and $2007.</p>
 <p><a class="reference external" href="https://www.nesdev.org/wiki/PPU_memory_map">https://www.nesdev.org/wiki/PPU_memory_map</a></p>
-<p>Address range       Size    Description
-$0000-$0FFF     $1000       Pattern table 0
-$1000-$1FFF     $1000       Pattern table 1
-$2000-$23FF     $0400       Nametable 0
-$2400-$27FF     $0400       Nametable 1
-$2800-$2BFF     $0400       Nametable 2
-$2C00-$2FFF     $0400       Nametable 3
-$3000-$3EFF     $0F00       Mirrors of $2000-$2EFF
-$3F00-$3F1F     $0020       Palette RAM indexes
-$3F20-$3FFF     $00E0       Mirrors of $3F00-$3F1F</p>
+<div class="table-wrapper"><table class="docutils align-default">
+<colgroup>
+<col style="width: 23%"/>
+<col style="width: 10%"/>
+<col style="width: 67%"/>
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Address range</p></th>
+<th class="head"><p>Size</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>$0000-$0FFF
+$1000-$1FFF</p></td>
+<td><p>$1000
+$1000</p></td>
+<td><p>Pattern table 0
+Pattern table 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>$2000-$23FF
+$2400-$27FF
+$2800-$2BFF
+$2C00-$2FFF</p></td>
+<td><p>$0400
+$0400
+$0400
+$0400</p></td>
+<td><p>Nametable 0
+Nametable 1
+Nametable 2
+Nametable 3</p></td>
+</tr>
+<tr class="row-even"><td><p>$3000-$3EFF</p></td>
+<td><p>$0F00</p></td>
+<td><p>Mirrors of $2000-$2EFF</p></td>
+</tr>
+<tr class="row-odd"><td><p>$3F00-$3F1F
+$3F20-$3FFF</p></td>
+<td><p>$0020
+$00E0</p></td>
+<td><p>Palette RAM indexes
+Mirrors of $3F00-$3F1F</p></td>
+</tr>
+</tbody>
+</table></div>
 <dl class="py method">
 <dt class="sig sig-object py" id="purenes.ppu.PPUBus.read">
-<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int:</span></span></span><a class="reference internal" href="_modules/purenes/ppu.html#PPUBus.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.ppu.PPUBus.read" title="Permalink to this definition">#</a></dt>
-<dd><p>Reads an address from a device connected to the PPU bus.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="purenes.ppu.PPUBus.write">
-<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None:</span></span></span><a class="reference internal" href="_modules/purenes/ppu.html#PPUBus.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.ppu.PPUBus.write" title="Permalink to this definition">#</a></dt>
-<dd><p>Writes to an address and device connected to the PPU bus.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/purenes/ppu.html#PPUBus.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Permalink to this definition">#</a></dt>
-<dd><p>Reads a value from the appropriate resource connected to the
-PPU.</p>
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/purenes/ppu.html#PPUBus.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.ppu.PPUBus.read" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads a value from the appropriate resource connected to the PPU.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>address</strong> (<em>int</em>) – A 16-bit address</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>data (int)</strong> (<em>An 8-bit value from the specified address</em>)</p></li>
-<li><p><em>location.</em></p></li>
-</ul>
-</p>
+<dd class="field-even"><p>An 8-bit value from the specified address location.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>data (int)</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="id3">
-<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/purenes/ppu.html#PPUBus.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Permalink to this definition">#</a></dt>
-<dd><p>Writes a value from the appropriate resource connected to the
-PPU.</p>
+<dt class="sig sig-object py" id="purenes.ppu.PPUBus.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/purenes/ppu.html#PPUBus.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.ppu.PPUBus.write" title="Permalink to this definition">#</a></dt>
+<dd><p>Writes a value from the appropriate resource connected to the PPU.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -386,7 +411,7 @@ PPU.</p>
 <li><p><strong>data</strong> (<em>int</em>) – An 8-bit value</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>

@@ -192,34 +192,32 @@
 
 
 <div class="viewcode-block" id="PPUBus"><a class="viewcode-back" href="../../purenes.html#purenes.ppu.PPUBus">[docs]</a><span class="k">class</span> <span class="nc">PPUBus</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">"""A class to encapsulate the logic of reading and writing to</span>
-<span class="sd">    devices connected to the PPU.</span>
+    <span class="sd">"""A class to encapsulate the logic of reading and writing to devices</span>
+<span class="sd">    connected to the PPU.</span>
 
 <span class="sd">    The PPU has its own bus with a 16kB addressable range, $0000-3FFF,</span>
-<span class="sd">    completely separate from the CPU's address bus. The PPU interacts</span>
-<span class="sd">    with its connected devices directly or via the CPU with memory</span>
-<span class="sd">    mapped registers at $2006 and $2007.</span>
+<span class="sd">    completely separate from the CPU's address bus. The PPU interacts with its</span>
+<span class="sd">    connected devices directly or via the CPU with memory mapped registers at</span>
+<span class="sd">    $2006 and $2007.</span>
 
 <span class="sd">    https://www.nesdev.org/wiki/PPU_memory_map</span>
 
-<span class="sd">    Address range	Size	Description</span>
-<span class="sd">    $0000-$0FFF	    $1000	Pattern table 0</span>
-<span class="sd">    $1000-$1FFF	    $1000	Pattern table 1</span>
-<span class="sd">    $2000-$23FF	    $0400	Nametable 0</span>
-<span class="sd">    $2400-$27FF	    $0400	Nametable 1</span>
-<span class="sd">    $2800-$2BFF	    $0400	Nametable 2</span>
-<span class="sd">    $2C00-$2FFF	    $0400	Nametable 3</span>
-<span class="sd">    $3000-$3EFF	    $0F00	Mirrors of $2000-$2EFF</span>
-<span class="sd">    $3F00-$3F1F	    $0020	Palette RAM indexes</span>
-<span class="sd">    $3F20-$3FFF	    $00E0	Mirrors of $3F00-$3F1F</span>
-
-<span class="sd">    Methods</span>
-<span class="sd">    -------</span>
-<span class="sd">    read(address: int) -&gt; int:</span>
-<span class="sd">        Reads an address from a device connected to the PPU bus.</span>
-
-<span class="sd">    write(address: int, data: int) -&gt; None:</span>
-<span class="sd">        Writes to an address and device connected to the PPU bus.</span>
+<span class="sd">    +----------------+-------+-----------------------------------------------+</span>
+<span class="sd">    | Address range  | Size  | Description                                   |</span>
+<span class="sd">    +================+=======+===============================================+</span>
+<span class="sd">    | $0000-$0FFF    | $1000 | Pattern table 0                               |</span>
+<span class="sd">    | $1000-$1FFF    | $1000 | Pattern table 1                               |</span>
+<span class="sd">    +----------------+-------+-----------------------------------------------+</span>
+<span class="sd">    | $2000-$23FF    | $0400 | Nametable 0                                   |</span>
+<span class="sd">    | $2400-$27FF    | $0400 | Nametable 1                                   |</span>
+<span class="sd">    | $2800-$2BFF    | $0400 | Nametable 2                                   |</span>
+<span class="sd">    | $2C00-$2FFF    | $0400 | Nametable 3                                   |</span>
+<span class="sd">    +----------------+-------+-----------------------------------------------+</span>
+<span class="sd">    | $3000-$3EFF    | $0F00 | Mirrors of $2000-$2EFF                        |</span>
+<span class="sd">    +----------------+-------+-----------------------------------------------+</span>
+<span class="sd">    | $3F00-$3F1F    | $0020 | Palette RAM indexes                           |</span>
+<span class="sd">    | $3F20-$3FFF    | $00E0 | Mirrors of $3F00-$3F1F                        |</span>
+<span class="sd">    +----------------+-------+-----------------------------------------------+</span>
 <span class="sd">    """</span>
 
     <span class="c1"># TODO: https://github.com/zeeps31/purenes/issues/6</span>
@@ -229,26 +227,21 @@
 
     <span class="n">_VRAM_ADDRESS_MASK</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="mh">0x07FF</span>
 
-    <span class="c1"># The 2KB video ram (VRAM) dedicated to the PPU, normally mapped to</span>
-    <span class="c1"># the nametable address space from $2000-2FFF,</span>
+    <span class="c1"># The 2KB video ram (VRAM) dedicated to the PPU, normally mapped to the</span>
+    <span class="c1"># nametable address space from $2000-2FFF,</span>
     <span class="n">_vram</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">]</span> <span class="o">*</span> <span class="mh">0x0800</span>
 
 <div class="viewcode-block" id="PPUBus.read"><a class="viewcode-back" href="../../purenes.html#purenes.ppu.PPUBus.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">"""Reads a value from the appropriate resource connected to the</span>
-<span class="sd">        PPU.</span>
+        <span class="sd">"""Reads a value from the appropriate resource connected to the PPU.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">            address : int</span>
-<span class="sd">                A 16-bit address</span>
+<span class="sd">        Args:</span>
+<span class="sd">            address (int): A 16-bit address</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">            data (int): An 8-bit value from the specified address</span>
-<span class="sd">            location.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            data (int): An 8-bit value from the specified address location.</span>
 <span class="sd">        """</span>
         <span class="c1"># TODO: https://github.com/zeeps31/purenes/issues/14</span>
         <span class="k">if</span> <span class="mh">0x2000</span> <span class="o">&lt;=</span> <span class="n">address</span> <span class="o">&lt;=</span> <span class="mh">0x2FFF</span><span class="p">:</span>
@@ -262,19 +255,13 @@
             <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PPUBus.write"><a class="viewcode-back" href="../../purenes.html#purenes.ppu.PPUBus.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">"""Writes a value from the appropriate resource connected to the</span>
-<span class="sd">        PPU.</span>
+        <span class="sd">"""Writes a value from the appropriate resource connected to the PPU.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">            address : int</span>
-<span class="sd">                A 16-bit address</span>
+<span class="sd">        Args:</span>
+<span class="sd">            address (int): A 16-bit address</span>
+<span class="sd">            data (int): An 8-bit value</span>
 
-<span class="sd">            data : int</span>
-<span class="sd">                An 8-bit value</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
+<span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        """</span>
         <span class="c1"># TODO: https://github.com/zeeps31/purenes/issues/14</span>

@@ -192,32 +192,33 @@
 
 
 <div class="viewcode-block" id="CPUBus"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPUBus">[docs]</a><span class="k">class</span> <span class="nc">CPUBus</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">"""A class to represent the NES CPU bus.</span>
+    <span class="sd">"""</span>
+<span class="sd">    A class to represent the NES CPU bus.</span>
 
-<span class="sd">    The CPU bus is responsible for handling the logic of delegating</span>
-<span class="sd">    reads and writes to the correct resource connected to the CPU</span>
-<span class="sd">    based on the CPU memory map.</span>
+<span class="sd">    The CPU bus is responsible for handling the logic of delegating reads and</span>
+<span class="sd">    writes to the correct resource connected to the CPU based on the CPU</span>
+<span class="sd">    memory map.</span>
 
 <span class="sd">    https://www.nesdev.org/wiki/CPU_memory_map.</span>
 
-<span class="sd">    Address range Size	Device</span>
-<span class="sd">    $0000-$07FF	  $0800	2KB internal RAM</span>
-<span class="sd">    $0800-$0FFF	  $0800	Mirrors of $0000-$07FF</span>
-<span class="sd">    $1000-$17FF	  $0800</span>
-<span class="sd">    $1800-$1FFF	  $0800</span>
-<span class="sd">    $2000-$2007	  $0008	NES PPU registers</span>
-<span class="sd">    $2008-$3FFF	  $1FF8	Mirrors of $2000-2007 (repeats every 8 bytes)</span>
-<span class="sd">    $4000-$4017	  $0018	NES APU and I/O registers</span>
-<span class="sd">    $4018-$401F	  $0008	APU and I/O functionality.</span>
-<span class="sd">    $4020-$FFFF	  $BFE0	Cartridge space: PRG ROM, PRG RAM, and mapper</span>
-
-<span class="sd">    Methods</span>
-<span class="sd">    -------</span>
-<span class="sd">    read(address: int) -&gt; int:</span>
-<span class="sd">        Reads an address from a device connected to the CPU bus.</span>
-
-<span class="sd">    write(address: int, data: int) -&gt; None:</span>
-<span class="sd">        Writes to an address and device connected to the CPU bus.</span>
+<span class="sd">    +----------------+------+-----------------------------------------------+</span>
+<span class="sd">    | Address range  | Size | Device                                        |</span>
+<span class="sd">    +================+======+===============================================+</span>
+<span class="sd">    | $0000-$07FF    |$0800 | 2KB internal RAM                              |</span>
+<span class="sd">    +----------------+------+-----------------------------------------------+</span>
+<span class="sd">    | $0800-$0FFF    |$0800 | Mirrors of $0000-$07FF                        |</span>
+<span class="sd">    | $1000-$17FF    |$0800 |                                               |</span>
+<span class="sd">    | $1800-$1FFF    |$0800 |                                               |</span>
+<span class="sd">    +----------------+------+-----------------------------------------------+</span>
+<span class="sd">    | $2000-$2007    |$0008 | NES PPU registers                             |</span>
+<span class="sd">    | $2008-$3FFF    |$1FF8 | Mirrors of $2000-2007 (repeats every 8 bytes) |</span>
+<span class="sd">    +----------------+------+-----------------------------------------------+</span>
+<span class="sd">    | $4000-$4017    |$0018 | NES APU and I/O registers                     |</span>
+<span class="sd">    +----------------+------+-----------------------------------------------+</span>
+<span class="sd">    | $4018-$401F    |$0008 | APU and I/O functionality.                    |</span>
+<span class="sd">    +----------------+------+-----------------------------------------------+</span>
+<span class="sd">    | $4020-$FFFF    |$BFE0 | Cartridge space: PRG ROM, PRG RAM, and mapper |</span>
+<span class="sd">    +----------------+------+-----------------------------------------------+</span>
 <span class="sd">    """</span>
     <span class="c1"># TODO: https://github.com/zeeps31/purenes/issues/6</span>
     <span class="n">_INVALID_ADDRESS_EXCEPTION</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"Invalid address provided: "</span>
@@ -229,8 +230,8 @@
     <span class="n">_ram</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Connects devices to the CPU and initializes the devices based</span>
-<span class="sd">        on reset and startup behaviors.</span>
+        <span class="sd">"""Connects devices to the CPU and initializes the devices based on</span>
+<span class="sd">        reset and startup behaviors.</span>
 <span class="sd">        """</span>
         <span class="c1"># Internal memory ($0000-$07FF) has unreliable startup state.</span>
         <span class="c1"># Some machines may have consistent RAM contents at power-on,</span>
@@ -239,18 +240,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_ram</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">]</span> <span class="o">*</span> <span class="mh">0x0800</span>
 
 <div class="viewcode-block" id="CPUBus.read"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPUBus.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">"""Reads a value from the appropriate resource connected to the</span>
-<span class="sd">        CPU.</span>
+        <span class="sd">"""Reads a value from the appropriate resource connected to the CPU.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">            address : int</span>
-<span class="sd">                A 16-bit address</span>
+<span class="sd">        Args:</span>
+<span class="sd">            address (int): A 16-bit address</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">            data (int): An 8-bit value from the specified address</span>
-<span class="sd">            location.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            data (int): An 8-bit value from the specified address location.</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="mh">0x0000</span> <span class="o">&lt;=</span> <span class="n">address</span> <span class="o">&lt;=</span> <span class="mh">0x1FFF</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ram</span><span class="p">[</span><span class="n">address</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_RAM_ADDRESS_MASK</span><span class="p">]</span>
@@ -263,19 +259,13 @@
             <span class="p">)</span></div>
 
 <div class="viewcode-block" id="CPUBus.write"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPUBus.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">"""Writes a value from the appropriate resource connected to the</span>
-<span class="sd">        CPU.</span>
+        <span class="sd">"""Writes a value from the appropriate resource connected to the CPU.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">            address : int</span>
-<span class="sd">                A 16-bit address</span>
+<span class="sd">        Args:</span>
+<span class="sd">            address (int): A 16-bit address</span>
+<span class="sd">            data (int): An 8-bit value</span>
 
-<span class="sd">            data : int</span>
-<span class="sd">                An 8-bit value</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
+<span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="mh">0x0000</span> <span class="o">&lt;=</span> <span class="n">address</span> <span class="o">&lt;=</span> <span class="mh">0x1FFF</span><span class="p">:</span>
@@ -294,31 +284,9 @@
 
 <span class="sd">    The NES CPU is based on the MOS6502 processor and runs at approximately</span>
 <span class="sd">    1.79 MHz.</span>
-
-<span class="sd">    Internal Registers:</span>
-<span class="sd">    ------------------</span>
-
-<span class="sd">    A - Accumulator:</span>
-<span class="sd">        8-bit register that supports using the status register</span>
-<span class="sd">        for carrying, overflow detection, and so on.</span>
-
-<span class="sd">    X and Y indexes:</span>
-<span class="sd">        8-bit registers used for several addressing modes. They can be used as</span>
-<span class="sd">        loop counters easily, using INC/DEC and branch instructions.</span>
-
-<span class="sd">    PC - Program Counter:</span>
-<span class="sd">        16-bits supports 65536 direct (unbanked) memory locations, however not</span>
-<span class="sd">        all values are sent to the cartridge. It can be accessed either by</span>
-<span class="sd">        allowing CPU's internal fetch logic increment the address bus, an</span>
-<span class="sd">        interrupt (NMI, Reset, IRQ/BRQ), and using the RTS/JMP/JSR/Branch</span>
-<span class="sd">        instructions.</span>
-
-<span class="sd">    S  - Stack Pointer:</span>
-<span class="sd">        8-bit and can be accessed using interrupts, pulls, pushes and</span>
-<span class="sd">        transfers.</span>
 <span class="sd">    """</span>
     <span class="c1"># The internal bus for the CPU</span>
-    <span class="n">cpu_bus</span><span class="p">:</span> <span class="n">CPUBus</span>
+    <span class="n">_cpu_bus</span><span class="p">:</span> <span class="n">CPUBus</span>
 
     <span class="c1"># The low byte of the reset vector.</span>
     <span class="n">_RES</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mh">0xFFFC</span>
@@ -338,15 +306,12 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpu_bus</span><span class="p">:</span> <span class="n">CPUBus</span><span class="p">):</span>
         <span class="sd">"""Connect the :class:`~purenes.cpu.CPUBus` to the CPU.</span>
 
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
+<span class="sd">        Note:</span>
 <span class="sd">            None of the internal registers are initialized at this point. This</span>
 <span class="sd">            does not happen until :func:`~purenes.cpu.CPU.reset` is called.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">            cpu_bus : CPUBus</span>
-<span class="sd">                An instance of a :class:`~purenes.cpu.CPUBus`</span>
+<span class="sd">        Args:</span>
+<span class="sd">            cpu_bus (CPUBus): An instance of a :class:`~purenes.cpu.CPUBus`</span>
 <span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cpu_bus</span> <span class="o">=</span> <span class="n">cpu_bus</span>
 
@@ -362,8 +327,7 @@
 <span class="sd">        3. The operation retrieved from the address at the program counter is</span>
 <span class="sd">           executed.</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
+<span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_active_operation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_PC</span><span class="p">)</span>
@@ -384,8 +348,7 @@
 <span class="sd">        and loading of all registers, but for the program counter, which is</span>
 <span class="sd">        provided by the reset vector at $FFFC.)</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
+<span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        """</span>
         <span class="c1"># Perform power-up state actions.</span>
