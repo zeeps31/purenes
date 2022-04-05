@@ -2,7 +2,7 @@ import semver
 from setuptools import setup
 from setuptools import find_packages
 
-version = semver.VersionInfo.parse('0.9.0')
+version = semver.VersionInfo.parse('0.10.0')
 
 setup(name='purenes',
       version=str(version),
@@ -15,6 +15,10 @@ setup(name='purenes',
             "pytest-cov==3.0.0",
             "pytest-mock==3.7.0"
       ],
-      setup_requires=["semver>=2.13.0"],
+      setup_requires=[
+            "semver>=2.13.0",
+            "sphinx==4.5.0",
+            "furo==2022.3.4"
+      ],
       packages=find_packages(exclude=["tests"]),
       )
