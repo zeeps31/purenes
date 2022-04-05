@@ -7,32 +7,33 @@ from typing import List
 
 
 class CPUBus(object):
-    """A class to represent the NES CPU bus.
+    """
+    A class to represent the NES CPU bus.
 
-    The CPU bus is responsible for handling the logic of delegating
-    reads and writes to the correct resource connected to the CPU
-    based on the CPU memory map.
+    The CPU bus is responsible for handling the logic of delegating reads and
+    writes to the correct resource connected to the CPU based on the CPU
+    memory map.
 
     https://www.nesdev.org/wiki/CPU_memory_map.
 
-    Address range Size	Device
-    $0000-$07FF	  $0800	2KB internal RAM
-    $0800-$0FFF	  $0800	Mirrors of $0000-$07FF
-    $1000-$17FF	  $0800
-    $1800-$1FFF	  $0800
-    $2000-$2007	  $0008	NES PPU registers
-    $2008-$3FFF	  $1FF8	Mirrors of $2000-2007 (repeats every 8 bytes)
-    $4000-$4017	  $0018	NES APU and I/O registers
-    $4018-$401F	  $0008	APU and I/O functionality.
-    $4020-$FFFF	  $BFE0	Cartridge space: PRG ROM, PRG RAM, and mapper
-
-    Methods
-    -------
-    read(address: int) -> int:
-        Reads an address from a device connected to the CPU bus.
-
-    write(address: int, data: int) -> None:
-        Writes to an address and device connected to the CPU bus.
+    +----------------+------+-----------------------------------------------+
+    | Address range  | Size | Device                                        |
+    +================+======+===============================================+
+    | $0000-$07FF    |$0800 | 2KB internal RAM                              |
+    +----------------+------+-----------------------------------------------+
+    | $0800-$0FFF    |$0800 | Mirrors of $0000-$07FF                        |
+    | $1000-$17FF    |$0800 |                                               |
+    | $1800-$1FFF    |$0800 |                                               |
+    +----------------+------+-----------------------------------------------+
+    | $2000-$2007    |$0008 | NES PPU registers                             |
+    | $2008-$3FFF    |$1FF8 | Mirrors of $2000-2007 (repeats every 8 bytes) |
+    +----------------+------+-----------------------------------------------+
+    | $4000-$4017    |$0018 | NES APU and I/O registers                     |
+    +----------------+------+-----------------------------------------------+
+    | $4018-$401F    |$0008 | APU and I/O functionality.                    |
+    +----------------+------+-----------------------------------------------+
+    | $4020-$FFFF    |$BFE0 | Cartridge space: PRG ROM, PRG RAM, and mapper |
+    +----------------+------+-----------------------------------------------+
     """
     # TODO: https://github.com/zeeps31/purenes/issues/6
     _INVALID_ADDRESS_EXCEPTION: Final = ("Invalid address provided: "
@@ -44,8 +45,8 @@ class CPUBus(object):
     _ram: List[int]
 
     def __init__(self):
-        """Connects devices to the CPU and initializes the devices based
-        on reset and startup behaviors.
+        """Connects devices to the CPU and initializes the devices based on
+        reset and startup behaviors.
         """
         # Internal memory ($0000-$07FF) has unreliable startup state.
         # Some machines may have consistent RAM contents at power-on,
@@ -54,18 +55,13 @@ class CPUBus(object):
         self._ram = [0x00] * 0x0800
 
     def read(self, address: int) -> int:
-        """Reads a value from the appropriate resource connected to the
-        CPU.
+        """Reads a value from the appropriate resource connected to the CPU.
 
-        Parameters
-        ----------
-            address : int
-                A 16-bit address
+        Args:
+            address (int): A 16-bit address
 
-        Returns
-        -------
-            data (int): An 8-bit value from the specified address
-            location.
+        Returns:
+            data (int): An 8-bit value from the specified address location.
         """
         if 0x0000 <= address <= 0x1FFF:
             return self._ram[address & self._RAM_ADDRESS_MASK]
@@ -78,19 +74,13 @@ class CPUBus(object):
             )
 
     def write(self, address: int, data: int) -> None:
-        """Writes a value from the appropriate resource connected to the
-        CPU.
+        """Writes a value from the appropriate resource connected to the CPU.
 
-        Parameters
-        ----------
-            address : int
-                A 16-bit address
+        Args:
+            address (int): A 16-bit address
+            data (int): An 8-bit value
 
-            data : int
-                An 8-bit value
-
-        Returns
-        -------
+        Returns:
             None
         """
         if 0x0000 <= address <= 0x1FFF:
@@ -109,31 +99,9 @@ class CPU(object):
 
     The NES CPU is based on the MOS6502 processor and runs at approximately
     1.79 MHz.
-
-    Internal Registers:
-    ------------------
-
-    A - Accumulator:
-        8-bit register that supports using the status register
-        for carrying, overflow detection, and so on.
-
-    X and Y indexes:
-        8-bit registers used for several addressing modes. They can be used as
-        loop counters easily, using INC/DEC and branch instructions.
-
-    PC - Program Counter:
-        16-bits supports 65536 direct (unbanked) memory locations, however not
-        all values are sent to the cartridge. It can be accessed either by
-        allowing CPU's internal fetch logic increment the address bus, an
-        interrupt (NMI, Reset, IRQ/BRQ), and using the RTS/JMP/JSR/Branch
-        instructions.
-
-    S  - Stack Pointer:
-        8-bit and can be accessed using interrupts, pulls, pushes and
-        transfers.
     """
     # The internal bus for the CPU
-    cpu_bus: CPUBus
+    _cpu_bus: CPUBus
 
     # The low byte of the reset vector.
     _RES: int = 0xFFFC
@@ -153,15 +121,12 @@ class CPU(object):
     def __init__(self, cpu_bus: CPUBus):
         """Connect the :class:`~purenes.cpu.CPUBus` to the CPU.
 
-        Notes
-        -----
+        Note:
             None of the internal registers are initialized at this point. This
             does not happen until :func:`~purenes.cpu.CPU.reset` is called.
 
-        Parameters
-        ----------
-            cpu_bus : CPUBus
-                An instance of a :class:`~purenes.cpu.CPUBus`
+        Args:
+            cpu_bus (CPUBus): An instance of a :class:`~purenes.cpu.CPUBus`
         """
         self._cpu_bus = cpu_bus
 
@@ -177,8 +142,7 @@ class CPU(object):
         3. The operation retrieved from the address at the program counter is
            executed.
 
-        Returns
-        -------
+        Returns:
             None
         """
         self._active_operation = self._read(self._PC)
@@ -199,8 +163,7 @@ class CPU(object):
         and loading of all registers, but for the program counter, which is
         provided by the reset vector at $FFFC.)
 
-        Returns
-        -------
+        Returns:
             None
         """
         # Perform power-up state actions.
