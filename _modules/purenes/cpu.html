@@ -1,0 +1,453 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
+
+    <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
+        <title>purenes.cpu - PureNES 0.9.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">PureNES 0.9.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  
+  <span class="sidebar-brand-text">PureNES 0.9.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <h1>Source code for purenes.cpu</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Python 3.7 and 3.8 support</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Final</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Final</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+
+<div class="viewcode-block" id="CPUBus"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPUBus">[docs]</a><span class="k">class</span> <span class="nc">CPUBus</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">"""A class to represent the NES CPU bus.</span>
+
+<span class="sd">    The CPU bus is responsible for handling the logic of delegating</span>
+<span class="sd">    reads and writes to the correct resource connected to the CPU</span>
+<span class="sd">    based on the CPU memory map.</span>
+
+<span class="sd">    https://www.nesdev.org/wiki/CPU_memory_map.</span>
+
+<span class="sd">    Address range Size	Device</span>
+<span class="sd">    $0000-$07FF	  $0800	2KB internal RAM</span>
+<span class="sd">    $0800-$0FFF	  $0800	Mirrors of $0000-$07FF</span>
+<span class="sd">    $1000-$17FF	  $0800</span>
+<span class="sd">    $1800-$1FFF	  $0800</span>
+<span class="sd">    $2000-$2007	  $0008	NES PPU registers</span>
+<span class="sd">    $2008-$3FFF	  $1FF8	Mirrors of $2000-2007 (repeats every 8 bytes)</span>
+<span class="sd">    $4000-$4017	  $0018	NES APU and I/O registers</span>
+<span class="sd">    $4018-$401F	  $0008	APU and I/O functionality.</span>
+<span class="sd">    $4020-$FFFF	  $BFE0	Cartridge space: PRG ROM, PRG RAM, and mapper</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    read(address: int) -&gt; int:</span>
+<span class="sd">        Reads an address from a device connected to the CPU bus.</span>
+
+<span class="sd">    write(address: int, data: int) -&gt; None:</span>
+<span class="sd">        Writes to an address and device connected to the CPU bus.</span>
+<span class="sd">    """</span>
+    <span class="c1"># TODO: https://github.com/zeeps31/purenes/issues/6</span>
+    <span class="n">_INVALID_ADDRESS_EXCEPTION</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"Invalid address provided: "</span>
+                                         <span class="s2">"</span><span class="si">{address}</span><span class="s2">. Address should be "</span>
+                                         <span class="s2">"between 0x0000 - 0xFFFF"</span><span class="p">)</span>
+
+    <span class="n">_RAM_ADDRESS_MASK</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="mh">0x1FF</span>
+
+    <span class="n">_ram</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""Connects devices to the CPU and initializes the devices based</span>
+<span class="sd">        on reset and startup behaviors.</span>
+<span class="sd">        """</span>
+        <span class="c1"># Internal memory ($0000-$07FF) has unreliable startup state.</span>
+        <span class="c1"># Some machines may have consistent RAM contents at power-on,</span>
+        <span class="c1"># but others do not. Here, the ram is initialized to a 2KB</span>
+        <span class="c1"># array of 0x00 values.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ram</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">]</span> <span class="o">*</span> <span class="mh">0x0800</span>
+
+<div class="viewcode-block" id="CPUBus.read"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPUBus.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">"""Reads a value from the appropriate resource connected to the</span>
+<span class="sd">        CPU.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            address : int</span>
+<span class="sd">                A 16-bit address</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            data (int): An 8-bit value from the specified address</span>
+<span class="sd">            location.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="mh">0x0000</span> <span class="o">&lt;=</span> <span class="n">address</span> <span class="o">&lt;=</span> <span class="mh">0x1FFF</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ram</span><span class="p">[</span><span class="n">address</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_RAM_ADDRESS_MASK</span><span class="p">]</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_INVALID_ADDRESS_EXCEPTION</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">address</span><span class="o">=</span><span class="nb">hex</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="CPUBus.write"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPUBus.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">"""Writes a value from the appropriate resource connected to the</span>
+<span class="sd">        CPU.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            address : int</span>
+<span class="sd">                A 16-bit address</span>
+
+<span class="sd">            data : int</span>
+<span class="sd">                An 8-bit value</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="mh">0x0000</span> <span class="o">&lt;=</span> <span class="n">address</span> <span class="o">&lt;=</span> <span class="mh">0x1FFF</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ram</span><span class="p">[</span><span class="n">address</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_RAM_ADDRESS_MASK</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_INVALID_ADDRESS_EXCEPTION</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">address</span><span class="o">=</span><span class="nb">hex</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="CPU"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPU">[docs]</a><span class="k">class</span> <span class="nc">CPU</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">"""A class to represent the NES CPU core.</span>
+
+<span class="sd">    The NES CPU is based on the MOS6502 processor and runs at approximately</span>
+<span class="sd">    1.79 MHz.</span>
+
+<span class="sd">    Internal Registers:</span>
+<span class="sd">    ------------------</span>
+
+<span class="sd">    A - Accumulator:</span>
+<span class="sd">        8-bit register that supports using the status register</span>
+<span class="sd">        for carrying, overflow detection, and so on.</span>
+
+<span class="sd">    X and Y indexes:</span>
+<span class="sd">        8-bit registers used for several addressing modes. They can be used as</span>
+<span class="sd">        loop counters easily, using INC/DEC and branch instructions.</span>
+
+<span class="sd">    PC - Program Counter:</span>
+<span class="sd">        16-bits supports 65536 direct (unbanked) memory locations, however not</span>
+<span class="sd">        all values are sent to the cartridge. It can be accessed either by</span>
+<span class="sd">        allowing CPU's internal fetch logic increment the address bus, an</span>
+<span class="sd">        interrupt (NMI, Reset, IRQ/BRQ), and using the RTS/JMP/JSR/Branch</span>
+<span class="sd">        instructions.</span>
+
+<span class="sd">    S  - Stack Pointer:</span>
+<span class="sd">        8-bit and can be accessed using interrupts, pulls, pushes and</span>
+<span class="sd">        transfers.</span>
+<span class="sd">    """</span>
+    <span class="c1"># The internal bus for the CPU</span>
+    <span class="n">cpu_bus</span><span class="p">:</span> <span class="n">CPUBus</span>
+
+    <span class="c1"># The low byte of the reset vector.</span>
+    <span class="n">_RES</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mh">0xFFFC</span>
+
+    <span class="c1"># CPU Internal registers</span>
+    <span class="n">_A</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">_X</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">_Y</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">_PC</span><span class="p">:</span> <span class="nb">int</span>
+
+    <span class="c1"># Tracks the total number of cycles that have been performed. This value</span>
+    <span class="c1"># is used to synchronize the CPU and PPU</span>
+    <span class="n">_cycle_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># Used to track the current opcode that the CPU is executing.</span>
+    <span class="n">_active_operation</span><span class="p">:</span> <span class="nb">int</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpu_bus</span><span class="p">:</span> <span class="n">CPUBus</span><span class="p">):</span>
+        <span class="sd">"""Connect the :class:`~purenes.cpu.CPUBus` to the CPU.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">            None of the internal registers are initialized at this point. This</span>
+<span class="sd">            does not happen until :func:`~purenes.cpu.CPU.reset` is called.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            cpu_bus : CPUBus</span>
+<span class="sd">                An instance of a :class:`~purenes.cpu.CPUBus`</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cpu_bus</span> <span class="o">=</span> <span class="n">cpu_bus</span>
+
+<div class="viewcode-block" id="CPU.clock"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPU.clock">[docs]</a>    <span class="k">def</span> <span class="nf">clock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">"""Perform one CPU "tick". The clock method is the main entry-point</span>
+<span class="sd">        into the CPU.</span>
+
+<span class="sd">        Each time the CPU is clocked the following events occur:</span>
+
+<span class="sd">        1. The CPU reads from :class:`~purenes.cpu.CPUBus` at the address</span>
+<span class="sd">           stored in the program counter.</span>
+<span class="sd">        2. The program counter is incremented by one.</span>
+<span class="sd">        3. The operation retrieved from the address at the program counter is</span>
+<span class="sd">           executed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active_operation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_PC</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_PC</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_execute_operation</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CPU.reset"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPU.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">"""Perform power-up and reset procedures for the CPU.</span>
+
+<span class="sd">        https://www.masswerk.at/6502/6502_instruction_set.html</span>
+
+<span class="sd">        As the reset the processor performs a start sequence of 7 cycles, at</span>
+<span class="sd">        the end of which the program counter (PC) is read from the address</span>
+<span class="sd">        provided in the 16-bit reset vector at $FFFC (LB-HB). Then, at the</span>
+<span class="sd">        eighth cycle, the processor transfers control by performing a JMP to</span>
+<span class="sd">        the provided address. Any other initializations are left to the thus</span>
+<span class="sd">        executed program. (Notably, instructions exist for the initialization</span>
+<span class="sd">        and loading of all registers, but for the program counter, which is</span>
+<span class="sd">        provided by the reset vector at $FFFC.)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
+        <span class="c1"># Perform power-up state actions.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_A</span> <span class="o">=</span> <span class="mh">0x00</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_X</span> <span class="o">=</span> <span class="mh">0x00</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Y</span> <span class="o">=</span> <span class="mh">0x00</span>
+
+        <span class="n">pc_lo</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_RES</span><span class="p">)</span>
+        <span class="n">pc_hi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_RES</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_PC</span> <span class="o">=</span> <span class="n">pc_hi</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span> <span class="o">|</span> <span class="n">pc_lo</span>
+
+        <span class="c1"># As the reset line goes high the processor performs a start sequence</span>
+        <span class="c1"># of 7 cycles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cycle_count</span> <span class="o">+=</span> <span class="mi">7</span></div>
+
+    <span class="k">def</span> <span class="nf">_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cpu_bus</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cpu_bus</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_execute_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">pass</span></div>
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2022, Stephen Brady
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/scripts/furo.js"></script>
+    </body>
+</html>

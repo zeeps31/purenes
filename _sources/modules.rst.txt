@@ -1,0 +1,7 @@
+purenes
+=======
+
+.. toctree::
+   :maxdepth: 4
+
+   purenes

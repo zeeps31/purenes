@@ -1,0 +1,29 @@
+purenes package
+===============
+
+Submodules
+----------
+
+purenes.cpu module
+------------------
+
+.. automodule:: purenes.cpu
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+purenes.ppu module
+------------------
+
+.. automodule:: purenes.ppu
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: purenes
+   :members:
+   :undoc-members:
+   :show-inheritance:

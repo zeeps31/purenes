@@ -1,0 +1,462 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
+
+    <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
+        <title>purenes package - PureNES 0.9.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">PureNES 0.9.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">PureNES 0.9.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="purenes-package">
+<h1>purenes package<a class="headerlink" href="#purenes-package" title="Permalink to this headline">#</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="module-purenes.cpu">
+<span id="purenes-cpu-module"></span><h2>purenes.cpu module<a class="headerlink" href="#module-purenes.cpu" title="Permalink to this headline">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="purenes.cpu.CPU">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">purenes.cpu.</span></span><span class="sig-name descname"><span class="pre">CPU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cpu_bus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#purenes.cpu.CPUBus" title="purenes.cpu.CPUBus"><span class="pre">purenes.cpu.CPUBus</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/purenes/cpu.html#CPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.cpu.CPU" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to represent the NES CPU core.</p>
+<p>The NES CPU is based on the MOS6502 processor and runs at approximately
+1.79 MHz.</p>
+<dl class="simple">
+<dt>A - Accumulator:</dt><dd><p>8-bit register that supports using the status register
+for carrying, overflow detection, and so on.</p>
+</dd>
+<dt>X and Y indexes:</dt><dd><p>8-bit registers used for several addressing modes. They can be used as
+loop counters easily, using INC/DEC and branch instructions.</p>
+</dd>
+<dt>PC - Program Counter:</dt><dd><p>16-bits supports 65536 direct (unbanked) memory locations, however not
+all values are sent to the cartridge. It can be accessed either by
+allowing CPU’s internal fetch logic increment the address bus, an
+interrupt (NMI, Reset, IRQ/BRQ), and using the RTS/JMP/JSR/Branch
+instructions.</p>
+</dd>
+<dt>S  - Stack Pointer:</dt><dd><p>8-bit and can be accessed using interrupts, pulls, pushes and
+transfers.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="purenes.cpu.CPU.clock">
+<span class="sig-name descname"><span class="pre">clock</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/purenes/cpu.html#CPU.clock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.cpu.CPU.clock" title="Permalink to this definition">#</a></dt>
+<dd><p>Perform one CPU “tick”. The clock method is the main entry-point
+into the CPU.</p>
+<p>Each time the CPU is clocked the following events occur:</p>
+<ol class="arabic simple">
+<li><p>The CPU reads from <a class="reference internal" href="#purenes.cpu.CPUBus" title="purenes.cpu.CPUBus"><code class="xref py py-class docutils literal notranslate"><span class="pre">CPUBus</span></code></a> at the address
+stored in the program counter.</p></li>
+<li><p>The program counter is incremented by one.</p></li>
+<li><p>The operation retrieved from the address at the program counter is
+executed.</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.cpu.CPU.cpu_bus">
+<span class="sig-name descname"><span class="pre">cpu_bus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.cpu.CPUBus" title="purenes.cpu.CPUBus"><span class="pre">purenes.cpu.CPUBus</span></a></em><a class="headerlink" href="#purenes.cpu.CPU.cpu_bus" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="purenes.cpu.CPU.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/purenes/cpu.html#CPU.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.cpu.CPU.reset" title="Permalink to this definition">#</a></dt>
+<dd><p>Perform power-up and reset procedures for the CPU.</p>
+<p><a class="reference external" href="https://www.masswerk.at/6502/6502_instruction_set.html">https://www.masswerk.at/6502/6502_instruction_set.html</a></p>
+<p>As the reset the processor performs a start sequence of 7 cycles, at
+the end of which the program counter (PC) is read from the address
+provided in the 16-bit reset vector at $FFFC (LB-HB). Then, at the
+eighth cycle, the processor transfers control by performing a JMP to
+the provided address. Any other initializations are left to the thus
+executed program. (Notably, instructions exist for the initialization
+and loading of all registers, but for the program counter, which is
+provided by the reset vector at $FFFC.)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="purenes.cpu.CPUBus">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">purenes.cpu.</span></span><span class="sig-name descname"><span class="pre">CPUBus</span></span><a class="reference internal" href="_modules/purenes/cpu.html#CPUBus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.cpu.CPUBus" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to represent the NES CPU bus.</p>
+<p>The CPU bus is responsible for handling the logic of delegating
+reads and writes to the correct resource connected to the CPU
+based on the CPU memory map.</p>
+<p><a class="reference external" href="https://www.nesdev.org/wiki/CPU_memory_map">https://www.nesdev.org/wiki/CPU_memory_map</a>.</p>
+<p>Address range Size  Device
+$0000-$07FF   $0800 2KB internal RAM
+$0800-$0FFF   $0800 Mirrors of $0000-$07FF
+$1000-$17FF   $0800
+$1800-$1FFF   $0800
+$2000-$2007   $0008 NES PPU registers
+$2008-$3FFF   $1FF8 Mirrors of $2000-2007 (repeats every 8 bytes)
+$4000-$4017   $0018 NES APU and I/O registers
+$4018-$401F   $0008 APU and I/O functionality.
+$4020-$FFFF   $BFE0 Cartridge space: PRG ROM, PRG RAM, and mapper</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="purenes.cpu.CPUBus.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int:</span></span></span><a class="reference internal" href="_modules/purenes/cpu.html#CPUBus.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.cpu.CPUBus.read" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads an address from a device connected to the CPU bus.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="purenes.cpu.CPUBus.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None:</span></span></span><a class="reference internal" href="_modules/purenes/cpu.html#CPUBus.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.cpu.CPUBus.write" title="Permalink to this definition">#</a></dt>
+<dd><p>Writes to an address and device connected to the CPU bus.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/purenes/cpu.html#CPUBus.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads a value from the appropriate resource connected to the
+CPU.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>address</strong> (<em>int</em>) – A 16-bit address</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>data (int)</strong> (<em>An 8-bit value from the specified address</em>)</p></li>
+<li><p><em>location.</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/purenes/cpu.html#CPUBus.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Permalink to this definition">#</a></dt>
+<dd><p>Writes a value from the appropriate resource connected to the
+CPU.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>address</strong> (<em>int</em>) – A 16-bit address</p></li>
+<li><p><strong>data</strong> (<em>int</em>) – An 8-bit value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+</section>
+<section id="module-purenes.ppu">
+<span id="purenes-ppu-module"></span><h2>purenes.ppu module<a class="headerlink" href="#module-purenes.ppu" title="Permalink to this headline">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="purenes.ppu.PPUBus">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">purenes.ppu.</span></span><span class="sig-name descname"><span class="pre">PPUBus</span></span><a class="reference internal" href="_modules/purenes/ppu.html#PPUBus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.ppu.PPUBus" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to encapsulate the logic of reading and writing to
+devices connected to the PPU.</p>
+<p>The PPU has its own bus with a 16kB addressable range, $0000-3FFF,
+completely separate from the CPU’s address bus. The PPU interacts
+with its connected devices directly or via the CPU with memory
+mapped registers at $2006 and $2007.</p>
+<p><a class="reference external" href="https://www.nesdev.org/wiki/PPU_memory_map">https://www.nesdev.org/wiki/PPU_memory_map</a></p>
+<p>Address range       Size    Description
+$0000-$0FFF     $1000       Pattern table 0
+$1000-$1FFF     $1000       Pattern table 1
+$2000-$23FF     $0400       Nametable 0
+$2400-$27FF     $0400       Nametable 1
+$2800-$2BFF     $0400       Nametable 2
+$2C00-$2FFF     $0400       Nametable 3
+$3000-$3EFF     $0F00       Mirrors of $2000-$2EFF
+$3F00-$3F1F     $0020       Palette RAM indexes
+$3F20-$3FFF     $00E0       Mirrors of $3F00-$3F1F</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="purenes.ppu.PPUBus.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int:</span></span></span><a class="reference internal" href="_modules/purenes/ppu.html#PPUBus.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.ppu.PPUBus.read" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads an address from a device connected to the PPU bus.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="purenes.ppu.PPUBus.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None:</span></span></span><a class="reference internal" href="_modules/purenes/ppu.html#PPUBus.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.ppu.PPUBus.write" title="Permalink to this definition">#</a></dt>
+<dd><p>Writes to an address and device connected to the PPU bus.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/purenes/ppu.html#PPUBus.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads a value from the appropriate resource connected to the
+PPU.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>address</strong> (<em>int</em>) – A 16-bit address</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>data (int)</strong> (<em>An 8-bit value from the specified address</em>)</p></li>
+<li><p><em>location.</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/purenes/ppu.html#PPUBus.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Permalink to this definition">#</a></dt>
+<dd><p>Writes a value from the appropriate resource connected to the
+PPU.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>address</strong> (<em>int</em>) – A 16-bit address</p></li>
+<li><p><strong>data</strong> (<em>int</em>) – An 8-bit value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+</section>
+<section id="module-purenes">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-purenes" title="Permalink to this headline">#</a></h2>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2022, Stephen Brady
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">purenes package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-purenes.cpu">purenes.cpu module</a></li>
+<li><a class="reference internal" href="#module-purenes.ppu">purenes.ppu module</a></li>
+<li><a class="reference internal" href="#module-purenes">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    </body>
+</html>
