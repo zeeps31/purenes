@@ -218,7 +218,7 @@ class PPU(object):
     _ppu_bus: PPUBus
 
     def __init__(self, ppu_bus: PPUBus):
-        pass
+        self._ppu_bus = ppu_bus
 
     def write(self, address: int, data: int) -> None:
         """Public write method exposed by the PPU for communication with the
