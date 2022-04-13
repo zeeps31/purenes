@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>purenes package - PureNES 0.10.0 documentation</title>
+        <title>purenes package - PureNES 0.11.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -121,7 +121,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">PureNES 0.10.0 documentation</div></a>
+      <a href="index.html"><div class="brand">PureNES 0.11.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -144,7 +144,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">PureNES 0.10.0 documentation</span>
+  <span class="sidebar-brand-text">PureNES 0.11.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -331,48 +331,6 @@ Mirrors of $2000-2007 (repeats every 8 bytes)</p></td>
 <dt class="sig sig-object py" id="purenes.ppu.PPU">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">purenes.ppu.</span></span><span class="sig-name descname"><span class="pre">PPU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ppu_bus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#purenes.ppu.PPUBus" title="purenes.ppu.PPUBus"><span class="pre">purenes.ppu.PPUBus</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/purenes/ppu.html#PPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.ppu.PPU" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py property">
-<dt class="sig sig-object py" id="purenes.ppu.PPU.control">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">control</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">purenes.ppu._Control</span></em><a class="headerlink" href="#purenes.ppu.PPU.control" title="Permalink to this definition">#</a></dt>
-<dd><p>Read-only access to the internal PPUCTRL register $2000. This should
-only be used for testing and debugging purposes</p>
-<p>Accessing the register through this property will not impact any of
-the other registers, so it is safe to do so.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The internal Control register class</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>_Control</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="purenes.ppu.PPU.vram">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vram</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">purenes.ppu._Address</span></em><a class="headerlink" href="#purenes.ppu.PPU.vram" title="Permalink to this definition">#</a></dt>
-<dd><p>Read-only access to the internal PPUADDR register $2006 (v).</p>
-<p>This should only be used for testing and debugging purposes.</p>
-<p>Accessing the register through this property will not impact any of
-the other registers, so it is safe to do so.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>_Address</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="purenes.ppu.PPU.vram_temp">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vram_temp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">purenes.ppu._Address</span></em><a class="headerlink" href="#purenes.ppu.PPU.vram_temp" title="Permalink to this definition">#</a></dt>
-<dd><p>Read-only access to the internal PPUADDR register $2006 (t).</p>
-<p>This should only be used for testing and debugging purposes.</p>
-<p>Accessing the register through this property will not impact any of
-the other registers, so it is safe to do so.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>_Address</p>
-</dd>
-</dl>
-</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="purenes.ppu.PPU.write">
 <span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/purenes/ppu.html#PPU.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.ppu.PPU.write" title="Permalink to this definition">#</a></dt>
@@ -395,6 +353,48 @@ every 8 bytes through $3FFF.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="purenes.ppu.PPU.control">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">control</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.ppu._Control" title="purenes.ppu._Control"><span class="pre">purenes.ppu._Control</span></a></em><a class="headerlink" href="#purenes.ppu.PPU.control" title="Permalink to this definition">#</a></dt>
+<dd><p>Read-only access to the internal PPUCTRL register $2000. This should
+only be used for testing and debugging purposes</p>
+<p>Accessing the register through this property will not impact any of
+the other registers, so it is safe to do so.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The internal Control register class</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#purenes.ppu._Control" title="purenes.ppu._Control">_Control</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="purenes.ppu.PPU.vram">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vram</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.ppu._Address" title="purenes.ppu._Address"><span class="pre">purenes.ppu._Address</span></a></em><a class="headerlink" href="#purenes.ppu.PPU.vram" title="Permalink to this definition">#</a></dt>
+<dd><p>Read-only access to the internal PPUADDR register $2006 (v).</p>
+<p>This should only be used for testing and debugging purposes.</p>
+<p>Accessing the register through this property will not impact any of
+the other registers, so it is safe to do so.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>_Address</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="purenes.ppu.PPU.vram_temp">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vram_temp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.ppu._Address" title="purenes.ppu._Address"><span class="pre">purenes.ppu._Address</span></a></em><a class="headerlink" href="#purenes.ppu.PPU.vram_temp" title="Permalink to this definition">#</a></dt>
+<dd><p>Read-only access to the internal PPUADDR register $2006 (t).</p>
+<p>This should only be used for testing and debugging purposes.</p>
+<p>Accessing the register through this property will not impact any of
+the other registers, so it is safe to do so.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>_Address</p>
 </dd>
 </dl>
 </dd></dl>
@@ -487,6 +487,96 @@ Mirrors of $3F00-$3F1F</p></td>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="purenes.ppu._Address">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">purenes.ppu.</span></span><span class="sig-name descname"><span class="pre">_Address</span></span><a class="reference internal" href="_modules/purenes/ppu.html#_Address"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.ppu._Address" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_ctypes.Union</span></code></p>
+<p>A class to represent the PPU $2006 register.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This class should only be directly accessed through the read-only
+<a class="reference internal" href="#purenes.ppu.PPU.vram" title="purenes.ppu.PPU.vram"><code class="xref py py-attr docutils literal notranslate"><span class="pre">vram</span></code></a> and <a class="reference internal" href="#purenes.ppu.PPU.vram_temp" title="purenes.ppu.PPU.vram_temp"><code class="xref py py-attr docutils literal notranslate"><span class="pre">vram_temp</span></code></a>
+properties of the <a class="reference internal" href="#purenes.ppu.PPU" title="purenes.ppu.PPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PPU</span></code></a>. The documentation of this
+class is included as a reference for testing and debugging.</p>
+</div>
+<p>During writes from the CPU through $2006 this register behaves as a
+reference to the current nametable address to begin rendering from. The CPU
+performs two writes to this register (high byte first) to compose the full
+address.</p>
+<p>During rendering, however, this register is composed and utilized by the
+PPU in a different way.</p>
+<p>The PPU maintains two 15-bit registers for this.</p>
+<p>v - Current VRAM address (15 bits)</p>
+<p>t - Temporary VRAM address (15 bits)</p>
+<p>The 15-bit registers t and v are composed this way during rendering:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yyy</span> <span class="n">NN</span> <span class="n">YYYYY</span> <span class="n">XXXXX</span>
+<span class="o">|||</span> <span class="o">||</span> <span class="o">|||||</span> <span class="o">+++++--</span> <span class="n">coarse</span> <span class="n">X</span> <span class="n">scroll</span>
+<span class="o">|||</span> <span class="o">||</span> <span class="o">+++++--------</span> <span class="n">coarse</span> <span class="n">Y</span> <span class="n">scroll</span>
+<span class="o">|||</span> <span class="o">++--------------</span> <span class="n">nametable</span> <span class="n">select</span>
+<span class="o">+++-----------------</span> <span class="n">fine</span> <span class="n">Y</span> <span class="n">scroll</span>
+</pre></div>
+</div>
+<p>The values detailed above be accessed using the
+<a class="reference internal" href="#purenes.ppu._Address.flags" title="purenes.ppu._Address.flags"><code class="xref py py-attr docutils literal notranslate"><span class="pre">flags</span></code></a> attribute of this class.</p>
+<ul class="simple">
+<li><p>coarse_x (XXXXX) - The coarse X value to use when scrolling.</p></li>
+<li><p>coarse_y (YYYYY) - The coarse Y value to use when scrolling.</p></li>
+<li><p>nt_select (NN) - Nametable select.</p></li>
+<li><p>fine_y (yyy) - The fine y value to use when scrolling.</p></li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu._Address.flags">
+<span class="sig-name descname"><span class="pre">flags</span></span><a class="headerlink" href="#purenes.ppu._Address.flags" title="Permalink to this definition">#</a></dt>
+<dd><p>Structure/Union member</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu._Address.reg">
+<span class="sig-name descname"><span class="pre">reg</span></span><a class="headerlink" href="#purenes.ppu._Address.reg" title="Permalink to this definition">#</a></dt>
+<dd><p>Structure/Union member</p>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="purenes.ppu._Control">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">purenes.ppu.</span></span><span class="sig-name descname"><span class="pre">_Control</span></span><a class="reference internal" href="_modules/purenes/ppu.html#_Control"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.ppu._Control" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_ctypes.Union</span></code></p>
+<p>A class to represent the PPU $2000 register. The flags have been
+replaced with more readable alternatives. A mapping is provided below.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This class should only be directly accessed through the read-only
+<a class="reference internal" href="#purenes.ppu.PPU.control" title="purenes.ppu.PPU.control"><code class="xref py py-attr docutils literal notranslate"><span class="pre">control</span></code></a> property of the
+<a class="reference internal" href="#purenes.ppu.PPU" title="purenes.ppu.PPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PPU</span></code></a>. The documentation of this class is included
+as a reference for testing and debugging.</p>
+</div>
+<p><a class="reference external" href="https://www.nesdev.org/wiki/PPU_registers#PPUCTRL">https://www.nesdev.org/wiki/PPU_registers#PPUCTRL</a></p>
+<p>The values detailed below can be accessed using the
+<a class="reference internal" href="#purenes.ppu._Control.flags" title="purenes.ppu._Control.flags"><code class="xref py py-attr docutils literal notranslate"><span class="pre">flags</span></code></a> attribute of this class.</p>
+<ul class="simple">
+<li><p>base_nt_address (NN) - The the base nametable address (0 = $2000; 1 =
+$2400; 2 = $2800; 3 = $2C00).</p></li>
+<li><p>vram_address_increment (I) - How the VRAM address should be incremented
+per CPU read/write (0: add 1, going across; 1: add 32, going down).</p></li>
+<li><p>sprite_pt_address (S) - Sprite pattern table address for 8x8 sprites
+(0: $0000; 1: $1000; ignored in 8x16 mode).</p></li>
+<li><p>background_pt_address (B) - Background pattern table address (0: $0000;
+1: $1000).</p></li>
+<li><p>sprite_size (H) - Sprite size (0: 8x8 pixels; 1: 8x16 pixels)</p></li>
+<li><p>ppu_leader_follower_select (P) - PPU leader/follower select (0: read
+backdrop from EXT pins; 1: output color on EXT pins)</p></li>
+<li><p>generate_nmi (V) - Generate an NMI at the start of the vertical blanking
+interval (0: off; 1: on)</p></li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu._Control.flags">
+<span class="sig-name descname"><span class="pre">flags</span></span><a class="headerlink" href="#purenes.ppu._Control.flags" title="Permalink to this definition">#</a></dt>
+<dd><p>Structure/Union member</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu._Control.reg">
+<span class="sig-name descname"><span class="pre">reg</span></span><a class="headerlink" href="#purenes.ppu._Control.reg" title="Permalink to this definition">#</a></dt>
+<dd><p>Structure/Union member</p>
 </dd></dl>
 </dd></dl>
 </section>

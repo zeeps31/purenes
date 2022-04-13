@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>purenes.ppu - PureNES 0.10.0 documentation</title>
+        <title>purenes.ppu - PureNES 0.11.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -120,7 +120,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PureNES 0.10.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PureNES 0.11.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -143,7 +143,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">PureNES 0.10.0 documentation</span>
+  <span class="sidebar-brand-text">PureNES 0.11.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -192,7 +192,7 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
 
-<span class="k">class</span> <span class="nc">_Control</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">Union</span><span class="p">):</span>
+<div class="viewcode-block" id="_Control"><a class="viewcode-back" href="../../purenes.html#purenes.ppu._Control">[docs]</a><span class="k">class</span> <span class="nc">_Control</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">Union</span><span class="p">):</span>
     <span class="sd">"""A class to represent the PPU $2000 register. The flags have been</span>
 <span class="sd">    replaced with more readable alternatives. A mapping is provided below.</span>
 
@@ -241,10 +241,10 @@
                 <span class="p">(</span><span class="s2">"generate_nmi"</span><span class="p">,</span>                     <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
             <span class="p">]}</span>
         <span class="p">)),</span>
-        <span class="p">(</span><span class="s2">"reg"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">)]</span>
+        <span class="p">(</span><span class="s2">"reg"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">)]</span></div>
 
 
-<span class="k">class</span> <span class="nc">_Address</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">Union</span><span class="p">):</span>
+<div class="viewcode-block" id="_Address"><a class="viewcode-back" href="../../purenes.html#purenes.ppu._Address">[docs]</a><span class="k">class</span> <span class="nc">_Address</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">Union</span><span class="p">):</span>
     <span class="sd">"""A class to represent the PPU $2006 register.</span>
 
 <span class="sd">    Note:</span>
@@ -299,7 +299,7 @@
                 <span class="p">(</span><span class="s2">"fine_y"</span><span class="p">,</span>    <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
             <span class="p">]}</span>
         <span class="p">)),</span>
-        <span class="p">(</span><span class="s2">"reg"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint16</span><span class="p">)]</span>
+        <span class="p">(</span><span class="s2">"reg"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint16</span><span class="p">)]</span></div>
 
 
 <div class="viewcode-block" id="PPUBus"><a class="viewcode-back" href="../../purenes.html#purenes.ppu.PPUBus">[docs]</a><span class="k">class</span> <span class="nc">PPUBus</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
