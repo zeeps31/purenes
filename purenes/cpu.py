@@ -1,8 +1,8 @@
 # Python 3.7 and 3.8 support
 try:
-    from typing import Final
-except ImportError:
-    from typing_extensions import Final
+    from typing import Final  # pragma: no cover
+except ImportError:  # pragma: no cover
+    from typing_extensions import Final  # pragma: no cover
 from typing import List
 
 
