@@ -59,6 +59,46 @@ class _Control(ctypes.Union):
         ("reg", ctypes.c_uint8)]
 
 
+class _Status(ctypes.Union):
+    """A class to represent the PPUSTATUS $2002 register.
+
+    Note:
+        This class should only be directly accessed through the read-only
+        :attr:`~purenes.ppu.PPU.status` property of the
+        :class:`~purenes.ppu.PPU`. The documentation of this class is included
+        as a reference for testing and debugging.
+
+    The values detailed below can be accessed using the
+    :attr:`~purenes.ppu._Status.flags` attribute of this class.
+
+    * na (.....) - Unused
+
+    * sprite_overflow (O) - Sprite overflow. Intended to be set when more than
+      eight sprites appear on a scanline.
+
+    * sprite_zero_hit (S) - Set when a nonzero pixel of sprite 0 overlaps a
+      nonzero background pixel.
+
+    * vertical_blank (V) - Vertical blank has started (0: not in vblank; 1: in
+      vblank).
+
+    https://www.nesdev.org/wiki/PPU_registers#PPUSTATUS
+
+    """
+    _fields_ = [
+        ("flags", type(
+            "_PPUSTATUS",
+            (ctypes.LittleEndianStructure,),
+            {"_fields_": [
+                ("na",              ctypes.c_uint8, 5),  # Unused
+                ("sprite_overflow", ctypes.c_uint8, 1),
+                ("sprite_zero_hit", ctypes.c_uint8, 1),
+                ("vertical_blank",  ctypes.c_uint8, 1),
+            ]}
+        )),
+        ("reg", ctypes.c_uint8)]
+
+
 class _Address(ctypes.Union):
     """A class to represent the PPU $2006 register.
 
@@ -208,6 +248,7 @@ class PPU(object):
 
     # Internal registers
     _control = _Control()  # $2000
+    _status = _Status()  # $2002
 
     # Loopy Registers
     _vram = _Address()       # Loopy v $2006
@@ -219,6 +260,27 @@ class PPU(object):
 
     def __init__(self, ppu_bus: PPUBus):
         self._ppu_bus = ppu_bus
+
+    def read(self, address: int) -> int:
+        """Public read method exposed by the PPU for communication with the
+        CPU through memory mapped registers $2000-$2007.
+
+        Note:
+            Although there are only eight registers, the values are mirrored
+            every 8 bytes through $3FFF.
+
+        Args:
+            address (int): A 16-bit address
+
+        Returns:
+            int: An 8-bit value
+        """
+        if 0x2000 <= address <= 0x3FFF:
+            _address = address % self._REGISTER_ADDRESS_MASK
+
+            if _address == 0x0002:
+                self._write_latch = 0
+                return self._status.reg
 
     def write(self, address: int, data: int) -> None:
         """Public write method exposed by the PPU for communication with the
@@ -233,7 +295,7 @@ class PPU(object):
             data (int): An 8-bit value
 
         Returns:
-            int: An 8-bit value
+            None
         """
         if 0x2000 <= address <= 0x3FFF:
             _address = address % self._REGISTER_ADDRESS_MASK
@@ -255,6 +317,19 @@ class PPU(object):
             _Control: The internal Control register class
         """
         return self._control
+
+    @property
+    def status(self) -> _Status:
+        """Read-only access to the internal PPUSTATUS register $2002. This
+        should only be used for testing and debugging purposes
+
+        Accessing the register through this property will not impact any of
+        the other registers, so it is safe to do so.
+
+        Returns:
+            _Status: The internal Status register class
+        """
+        return self._status
 
     @property
     def vram(self) -> _Address:
@@ -283,3 +358,17 @@ class PPU(object):
             _Address
         """
         return self._vram_temp
+
+    @property
+    def write_latch(self) -> int:
+        """Read-only access to the internal write latch (w).
+
+        This should only be used for testing and debugging purposes.
+
+        Accessing the register through this property will not impact any of
+        the other registers, so it is safe to do so.
+
+        Returns:
+            int: (0 first write, 1 second)
+        """
+        return self._write_latch
