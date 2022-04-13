@@ -22,7 +22,7 @@ copyright = '2022, Stephen Brady'
 author = 'Stephen Brady'
 
 # The full version, including alpha/beta/rc tags
-release = '0.10.0'
+release = '0.11.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -38,6 +38,8 @@ extensions = [
     'sphinx.ext.githubpages',
 ]
 
+napoleon_include_private_with_doc = True
+autodoc_member_order = 'groupwise'
 coverage_show_missing_items = True
 
 # Add any paths that contain templates here, relative to this directory.
