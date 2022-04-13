@@ -1,9 +1,120 @@
 # Python 3.7 and 3.8 support
 try:
-    from typing import Final
-except ImportError:
-    from typing_extensions import Final
+    from typing import Final  # pragma: no cover
+except ImportError:  # pragma: no cover
+    from typing_extensions import Final  # pragma: no cover
+import ctypes
 from typing import List
+
+
+class _Control(ctypes.Union):
+    """A class to represent the PPU $2000 register. The flags have been
+    replaced with more readable alternatives. A mapping is provided below.
+
+    Note:
+        This class should only be directly accessed through the read-only
+        :attr:`~purenes.ppu.PPU.control` property of the
+        :class:`~purenes.ppu.PPU`. The documentation of this class is included
+        as a reference for testing and debugging.
+
+    https://www.nesdev.org/wiki/PPU_registers#PPUCTRL
+
+    The values detailed below can be accessed using the
+    :attr:`~purenes.ppu._Control.flags` attribute of this class.
+
+    * base_nt_address (NN) - The the base nametable address (0 = $2000; 1 =
+      $2400; 2 = $2800; 3 = $2C00).
+
+    * vram_address_increment (I) - How the VRAM address should be incremented
+      per CPU read/write (0: add 1, going across; 1: add 32, going down).
+
+    * sprite_pt_address (S) - Sprite pattern table address for 8x8 sprites
+      (0: $0000; 1: $1000; ignored in 8x16 mode).
+
+    * background_pt_address (B) - Background pattern table address (0: $0000;
+      1: $1000).
+
+    * sprite_size (H) - Sprite size (0: 8x8 pixels; 1: 8x16 pixels)
+
+    * ppu_leader_follower_select (P) - PPU leader/follower select (0: read
+      backdrop from EXT pins; 1: output color on EXT pins)
+
+    * generate_nmi (V) - Generate an NMI at the start of the vertical blanking
+      interval (0: off; 1: on)
+    """
+    _fields_ = [
+        ("flags", type(
+            "_PPUCTRL",
+            (ctypes.LittleEndianStructure,),
+            {"_fields_": [
+                ("base_nt_address",                  ctypes.c_uint8, 2),
+                ("vram_address_increment",           ctypes.c_uint8, 1),
+                ("sprite_pt_address",                ctypes.c_uint8, 1),
+                ("background_pt_address",            ctypes.c_uint8, 1),
+                ("sprite_size",                      ctypes.c_uint8, 1),
+                ("ppu_leader_follower_select",       ctypes.c_uint8, 1),
+                ("generate_nmi",                     ctypes.c_uint8, 1),
+            ]}
+        )),
+        ("reg", ctypes.c_uint8)]
+
+
+class _Address(ctypes.Union):
+    """A class to represent the PPU $2006 register.
+
+    Note:
+        This class should only be directly accessed through the read-only
+        :attr:`~purenes.ppu.PPU.vram` and :attr:`~purenes.ppu.PPU.vram_temp`
+        properties of the :class:`~purenes.ppu.PPU`. The documentation of this
+        class is included as a reference for testing and debugging.
+
+    During writes from the CPU through $2006 this register behaves as a
+    reference to the current nametable address to begin rendering from. The CPU
+    performs two writes to this register (high byte first) to compose the full
+    address.
+
+    During rendering, however, this register is composed and utilized by the
+    PPU in a different way.
+
+    The PPU maintains two 15-bit registers for this.
+
+    v - Current VRAM address (15 bits)
+
+    t - Temporary VRAM address (15 bits)
+
+    The 15-bit registers t and v are composed this way during rendering:
+
+    ::
+
+        yyy NN YYYYY XXXXX
+        ||| || ||||| +++++-- coarse X scroll
+        ||| || +++++-------- coarse Y scroll
+        ||| ++-------------- nametable select
+        +++----------------- fine Y scroll
+
+    The values detailed above be accessed using the
+    :attr:`~purenes.ppu._Address.flags` attribute of this class.
+
+    * coarse_x (XXXXX) - The coarse X value to use when scrolling.
+
+    * coarse_y (YYYYY) - The coarse Y value to use when scrolling.
+
+    * nt_select (NN) - Nametable select.
+
+    * fine_y (yyy) - The fine y value to use when scrolling.
+    """
+    _fields_ = [
+        ("flags", type(
+            "_PPUADDRESS",
+            (ctypes.LittleEndianStructure,),
+            {"_fields_": [
+                ("coarse_x",  ctypes.c_uint8, 5),
+                ("coarse_y",  ctypes.c_uint8, 5),
+                ("nt_select", ctypes.c_uint8, 2),
+                ("fine_y",    ctypes.c_uint8, 3),
+            ]}
+        )),
+        ("reg", ctypes.c_uint16)]
 
 
 class PPUBus(object):
@@ -89,3 +200,86 @@ class PPUBus(object):
                     address=hex(address)
                 )
             )
+
+
+class PPU(object):
+
+    _REGISTER_ADDRESS_MASK: Final = 0x08
+
+    # Internal registers
+    _control = _Control()  # $2000
+
+    # Loopy Registers
+    _vram = _Address()       # Loopy v $2006
+    _vram_temp = _Address()  # Loopy t
+    _fine_x: int             # Loopy x fine x scroll
+    _write_latch: int        # Loopy w latch (0 first write, 1 second)
+
+    _ppu_bus: PPUBus
+
+    def __init__(self, ppu_bus: PPUBus):
+        self._ppu_bus = ppu_bus
+
+    def write(self, address: int, data: int) -> None:
+        """Public write method exposed by the PPU for communication with the
+        CPU through memory mapped registers $2000-$2007.
+
+        Note:
+            Although there are only eight registers, the values are mirrored
+            every 8 bytes through $3FFF.
+
+        Args:
+            address (int): A 16-bit address
+            data (int): An 8-bit value
+
+        Returns:
+            int: An 8-bit value
+        """
+        if 0x2000 <= address <= 0x3FFF:
+            _address = address % self._REGISTER_ADDRESS_MASK
+
+            if _address == 0x0000:
+                self._control.reg = data
+                nt_select = self._control.flags.base_nt_address
+                self._vram_temp.flags.nt_select = nt_select
+
+    @property
+    def control(self) -> _Control:
+        """Read-only access to the internal PPUCTRL register $2000. This should
+        only be used for testing and debugging purposes
+
+        Accessing the register through this property will not impact any of
+        the other registers, so it is safe to do so.
+
+        Returns:
+            _Control: The internal Control register class
+        """
+        return self._control
+
+    @property
+    def vram(self) -> _Address:
+        """Read-only access to the internal PPUADDR register $2006 (v).
+
+        This should only be used for testing and debugging purposes.
+
+        Accessing the register through this property will not impact any of
+        the other registers, so it is safe to do so.
+
+        Returns:
+            _Address
+        """
+        return self._vram
+
+    @property
+    def vram_temp(self) -> _Address:
+        """Read-only access to the internal PPUADDR register $2006 (t).
+
+        This should only be used for testing and debugging purposes.
+
+        Accessing the register through this property will not impact any of
+        the other registers, so it is safe to do so.
+
+        Returns:
+            _Address
+        """
+        return self._vram_temp
