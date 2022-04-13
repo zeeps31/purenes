@@ -35,3 +35,10 @@ class TestPPU(object):
         assert(control.flags.ppu_leader_follower_select == (data >> 6) & 1)
         assert(control.flags.generate_nmi == (data >> 7) & 1)
         assert(vram_temp.flags.nt_select == (data >> 0) & 3)
+
+    def test_status_read(self, test_object):
+        address = 0x2002
+
+        test_object.read(address)
+
+        assert(test_object.write_latch == 0)
