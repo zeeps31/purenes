@@ -244,6 +244,45 @@
         <span class="p">(</span><span class="s2">"reg"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">)]</span></div>
 
 
+<div class="viewcode-block" id="_Status"><a class="viewcode-back" href="../../purenes.html#purenes.ppu._Status">[docs]</a><span class="k">class</span> <span class="nc">_Status</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">Union</span><span class="p">):</span>
+    <span class="sd">"""A class to represent the PPUSTATUS $2002 register.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This class should only be directly accessed through the read-only</span>
+<span class="sd">        :attr:`~purenes.ppu.PPU.status` property of the</span>
+<span class="sd">        :class:`~purenes.ppu.PPU`. The documentation of this class is included</span>
+<span class="sd">        as a reference for testing and debugging.</span>
+
+<span class="sd">    The values detailed below can be accessed using the</span>
+<span class="sd">    :attr:`~purenes.ppu._Status.flags` attribute of this class.</span>
+
+<span class="sd">    https://www.nesdev.org/wiki/PPU_registers#PPUSTATUS</span>
+
+<span class="sd">    * na (.....) - Unused</span>
+
+<span class="sd">    * sprite_overflow (O) - Sprite overflow. Intended to be set when more than</span>
+<span class="sd">      eight sprites appear on a scanline.</span>
+
+<span class="sd">    * sprite_zero_hit (S) - Set when a nonzero pixel of sprite 0 overlaps a</span>
+<span class="sd">      nonzero background pixel.</span>
+
+<span class="sd">    * vertical_blank (V) - Vertical blank has started (0: not in vblank; 1: in</span>
+<span class="sd">      vblank).</span>
+<span class="sd">    """</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">"flags"</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span>
+            <span class="s2">"_PPUSTATUS"</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">LittleEndianStructure</span><span class="p">,),</span>
+            <span class="p">{</span><span class="s2">"_fields_"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s2">"na"</span><span class="p">,</span>              <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>  <span class="c1"># Unused</span>
+                <span class="p">(</span><span class="s2">"sprite_overflow"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"sprite_zero_hit"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"vertical_blank"</span><span class="p">,</span>  <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="p">]}</span>
+        <span class="p">)),</span>
+        <span class="p">(</span><span class="s2">"reg"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">)]</span></div>
+
+
 <div class="viewcode-block" id="_Address"><a class="viewcode-back" href="../../purenes.html#purenes.ppu._Address">[docs]</a><span class="k">class</span> <span class="nc">_Address</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">Union</span><span class="p">):</span>
     <span class="sd">"""A class to represent the PPU $2006 register.</span>
 
@@ -393,6 +432,7 @@
 
     <span class="c1"># Internal registers</span>
     <span class="n">_control</span> <span class="o">=</span> <span class="n">_Control</span><span class="p">()</span>  <span class="c1"># $2000</span>
+    <span class="n">_status</span> <span class="o">=</span> <span class="n">_Status</span><span class="p">()</span>  <span class="c1"># $2002</span>
 
     <span class="c1"># Loopy Registers</span>
     <span class="n">_vram</span> <span class="o">=</span> <span class="n">_Address</span><span class="p">()</span>       <span class="c1"># Loopy v $2006</span>
@@ -404,6 +444,27 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ppu_bus</span><span class="p">:</span> <span class="n">PPUBus</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ppu_bus</span> <span class="o">=</span> <span class="n">ppu_bus</span>
+
+<div class="viewcode-block" id="PPU.read"><a class="viewcode-back" href="../../purenes.html#purenes.ppu.PPU.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">"""Public read method exposed by the PPU for communication with the</span>
+<span class="sd">        CPU through memory mapped registers $2000-$2007.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            Although there are only eight registers, the values are mirrored</span>
+<span class="sd">            every 8 bytes through $3FFF.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            address (int): A 16-bit address</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: An 8-bit value</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="mh">0x2000</span> <span class="o">&lt;=</span> <span class="n">address</span> <span class="o">&lt;=</span> <span class="mh">0x3FFF</span><span class="p">:</span>
+            <span class="n">_address</span> <span class="o">=</span> <span class="n">address</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_REGISTER_ADDRESS_MASK</span>
+
+            <span class="k">if</span> <span class="n">_address</span> <span class="o">==</span> <span class="mh">0x0002</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_write_latch</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">reg</span></div>
 
 <div class="viewcode-block" id="PPU.write"><a class="viewcode-back" href="../../purenes.html#purenes.ppu.PPU.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">"""Public write method exposed by the PPU for communication with the</span>
@@ -418,7 +479,7 @@
 <span class="sd">            data (int): An 8-bit value</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            int: An 8-bit value</span>
+<span class="sd">            None</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="mh">0x2000</span> <span class="o">&lt;=</span> <span class="n">address</span> <span class="o">&lt;=</span> <span class="mh">0x3FFF</span><span class="p">:</span>
             <span class="n">_address</span> <span class="o">=</span> <span class="n">address</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_REGISTER_ADDRESS_MASK</span>
@@ -440,6 +501,19 @@
 <span class="sd">            _Control: The internal Control register class</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_control</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Status</span><span class="p">:</span>
+        <span class="sd">"""Read-only access to the internal PPUSTATUS register $2002. This</span>
+<span class="sd">        should only be used for testing and debugging purposes</span>
+
+<span class="sd">        Accessing the register through this property will not impact any of</span>
+<span class="sd">        the other registers, so it is safe to do so.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            _Status: The internal Status register class</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">vram</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Address</span><span class="p">:</span>
@@ -467,7 +541,21 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            _Address</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram_temp</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram_temp</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">write_latch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">"""Read-only access to the internal write latch (w).</span>
+
+<span class="sd">        This should only be used for testing and debugging purposes.</span>
+
+<span class="sd">        Accessing the register through this property will not impact any of</span>
+<span class="sd">        the other registers, so it is safe to do so.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: (0 first write, 1 second)</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_latch</span></div>
 </pre></div>
         </article>
       </div>
