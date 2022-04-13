@@ -185,10 +185,121 @@
           <h1>Source code for purenes.ppu</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Python 3.7 and 3.8 support</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Final</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Final</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Final</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Final</span>  <span class="c1"># pragma: no cover</span>
+<span class="kn">import</span> <span class="nn">ctypes</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+
+<span class="k">class</span> <span class="nc">_Control</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">Union</span><span class="p">):</span>
+    <span class="sd">"""A class to represent the PPU $2000 register. The flags have been</span>
+<span class="sd">    replaced with more readable alternatives. A mapping is provided below.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This class should only be directly accessed through the read-only</span>
+<span class="sd">        :attr:`~purenes.ppu.PPU.control` property of the</span>
+<span class="sd">        :class:`~purenes.ppu.PPU`. The documentation of this class is included</span>
+<span class="sd">        as a reference for testing and debugging.</span>
+
+<span class="sd">    https://www.nesdev.org/wiki/PPU_registers#PPUCTRL</span>
+
+<span class="sd">    The values detailed below can be accessed using the</span>
+<span class="sd">    :attr:`~purenes.ppu._Control.flags` attribute of this class.</span>
+
+<span class="sd">    * base_nt_address (NN) - The the base nametable address (0 = $2000; 1 =</span>
+<span class="sd">      $2400; 2 = $2800; 3 = $2C00).</span>
+
+<span class="sd">    * vram_address_increment (I) - How the VRAM address should be incremented</span>
+<span class="sd">      per CPU read/write (0: add 1, going across; 1: add 32, going down).</span>
+
+<span class="sd">    * sprite_pt_address (S) - Sprite pattern table address for 8x8 sprites</span>
+<span class="sd">      (0: $0000; 1: $1000; ignored in 8x16 mode).</span>
+
+<span class="sd">    * background_pt_address (B) - Background pattern table address (0: $0000;</span>
+<span class="sd">      1: $1000).</span>
+
+<span class="sd">    * sprite_size (H) - Sprite size (0: 8x8 pixels; 1: 8x16 pixels)</span>
+
+<span class="sd">    * ppu_leader_follower_select (P) - PPU leader/follower select (0: read</span>
+<span class="sd">      backdrop from EXT pins; 1: output color on EXT pins)</span>
+
+<span class="sd">    * generate_nmi (V) - Generate an NMI at the start of the vertical blanking</span>
+<span class="sd">      interval (0: off; 1: on)</span>
+<span class="sd">    """</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">"flags"</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span>
+            <span class="s2">"_PPUCTRL"</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">LittleEndianStructure</span><span class="p">,),</span>
+            <span class="p">{</span><span class="s2">"_fields_"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s2">"base_nt_address"</span><span class="p">,</span>                  <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"vram_address_increment"</span><span class="p">,</span>           <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"sprite_pt_address"</span><span class="p">,</span>                <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"background_pt_address"</span><span class="p">,</span>            <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"sprite_size"</span><span class="p">,</span>                      <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"ppu_leader_follower_select"</span><span class="p">,</span>       <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"generate_nmi"</span><span class="p">,</span>                     <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="p">]}</span>
+        <span class="p">)),</span>
+        <span class="p">(</span><span class="s2">"reg"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">)]</span>
+
+
+<span class="k">class</span> <span class="nc">_Address</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">Union</span><span class="p">):</span>
+    <span class="sd">"""A class to represent the PPU $2006 register.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This class should only be directly accessed through the read-only</span>
+<span class="sd">        :attr:`~purenes.ppu.PPU.vram` and :attr:`~purenes.ppu.PPU.vram_temp`</span>
+<span class="sd">        properties of the :class:`~purenes.ppu.PPU`. The documentation of this</span>
+<span class="sd">        class is included as a reference for testing and debugging.</span>
+
+<span class="sd">    During writes from the CPU through $2006 this register behaves as a</span>
+<span class="sd">    reference to the current nametable address to begin rendering from. The CPU</span>
+<span class="sd">    performs two writes to this register (high byte first) to compose the full</span>
+<span class="sd">    address.</span>
+
+<span class="sd">    During rendering, however, this register is composed and utilized by the</span>
+<span class="sd">    PPU in a different way.</span>
+
+<span class="sd">    The PPU maintains two 15-bit registers for this.</span>
+
+<span class="sd">    v - Current VRAM address (15 bits)</span>
+
+<span class="sd">    t - Temporary VRAM address (15 bits)</span>
+
+<span class="sd">    The 15-bit registers t and v are composed this way during rendering:</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        yyy NN YYYYY XXXXX</span>
+<span class="sd">        ||| || ||||| +++++-- coarse X scroll</span>
+<span class="sd">        ||| || +++++-------- coarse Y scroll</span>
+<span class="sd">        ||| ++-------------- nametable select</span>
+<span class="sd">        +++----------------- fine Y scroll</span>
+
+<span class="sd">    The values detailed above be accessed using the</span>
+<span class="sd">    :attr:`~purenes.ppu._Address.flags` attribute of this class.</span>
+
+<span class="sd">    * coarse_x (XXXXX) - The coarse X value to use when scrolling.</span>
+
+<span class="sd">    * coarse_y (YYYYY) - The coarse Y value to use when scrolling.</span>
+
+<span class="sd">    * nt_select (NN) - Nametable select.</span>
+
+<span class="sd">    * fine_y (yyy) - The fine y value to use when scrolling.</span>
+<span class="sd">    """</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">"flags"</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span>
+            <span class="s2">"_PPUADDRESS"</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">LittleEndianStructure</span><span class="p">,),</span>
+            <span class="p">{</span><span class="s2">"_fields_"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s2">"coarse_x"</span><span class="p">,</span>  <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"coarse_y"</span><span class="p">,</span>  <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"nt_select"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"fine_y"</span><span class="p">,</span>    <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+            <span class="p">]}</span>
+        <span class="p">)),</span>
+        <span class="p">(</span><span class="s2">"reg"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint16</span><span class="p">)]</span>
 
 
 <div class="viewcode-block" id="PPUBus"><a class="viewcode-back" href="../../purenes.html#purenes.ppu.PPUBus">[docs]</a><span class="k">class</span> <span class="nc">PPUBus</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -274,6 +385,89 @@
                     <span class="n">address</span><span class="o">=</span><span class="nb">hex</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
                 <span class="p">)</span>
             <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="PPU"><a class="viewcode-back" href="../../purenes.html#purenes.ppu.PPU">[docs]</a><span class="k">class</span> <span class="nc">PPU</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="n">_REGISTER_ADDRESS_MASK</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="mh">0x08</span>
+
+    <span class="c1"># Internal registers</span>
+    <span class="n">_control</span> <span class="o">=</span> <span class="n">_Control</span><span class="p">()</span>  <span class="c1"># $2000</span>
+
+    <span class="c1"># Loopy Registers</span>
+    <span class="n">_vram</span> <span class="o">=</span> <span class="n">_Address</span><span class="p">()</span>       <span class="c1"># Loopy v $2006</span>
+    <span class="n">_vram_temp</span> <span class="o">=</span> <span class="n">_Address</span><span class="p">()</span>  <span class="c1"># Loopy t</span>
+    <span class="n">_fine_x</span><span class="p">:</span> <span class="nb">int</span>             <span class="c1"># Loopy x fine x scroll</span>
+    <span class="n">_write_latch</span><span class="p">:</span> <span class="nb">int</span>        <span class="c1"># Loopy w latch (0 first write, 1 second)</span>
+
+    <span class="n">_ppu_bus</span><span class="p">:</span> <span class="n">PPUBus</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ppu_bus</span><span class="p">:</span> <span class="n">PPUBus</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ppu_bus</span> <span class="o">=</span> <span class="n">ppu_bus</span>
+
+<div class="viewcode-block" id="PPU.write"><a class="viewcode-back" href="../../purenes.html#purenes.ppu.PPU.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">"""Public write method exposed by the PPU for communication with the</span>
+<span class="sd">        CPU through memory mapped registers $2000-$2007.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            Although there are only eight registers, the values are mirrored</span>
+<span class="sd">            every 8 bytes through $3FFF.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            address (int): A 16-bit address</span>
+<span class="sd">            data (int): An 8-bit value</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: An 8-bit value</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="mh">0x2000</span> <span class="o">&lt;=</span> <span class="n">address</span> <span class="o">&lt;=</span> <span class="mh">0x3FFF</span><span class="p">:</span>
+            <span class="n">_address</span> <span class="o">=</span> <span class="n">address</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_REGISTER_ADDRESS_MASK</span>
+
+            <span class="k">if</span> <span class="n">_address</span> <span class="o">==</span> <span class="mh">0x0000</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_control</span><span class="o">.</span><span class="n">reg</span> <span class="o">=</span> <span class="n">data</span>
+                <span class="n">nt_select</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_control</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">base_nt_address</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_vram_temp</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">nt_select</span> <span class="o">=</span> <span class="n">nt_select</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">control</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Control</span><span class="p">:</span>
+        <span class="sd">"""Read-only access to the internal PPUCTRL register $2000. This should</span>
+<span class="sd">        only be used for testing and debugging purposes</span>
+
+<span class="sd">        Accessing the register through this property will not impact any of</span>
+<span class="sd">        the other registers, so it is safe to do so.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            _Control: The internal Control register class</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_control</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vram</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Address</span><span class="p">:</span>
+        <span class="sd">"""Read-only access to the internal PPUADDR register $2006 (v).</span>
+
+<span class="sd">        This should only be used for testing and debugging purposes.</span>
+
+<span class="sd">        Accessing the register through this property will not impact any of</span>
+<span class="sd">        the other registers, so it is safe to do so.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            _Address</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vram_temp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Address</span><span class="p">:</span>
+        <span class="sd">"""Read-only access to the internal PPUADDR register $2006 (t).</span>
+
+<span class="sd">        This should only be used for testing and debugging purposes.</span>
+
+<span class="sd">        Accessing the register through this property will not impact any of</span>
+<span class="sd">        the other registers, so it is safe to do so.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            _Address</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram_temp</span></div>
 </pre></div>
         </article>
       </div>
