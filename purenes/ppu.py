@@ -71,6 +71,8 @@ class _Status(ctypes.Union):
     The values detailed below can be accessed using the
     :attr:`~purenes.ppu._Status.flags` attribute of this class.
 
+    https://www.nesdev.org/wiki/PPU_registers#PPUSTATUS
+
     * na (.....) - Unused
 
     * sprite_overflow (O) - Sprite overflow. Intended to be set when more than
@@ -81,9 +83,6 @@ class _Status(ctypes.Union):
 
     * vertical_blank (V) - Vertical blank has started (0: not in vblank; 1: in
       vblank).
-
-    https://www.nesdev.org/wiki/PPU_registers#PPUSTATUS
-
     """
     _fields_ = [
         ("flags", type(
