@@ -36,6 +36,36 @@ class TestPPU(object):
         assert(control.flags.generate_nmi == (data >> 7) & 1)
         assert(vram_temp.flags.nt_select == (data >> 0) & 3)
 
+    @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
+    def test_vram_address_write(self, test_object, data):
+        # TODO: https://github.com/zeeps31/purenes/issues/28
+        # Test writes to $2006. Writing to $2006 requires two writes to set the
+        # VRAM address.
+        #
+        # Verifies on the first write vram_temp is updated correctly and the
+        # write_latch is set to 1 and on the second write verifies the internal
+        # write_latch is set to 0 and the full address is transferred from
+        # t -> v.
+        address = 0x2006
+        test_object.read(0x2002)  # Init/reset write latch
+
+        vram = test_object.vram
+        vram_temp = test_object.vram_temp
+
+        test_object.write(address, data)
+
+        # Verify t: .CDEFGH ........ <- d: ..CDEFGH
+        assert(((vram_temp.reg >> 8) & 0x3F) == (data & 0x3F))
+        assert(test_object.write_latch == 1)
+
+        test_object.write(address, data)
+
+        # Verify t: ....... ABCDEFGH <- d: ABCDEFGH
+        assert(vram.reg == ((data & 0x3F) << 8) | data)
+        # Verify v: <...all bits...> <- t: <...all bits...>
+        assert(vram.reg == vram_temp.reg)
+        assert(test_object.write_latch == 0)
+
     def test_status_read(self, test_object):
         address = 0x2002
 

@@ -304,6 +304,25 @@ class PPU(object):
                 nt_select = self._control.flags.base_nt_address
                 self._vram_temp.flags.nt_select = nt_select
 
+            if _address == 0x0006:
+                t = self._vram_temp.reg  # Preserve space
+                if self._write_latch == 0:
+                    # Set bits 8-13 of vram_temp. The bitwise AND with 0x3F
+                    # isolates bits 0-5 and the bit shift << 8 moves the bits
+                    # to 8-13. This effectively clears bit 9 (z) as required.
+                    # The bitwise AND with 0x00FF low-order bits 0-7 preserves
+                    # the current value.
+                    self._vram_temp.reg = ((data & 0x3F) << 8) | (t & 0x00FF)
+                    self._write_latch = 1
+
+                else:
+                    # Set low order bits 0-7 and perform bitwise OR with the
+                    # high order bits assigned on the first write.
+                    # Transfer t to v.
+                    self._vram_temp.reg = (t & 0xFF00) | data
+                    self._vram.reg = self._vram_temp.reg
+                    self._write_latch = 0
+
     @property
     def control(self) -> _Control:
         """Read-only access to the internal PPUCTRL register $2000. This should
