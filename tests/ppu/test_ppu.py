@@ -12,6 +12,15 @@ class TestPPU(object):
     def test_object(self, mock_ppu_bus):
         yield PPU(mock_ppu_bus)
 
+    def test_ppu_reset(self, test_object):
+        test_object.reset()
+
+        assert(test_object.control.reg == 0)
+        assert(test_object.status.reg == 0)
+        assert(test_object.vram.reg == 0)
+        assert(test_object.vram_temp.reg == 0)
+        assert(test_object.write_latch == 0)
+
     # Test internal registers
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
     def test_control_write(self, test_object, data):

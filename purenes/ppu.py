@@ -323,6 +323,24 @@ class PPU(object):
                     self._vram.reg = self._vram_temp.reg
                     self._write_latch = 0
 
+    def reset(self) -> None:
+        """Perform a reset of the PPU.
+
+        Calling this method will reset a series of internal registers and
+        values used for rendering.
+
+        https://www.nesdev.org/wiki/PPU_power_up_state
+
+        Returns:
+            None
+        """
+        self._control.reg = 0x00
+        self._status.reg = 0x00
+        self._vram.reg = 0x00
+        self._vram_temp.reg = 0x00
+        self._write_latch = 0x00
+        self._fine_x = 0x00
+
     @property
     def control(self) -> _Control:
         """Read-only access to the internal PPUCTRL register $2000. This should
