@@ -256,7 +256,7 @@ class PPU(object):
     _write_latch: int        # Loopy w latch (0 first write, 1 second)
 
     # $2007 read buffer used to preserve data across frames.
-    _data_read_buffer: int = 0x00
+    _data_read_buffer: int
 
     _ppu_bus: PPUBus
 
@@ -362,6 +362,7 @@ class PPU(object):
         self._vram_temp.reg = 0x00
         self._write_latch = 0x00
         self._fine_x = 0x00
+        self._data_read_buffer = 0x00
 
     @property
     def control(self) -> _Control:
