@@ -432,5 +432,5 @@ class PPU(object):
         return self._write_latch
 
     def _read(self, address: int) -> int:
-        # Internal read
+        # Internal read.
         return self._ppu_bus.read(address)

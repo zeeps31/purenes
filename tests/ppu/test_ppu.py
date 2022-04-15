@@ -90,7 +90,7 @@ class TestPPU(object):
         # Test PPUDATA $2007 x increment.
         #
         # Test that successive writes to the data register with increment_mode
-        # 0 increments the value correctly by one byte.
+        # 0 increments the vram address by one byte.
         address = 0x2007
 
         test_object.read(address)
@@ -105,7 +105,7 @@ class TestPPU(object):
         # Test PPUDATA $2007 y increment.
         #
         # Test that successive writes to the data register with increment_mode
-        # 1 increments the value correctly by 32 bytes.
+        # 1 increments the vram address by 32 bytes.
         address = 0x2007
 
         test_object.write(0x2000, 0x4)
