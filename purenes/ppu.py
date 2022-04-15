@@ -47,13 +47,13 @@ class _Control(ctypes.Union):
             "_PPUCTRL",
             (ctypes.LittleEndianStructure,),
             {"_fields_": [
-                ("base_nt_address",                  ctypes.c_uint8, 2),
-                ("vram_address_increment",           ctypes.c_uint8, 1),
-                ("sprite_pt_address",                ctypes.c_uint8, 1),
-                ("background_pt_address",            ctypes.c_uint8, 1),
-                ("sprite_size",                      ctypes.c_uint8, 1),
-                ("ppu_leader_follower_select",       ctypes.c_uint8, 1),
-                ("generate_nmi",                     ctypes.c_uint8, 1),
+                ("base_nt_address",            ctypes.c_uint8, 2),
+                ("vram_address_increment",     ctypes.c_uint8, 1),
+                ("sprite_pt_address",          ctypes.c_uint8, 1),
+                ("background_pt_address",      ctypes.c_uint8, 1),
+                ("sprite_size",                ctypes.c_uint8, 1),
+                ("ppu_leader_follower_select", ctypes.c_uint8, 1),
+                ("generate_nmi",               ctypes.c_uint8, 1),
             ]}
         )),
         ("reg", ctypes.c_uint8)]
