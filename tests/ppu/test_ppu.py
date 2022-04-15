@@ -12,6 +12,10 @@ class TestPPU(object):
     def test_object(self, mock_ppu_bus):
         yield PPU(mock_ppu_bus)
 
+    @pytest.fixture(autouse=True)
+    def before_each(self, test_object):
+        test_object.reset()
+
     def test_ppu_reset(self, test_object):
         test_object.reset()
 
@@ -81,3 +85,79 @@ class TestPPU(object):
         test_object.read(address)
 
         assert(test_object.write_latch == 0)
+
+    def test_data_read_x_increment(self, test_object, mock_ppu_bus, mocker):
+        # Test PPUDATA $2007 x increment.
+        #
+        # Test that successive writes to the data register with increment_mode
+        # 0 increments the vram address by one byte.
+        address = 0x2007
+
+        test_object.read(address)
+        test_object.read(address)
+
+        mock_ppu_bus.read.assert_has_calls([
+            mocker.call.read(0x0000),
+            mocker.call.read(0x0001)
+        ])
+
+    def test_data_read_y_increment(self, test_object, mock_ppu_bus, mocker):
+        # Test PPUDATA $2007 y increment.
+        #
+        # Test that successive writes to the data register with increment_mode
+        # 1 increments the vram address by 32 bytes.
+        address = 0x2007
+
+        test_object.write(0x2000, 0x4)
+
+        test_object.read(address)
+        test_object.read(address)
+
+        mock_ppu_bus.read.assert_has_calls([
+            mocker.call.read(0x0000),
+            mocker.call.read(0x0020)
+        ])
+
+    def test_data_read_buffer(self, test_object, mock_ppu_bus):
+        # Test PPUDATA $2007 read for non-palette address 0-$3EFF.
+        #
+        # Test that successive reads from $2007 for VVRAM addresses <= $3EFF
+        # are buffered and delayed by one frame
+        address = 0x2007
+        expected_values = [0x00, 0x00, 0x01]
+        actual_values = []
+
+        mock_ppu_bus.read.side_effect = [
+            0x00,
+            0x01,
+            0x02
+        ]
+
+        actual_values.append(test_object.read(address))
+        actual_values.append(test_object.read(address))
+        actual_values.append(test_object.read(address))
+
+        assert(actual_values == expected_values)
+
+    def test_data_read_buffer_palette_address(self, test_object, mock_ppu_bus):
+        # Tests PPUDATA $2007 read for addresses >= $3F00.
+        #
+        # Test that successive reads to $2007 for VVRAM addresses >= $3F00
+        # are not buffered and returned immediately.
+        address = 0x2007
+        expected_values = [0x00, 0x01, 0x02]
+        actual_values = []
+
+        test_object.write(0x2006, 0x3F)  # VRAM address high-byte
+        test_object.write(0x2006, 0x00)  # VRAM address low-byte
+        mock_ppu_bus.read.side_effect = [
+            0x00,
+            0x01,
+            0x02
+        ]
+
+        actual_values.append(test_object.read(address))
+        actual_values.append(test_object.read(address))
+        actual_values.append(test_object.read(address))
+
+        assert(actual_values == expected_values)

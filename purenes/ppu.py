@@ -255,6 +255,9 @@ class PPU(object):
     _fine_x: int             # Loopy x fine x scroll
     _write_latch: int        # Loopy w latch (0 first write, 1 second)
 
+    # $2007 read buffer used to preserve data across frames.
+    _data_read_buffer: int = 0x00
+
     _ppu_bus: PPUBus
 
     def __init__(self, ppu_bus: PPUBus):
@@ -280,6 +283,25 @@ class PPU(object):
             if _address == 0x0002:
                 self._write_latch = 0
                 return self._status.reg
+
+            elif _address == 0x0007:
+                address_increment = 1
+                if self._control.flags.vram_address_increment == 1:
+                    address_increment = 32
+
+                # When reading while the VRAM address is in the range 0-$3EFF
+                # the read will return the contents of an internal read buffer.
+                # This internal buffer is updated only when reading PPUDATA
+                data = self._data_read_buffer
+                self._data_read_buffer = self._read(self._vram.reg)
+
+                # Reading palette data from $3F00-$3FFF returns the
+                # current result.
+                if self._vram.reg >= 0x3F00:
+                    data = self._data_read_buffer
+
+                self._vram.reg += address_increment
+                return data
 
     def write(self, address: int, data: int) -> None:
         """Public write method exposed by the PPU for communication with the
@@ -408,3 +430,7 @@ class PPU(object):
             int: (0 first write, 1 second)
         """
         return self._write_latch
+
+    def _read(self, address: int) -> int:
+        # Internal read.
+        return self._ppu_bus.read(address)
