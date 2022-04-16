@@ -79,6 +79,40 @@ class TestPPU(object):
         assert(vram.reg == vram_temp.reg)
         assert(test_object.write_latch == 0)
 
+    def test_data_write_x_increment(self, test_object, mock_ppu_bus, mocker):
+        # Test PPUDATA $2007 write x increment.
+        #
+        # Test that successive writes to the data register with increment_mode
+        # 0 increments the vram address by one byte.
+        address = 0x2007
+        data = 0x01
+
+        test_object.write(address, data)
+        test_object.write(address, data)
+
+        mock_ppu_bus.write.assert_has_calls([
+            mocker.call.write(0x0000, 0x01),
+            mocker.call.write(0x0001, 0x01)
+        ])
+
+    def test_data_write_y_increment(self, test_object, mock_ppu_bus, mocker):
+        # Test PPUDATA $2007 write y increment.
+        #
+        # Test that successive writes to the data register with increment_mode
+        # 1 increments the vram address by 32 bytes.
+        address = 0x2007
+        data = 0x01
+
+        test_object.write(0x2000, 0x4)
+
+        test_object.write(address, data)
+        test_object.write(address, data)
+
+        mock_ppu_bus.write.assert_has_calls([
+            mocker.call.write(0x0000, 0x01),
+            mocker.call.write(0x0020, 0x01)
+        ])
+
     def test_status_read(self, test_object):
         address = 0x2002
 
