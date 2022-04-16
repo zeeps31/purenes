@@ -345,6 +345,15 @@ class PPU(object):
                     self._vram.reg = self._vram_temp.reg
                     self._write_latch = 0
 
+            if _address == 0x0007:
+                # Preserve space
+                i = self._control.flags.vram_address_increment
+
+                # Writing to $2007 does not impact the internal
+                # _data_read_buffer
+                self._write(self._vram.reg, data)
+                self._vram.reg += 1 if i == 0 else 32
+
     def reset(self) -> None:
         """Perform a reset of the PPU.
 
@@ -435,3 +444,7 @@ class PPU(object):
     def _read(self, address: int) -> int:
         # Internal read.
         return self._ppu_bus.read(address)
+
+    def _write(self, address: int, data: int) -> None:
+        # Internal write.
+        return self._ppu_bus.write(address, data)
