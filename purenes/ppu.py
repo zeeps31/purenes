@@ -22,38 +22,26 @@ class _Control(ctypes.Union):
     The values detailed below can be accessed using the
     :attr:`~purenes.ppu._Control.flags` attribute of this class.
 
-    * base_nt_address (NN) - The the base nametable address (0 = $2000; 1 =
-      $2400; 2 = $2800; 3 = $2C00).
-
-    * vram_address_increment (I) - How the VRAM address should be incremented
-      per CPU read/write (0: add 1, going across; 1: add 32, going down).
-
-    * sprite_pt_address (S) - Sprite pattern table address for 8x8 sprites
-      (0: $0000; 1: $1000; ignored in 8x16 mode).
-
-    * background_pt_address (B) - Background pattern table address (0: $0000;
-      1: $1000).
-
-    * sprite_size (H) - Sprite size (0: 8x8 pixels; 1: 8x16 pixels)
-
-    * ppu_leader_follower_select (P) - PPU leader/follower select (0: read
-      backdrop from EXT pins; 1: output color on EXT pins)
-
-    * generate_nmi (V) - Generate an NMI at the start of the vertical blanking
-      interval (0: off; 1: on)
+    * base_nt_address        (NN) - (0 = $2000; 1 =$2400; 2 = $2800; 3 = $2C00)
+    * vram_address_increment (I) - (0: add 1, x; 1: add 32, y).
+    * sprite_pt_address      (S) - (0: $0000; 1: $1000; ignored in 8x16 mode).
+    * background_pt_address  (B) - (0: $0000; 1: $1000).
+    * sprite_size            (H) - Sprite size (0: 8x8 pixels; 1: 8x16 pixels)
+    * ppu_leader_follower    (P) - EXT pins (0: read backdrop; 1: output color)
+    * generate_nmi           (V) - (0: off; 1: on)
     """
     _fields_ = [
         ("flags", type(
             "_PPUCTRL",
             (ctypes.LittleEndianStructure,),
             {"_fields_": [
-                ("base_nt_address",            ctypes.c_uint8, 2),
-                ("vram_address_increment",     ctypes.c_uint8, 1),
-                ("sprite_pt_address",          ctypes.c_uint8, 1),
-                ("background_pt_address",      ctypes.c_uint8, 1),
-                ("sprite_size",                ctypes.c_uint8, 1),
-                ("ppu_leader_follower_select", ctypes.c_uint8, 1),
-                ("generate_nmi",               ctypes.c_uint8, 1),
+                ("base_nt_address",        ctypes.c_uint8, 2),
+                ("vram_address_increment", ctypes.c_uint8, 1),
+                ("sprite_pt_address",      ctypes.c_uint8, 1),
+                ("background_pt_address",  ctypes.c_uint8, 1),
+                ("sprite_size",            ctypes.c_uint8, 1),
+                ("ppu_leader_follower",    ctypes.c_uint8, 1),
+                ("generate_nmi",           ctypes.c_uint8, 1),
             ]}
         )),
         ("reg", ctypes.c_uint8)]
@@ -67,6 +55,9 @@ class _Mask(ctypes.Union):
         :attr:`~purenes.ppu.PPU.mask` property of the
         :class:`~purenes.ppu.PPU`. The documentation of this class is included
         as a reference for testing and debugging.
+
+    The values detailed below can be accessed using the
+    :attr:`~purenes.ppu._Mask.flags` attribute of this class.
 
     https://www.nesdev.org/wiki/PPU_registers#PPUMASK
 
@@ -111,16 +102,10 @@ class _Status(ctypes.Union):
 
     https://www.nesdev.org/wiki/PPU_registers#PPUSTATUS
 
-    * na (.....) - Unused
-
-    * sprite_overflow (O) - Sprite overflow. Intended to be set when more than
-      eight sprites appear on a scanline.
-
-    * sprite_zero_hit (S) - Set when a nonzero pixel of sprite 0 overlaps a
-      nonzero background pixel.
-
-    * vertical_blank (V) - Vertical blank has started (0: not in vblank; 1: in
-      vblank).
+    * na              (.....) - Unused
+    * sprite_overflow (O) - Set when more than 8 sprites appear on a scanline.
+    * sprite_zero_hit (S) - Pixel > 0 of sprite 0 overlaps a background pixel.
+    * vertical_blank  (V) - (0: not in VBLANK; 1: in VBLANK).
     """
     _fields_ = [
         ("flags", type(
@@ -169,16 +154,13 @@ class _Address(ctypes.Union):
         ||| ++-------------- nametable select
         +++----------------- fine Y scroll
 
-    The values detailed above be accessed using the
+    The values detailed below can be accessed using the
     :attr:`~purenes.ppu._Address.flags` attribute of this class.
 
-    * coarse_x (XXXXX) - The coarse X value to use when scrolling.
-
-    * coarse_y (YYYYY) - The coarse Y value to use when scrolling.
-
+    * coarse_x  (XXXXX) - The coarse X value to use when scrolling.
+    * coarse_y  (YYYYY) - The coarse Y value to use when scrolling.
     * nt_select (NN) - Nametable select.
-
-    * fine_y (yyy) - The fine y value to use when scrolling.
+    * fine_y    (yyy) - The fine y value to use when scrolling.
     """
     _fields_ = [
         ("flags", type(
