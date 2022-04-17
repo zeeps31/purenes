@@ -45,7 +45,7 @@ class TestPPU(object):
         assert(control.flags.sprite_pt_address == (data >> 3) & 1)
         assert(control.flags.background_pt_address == (data >> 4) & 1)
         assert(control.flags.sprite_size == (data >> 5) & 1)
-        assert(control.flags.ppu_leader_follower_select == (data >> 6) & 1)
+        assert(control.flags.ppu_leader_follower == (data >> 6) & 1)
         assert(control.flags.generate_nmi == (data >> 7) & 1)
         assert(vram_temp.flags.nt_select == (data >> 0) & 3)
 
