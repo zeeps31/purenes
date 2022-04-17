@@ -242,6 +242,14 @@ class PPUBus(object):
 
 
 class PPU(object):
+    """A class to represent the NES Picture Processing Unit (PPU).
+
+    This class is responsible for interacting with the CPU and devices
+    connected to the PPUBus to generate a composite video signal with 240 lines
+    of pixels each frame.
+
+    https://www.nesdev.org/wiki/PPU
+    """
 
     _REGISTER_ADDRESS_MASK: Final = 0x08
 
@@ -261,6 +269,15 @@ class PPU(object):
     _ppu_bus: PPUBus
 
     def __init__(self, ppu_bus: PPUBus):
+        """Connect the :class:`~purenes.ppu.PPUBus` to the PPU.
+
+        Note:
+            None of the internal registers are initialized at this point. This
+            does not happen until :func:`~purenes.ppu.PPU.reset` is called.
+
+        Args:
+            ppu_bus (PPUBus): An instance of a :class:`~purenes.ppu.PPUBus`
+        """
         self._ppu_bus = ppu_bus
 
     def read(self, address: int) -> int:
@@ -452,9 +469,6 @@ class PPU(object):
         """Read-only access to the internal write latch (w).
 
         This should only be used for testing and debugging purposes.
-
-        Accessing the register through this property will not impact any of
-        the other registers, so it is safe to do so.
 
         Returns:
             int: (0 first write, 1 second)
