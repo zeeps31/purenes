@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>purenes.ppu - PureNES 0.16.1 documentation</title>
+        <title>purenes.ppu - PureNES 0.16.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -120,7 +120,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PureNES 0.16.1 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PureNES 0.16.2 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -143,7 +143,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">PureNES 0.16.1 documentation</span>
+  <span class="sidebar-brand-text">PureNES 0.16.2 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -529,7 +529,7 @@
                 <span class="n">nt_select</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_control</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">base_nt_address</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_vram_temp</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">nt_select</span> <span class="o">=</span> <span class="n">nt_select</span>
 
-            <span class="k">if</span> <span class="n">_address</span> <span class="o">==</span> <span class="mh">0x0005</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">_address</span> <span class="o">==</span> <span class="mh">0x0005</span><span class="p">:</span>
                 <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram_temp</span>  <span class="c1"># Preserve space</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_latch</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="c1"># On the first write bits 3-7 are used to set coarse_x in</span>
@@ -549,7 +549,7 @@
                     <span class="n">t</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">fine_y</span> <span class="o">=</span> <span class="n">data</span> <span class="o">&amp;</span> <span class="mh">0x07</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_write_latch</span> <span class="o">=</span> <span class="mi">0</span>
 
-            <span class="k">if</span> <span class="n">_address</span> <span class="o">==</span> <span class="mh">0x0006</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">_address</span> <span class="o">==</span> <span class="mh">0x0006</span><span class="p">:</span>
                 <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram_temp</span><span class="o">.</span><span class="n">reg</span>  <span class="c1"># Preserve space</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_latch</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="c1"># Set bits 8-13 of vram_temp. The bitwise AND with 0x3F</span>
@@ -568,7 +568,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">reg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram_temp</span><span class="o">.</span><span class="n">reg</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_write_latch</span> <span class="o">=</span> <span class="mi">0</span>
 
-            <span class="k">if</span> <span class="n">_address</span> <span class="o">==</span> <span class="mh">0x0007</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">_address</span> <span class="o">==</span> <span class="mh">0x0007</span><span class="p">:</span>
                 <span class="c1"># Preserve space</span>
                 <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_control</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">vram_address_increment</span>
 
