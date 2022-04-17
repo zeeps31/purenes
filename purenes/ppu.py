@@ -59,6 +59,44 @@ class _Control(ctypes.Union):
         ("reg", ctypes.c_uint8)]
 
 
+class _Mask(ctypes.Union):
+    """A class to represent the PPUMASK $2001 register.
+
+    Note:
+        This class should only be directly accessed through the read-only
+        :attr:`~purenes.ppu.PPU.mask` property of the
+        :class:`~purenes.ppu.PPU`. The documentation of this class is included
+        as a reference for testing and debugging.
+
+    https://www.nesdev.org/wiki/PPU_registers#PPUMASK
+
+    * greyscale                (G) - (0: normal , 1: greyscale)
+    * show_background_leftmost (m) - (1: show, 0: hide)
+    * show_sprites_leftmost    (M) - (1: show , 0: hide)
+    * show_background          (b) - (1: show background)
+    * show_sprites             (s) - (1: show sprites)
+    * emphasize_red            (R) - Emphasize red
+    * emphasize_green          (G) - Emphasize green
+    * emphasize_blue           (B) - Emphasize blue
+    """
+    _fields_ = [
+        ("flags", type(
+            "_PPUMASK",
+            (ctypes.LittleEndianStructure,),
+            {"_fields_": [
+                ("greyscale",                ctypes.c_uint8, 1),
+                ("show_background_leftmost", ctypes.c_uint8, 1),
+                ("show_sprites_leftmost",    ctypes.c_uint8, 1),
+                ("show_background",          ctypes.c_uint8, 1),
+                ("show_sprites",             ctypes.c_uint8, 1),
+                ("emphasize_red",            ctypes.c_uint8, 1),
+                ("emphasize_green",          ctypes.c_uint8, 1),
+                ("emphasize_blue",           ctypes.c_uint8, 1),
+            ]}
+        )),
+        ("reg", ctypes.c_uint8)]
+
+
 class _Status(ctypes.Union):
     """A class to represent the PPUSTATUS $2002 register.
 
@@ -256,7 +294,8 @@ class PPU(object):
 
     # Internal registers
     _control = _Control()  # $2000
-    _status = _Status()  # $2002
+    _mask = _Mask()        # $2001
+    _status = _Status()    # $2002
 
     # Loopy Registers
     _vram = _Address()       # Loopy v $2006
@@ -344,6 +383,9 @@ class PPU(object):
                 nt_select = self._control.flags.base_nt_address
                 self._vram_temp.flags.nt_select = nt_select
 
+            elif _address == 0x0001:
+                self._mask.reg = data
+
             elif _address == 0x0005:
                 t = self._vram_temp  # Preserve space
                 if self._write_latch == 0:
@@ -404,6 +446,7 @@ class PPU(object):
             None
         """
         self._control.reg = 0x00
+        self._mask.reg = 0x00
         self._status.reg = 0x00
         self._vram.reg = 0x00
         self._vram_temp.reg = 0x00
@@ -423,6 +466,19 @@ class PPU(object):
             _Control: The internal Control register class
         """
         return self._control
+
+    @property
+    def mask(self) -> _Mask:
+        """Read-only access to the internal PPUMASK register $2001. This should
+        only be used for testing and debugging purposes
+
+        Accessing the register through this property will not impact any of
+        the other registers, so it is safe to do so.
+
+        Returns:
+            _Mask: The internal Mask register class
+        """
+        return self._mask
 
     @property
     def status(self) -> _Status:
