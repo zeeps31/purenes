@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>purenes package - PureNES 0.16.0 documentation</title>
+        <title>purenes package - PureNES 0.16.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -121,7 +121,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">PureNES 0.16.0 documentation</div></a>
+      <a href="index.html"><div class="brand">PureNES 0.16.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -144,7 +144,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">PureNES 0.16.0 documentation</span>
+  <span class="sidebar-brand-text">PureNES 0.16.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -331,6 +331,12 @@ Mirrors of $2000-2007 (repeats every 8 bytes)</p></td>
 <dt class="sig sig-object py" id="purenes.ppu.PPU">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">purenes.ppu.</span></span><span class="sig-name descname"><span class="pre">PPU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ppu_bus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#purenes.ppu.PPUBus" title="purenes.ppu.PPUBus"><span class="pre">purenes.ppu.PPUBus</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/purenes/ppu.html#PPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.ppu.PPU" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to represent the NES Picture Processing Unit (PPU).</p>
+<p>This class is responsible for interacting with the
+<a class="reference internal" href="#purenes.cpu.CPU" title="purenes.cpu.CPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">CPU</span></code></a> and devices connected to the
+<a class="reference internal" href="#purenes.ppu.PPUBus" title="purenes.ppu.PPUBus"><code class="xref py py-class docutils literal notranslate"><span class="pre">PPUBus</span></code></a> to generate a composite video signal with 240
+lines of pixels for each frame.</p>
+<p><a class="reference external" href="https://www.nesdev.org/wiki/PPU">https://www.nesdev.org/wiki/PPU</a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="purenes.ppu.PPU.read">
 <span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/purenes/ppu.html#PPU.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.ppu.PPU.read" title="Permalink to this definition">#</a></dt>
@@ -465,8 +471,6 @@ the other registers, so it is safe to do so.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">write_latch</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPU.write_latch" title="Permalink to this definition">#</a></dt>
 <dd><p>Read-only access to the internal write latch (w).</p>
 <p>This should only be used for testing and debugging purposes.</p>
-<p>Accessing the register through this property will not impact any of
-the other registers, so it is safe to do so.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>(0 first write, 1 second)</p>

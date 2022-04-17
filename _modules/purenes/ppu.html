@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>purenes.ppu - PureNES 0.16.0 documentation</title>
+        <title>purenes.ppu - PureNES 0.16.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -120,7 +120,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PureNES 0.16.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PureNES 0.16.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -143,7 +143,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">PureNES 0.16.0 documentation</span>
+  <span class="sidebar-brand-text">PureNES 0.16.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -427,6 +427,15 @@
 
 
 <div class="viewcode-block" id="PPU"><a class="viewcode-back" href="../../purenes.html#purenes.ppu.PPU">[docs]</a><span class="k">class</span> <span class="nc">PPU</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">"""A class to represent the NES Picture Processing Unit (PPU).</span>
+
+<span class="sd">    This class is responsible for interacting with the</span>
+<span class="sd">    :class:`~purenes.cpu.CPU` and devices connected to the</span>
+<span class="sd">    :class:`~purenes.ppu.PPUBus` to generate a composite video signal with 240</span>
+<span class="sd">    lines of pixels for each frame.</span>
+
+<span class="sd">    https://www.nesdev.org/wiki/PPU</span>
+<span class="sd">    """</span>
 
     <span class="n">_REGISTER_ADDRESS_MASK</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="mh">0x08</span>
 
@@ -446,6 +455,15 @@
     <span class="n">_ppu_bus</span><span class="p">:</span> <span class="n">PPUBus</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ppu_bus</span><span class="p">:</span> <span class="n">PPUBus</span><span class="p">):</span>
+        <span class="sd">"""Connect the :class:`~purenes.ppu.PPUBus` to the PPU.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            None of the internal registers are initialized at this point. This</span>
+<span class="sd">            does not happen until :func:`~purenes.ppu.PPU.reset` is called.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ppu_bus (PPUBus): An instance of a :class:`~purenes.ppu.PPUBus`</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ppu_bus</span> <span class="o">=</span> <span class="n">ppu_bus</span>
 
 <div class="viewcode-block" id="PPU.read"><a class="viewcode-back" href="../../purenes.html#purenes.ppu.PPU.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -637,9 +655,6 @@
         <span class="sd">"""Read-only access to the internal write latch (w).</span>
 
 <span class="sd">        This should only be used for testing and debugging purposes.</span>
-
-<span class="sd">        Accessing the register through this property will not impact any of</span>
-<span class="sd">        the other registers, so it is safe to do so.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            int: (0 first write, 1 second)</span>
