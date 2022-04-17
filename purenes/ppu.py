@@ -326,6 +326,26 @@ class PPU(object):
                 nt_select = self._control.flags.base_nt_address
                 self._vram_temp.flags.nt_select = nt_select
 
+            if _address == 0x0005:
+                t = self._vram_temp  # Preserve space
+                if self._write_latch == 0:
+                    # On the first write bits 3-7 are used to set coarse_x in
+                    # vram_temp (t) by bit shifting the data value right by
+                    # three bits. A bitwise AND is performed on the data value
+                    # with 0x07 (00000111) to set the fine_x scroll.
+                    t.flags.coarse_x = data >> 3
+                    self._fine_x = data & 0x07
+                    self._write_latch = 1
+
+                else:
+                    # Bits 3-7 are used to set coarse_y in vram_temp (t) by
+                    # bit shifting the data value right by three bits. A
+                    # bitwise AND is performed on the data value with 0x07
+                    # (00000111) to set the fine_y scroll in vram_temp (t).
+                    t.flags.coarse_y = data >> 3
+                    t.flags.fine_y = data & 0x07
+                    self._write_latch = 0
+
             if _address == 0x0006:
                 t = self._vram_temp.reg  # Preserve space
                 if self._write_latch == 0:
@@ -440,6 +460,17 @@ class PPU(object):
             int: (0 first write, 1 second)
         """
         return self._write_latch
+
+    @property
+    def fine_x(self) -> int:
+        """Read-only access to the internal fine x scroll value (x).
+
+        This should only be used for testing and debugging purposes.
+
+        Returns:
+            int: The value of the fine x scroll
+        """
+        return self._fine_x
 
     def _read(self, address: int) -> int:
         # Internal read.

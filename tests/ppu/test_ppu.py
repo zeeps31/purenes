@@ -50,6 +50,32 @@ class TestPPU(object):
         assert(vram_temp.flags.nt_select == (data >> 0) & 3)
 
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
+    def test_scroll_write(self, test_object, data):
+        # Test PPUSCROLL $2005 write.
+        #
+        # Verifies that on the first write to $2005 bits 3-7 of the input data
+        # are used to set coarse_x in t, bits 0-2 are used to set fine_x and
+        # the write_latch is updated to 1. On the second write bits 3-7 of the
+        # input data are used to set coarse_y in t, bits 0-2 are used to set
+        # fine_y and the write_latch is set to 0.
+        address = 0x2005
+
+        # First write
+        test_object.write(address, data)
+
+        vram_temp = test_object.vram_temp
+        assert(vram_temp.flags.coarse_x == data >> 3)
+        assert(test_object.fine_x == data & 0x07)
+        assert(test_object.write_latch == 1)
+
+        # Second write
+        test_object.write(address, data)
+
+        assert(vram_temp.flags.coarse_y == data >> 3)
+        assert(vram_temp.flags.fine_y == data & 0x07)
+        assert(test_object.write_latch == 0)
+
+    @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
     def test_vram_address_write(self, test_object, data):
         # TODO: https://github.com/zeeps31/purenes/issues/28
         # Test writes to $2006. Writing to $2006 requires two writes to set the
