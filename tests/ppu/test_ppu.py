@@ -50,6 +50,25 @@ class TestPPU(object):
         assert(vram_temp.flags.nt_select == (data >> 0) & 3)
 
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
+    def test_mask_write(self, test_object, data):
+        # Test PPUMASK $2001 write.
+        #
+        # Verifies that all flags are set appropriately for a given input.
+        address = 0x2001
+
+        test_object.write(address, data)
+
+        mask = test_object.mask
+        assert(mask.flags.greyscale == (data >> 0) & 1)
+        assert(mask.flags.show_background_leftmost == (data >> 1) & 1)
+        assert(mask.flags.show_sprites_leftmost == (data >> 2) & 1)
+        assert(mask.flags.show_background == (data >> 3) & 1)
+        assert(mask.flags.show_sprites == (data >> 4) & 1)
+        assert(mask.flags.emphasize_red == (data >> 5) & 1)
+        assert(mask.flags.emphasize_green == (data >> 6) & 1)
+        assert(mask.flags.emphasize_blue == (data >> 7) & 1)
+
+    @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
     def test_scroll_write(self, test_object, data):
         # Test PPUSCROLL $2005 write.
         #
