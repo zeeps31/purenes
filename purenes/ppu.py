@@ -244,9 +244,10 @@ class PPUBus(object):
 class PPU(object):
     """A class to represent the NES Picture Processing Unit (PPU).
 
-    This class is responsible for interacting with the CPU and devices
-    connected to the PPUBus to generate a composite video signal with 240 lines
-    of pixels each frame.
+    This class is responsible for interacting with the
+    :class:`~purenes.cpu.CPU` and devices connected to the
+    :class:`~purenes.ppu.PPUBus` to generate a composite video signal with 240
+    lines of pixels for each frame.
 
     https://www.nesdev.org/wiki/PPU
     """
