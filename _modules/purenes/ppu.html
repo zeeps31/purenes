@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>purenes.ppu - PureNES 0.17.0 documentation</title>
+        <title>purenes.ppu - PureNES 0.17.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -120,7 +120,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PureNES 0.17.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PureNES 0.17.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -143,7 +143,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">PureNES 0.17.0 documentation</span>
+  <span class="sidebar-brand-text">PureNES 0.17.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -207,38 +207,26 @@
 <span class="sd">    The values detailed below can be accessed using the</span>
 <span class="sd">    :attr:`~purenes.ppu._Control.flags` attribute of this class.</span>
 
-<span class="sd">    * base_nt_address (NN) - The the base nametable address (0 = $2000; 1 =</span>
-<span class="sd">      $2400; 2 = $2800; 3 = $2C00).</span>
-
-<span class="sd">    * vram_address_increment (I) - How the VRAM address should be incremented</span>
-<span class="sd">      per CPU read/write (0: add 1, going across; 1: add 32, going down).</span>
-
-<span class="sd">    * sprite_pt_address (S) - Sprite pattern table address for 8x8 sprites</span>
-<span class="sd">      (0: $0000; 1: $1000; ignored in 8x16 mode).</span>
-
-<span class="sd">    * background_pt_address (B) - Background pattern table address (0: $0000;</span>
-<span class="sd">      1: $1000).</span>
-
-<span class="sd">    * sprite_size (H) - Sprite size (0: 8x8 pixels; 1: 8x16 pixels)</span>
-
-<span class="sd">    * ppu_leader_follower_select (P) - PPU leader/follower select (0: read</span>
-<span class="sd">      backdrop from EXT pins; 1: output color on EXT pins)</span>
-
-<span class="sd">    * generate_nmi (V) - Generate an NMI at the start of the vertical blanking</span>
-<span class="sd">      interval (0: off; 1: on)</span>
+<span class="sd">    * base_nt_address        (NN) - (0 = $2000; 1 =$2400; 2 = $2800; 3 = $2C00)</span>
+<span class="sd">    * vram_address_increment (I) - (0: add 1, x; 1: add 32, y).</span>
+<span class="sd">    * sprite_pt_address      (S) - (0: $0000; 1: $1000; ignored in 8x16 mode).</span>
+<span class="sd">    * background_pt_address  (B) - (0: $0000; 1: $1000).</span>
+<span class="sd">    * sprite_size            (H) - Sprite size (0: 8x8 pixels; 1: 8x16 pixels)</span>
+<span class="sd">    * ppu_leader_follower    (P) - EXT pins (0: read backdrop; 1: output color)</span>
+<span class="sd">    * generate_nmi           (V) - (0: off; 1: on)</span>
 <span class="sd">    """</span>
     <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span><span class="s2">"flags"</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span>
             <span class="s2">"_PPUCTRL"</span><span class="p">,</span>
             <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">LittleEndianStructure</span><span class="p">,),</span>
             <span class="p">{</span><span class="s2">"_fields_"</span><span class="p">:</span> <span class="p">[</span>
-                <span class="p">(</span><span class="s2">"base_nt_address"</span><span class="p">,</span>            <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">"vram_address_increment"</span><span class="p">,</span>     <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">"sprite_pt_address"</span><span class="p">,</span>          <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">"background_pt_address"</span><span class="p">,</span>      <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">"sprite_size"</span><span class="p">,</span>                <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">"ppu_leader_follower_select"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">"generate_nmi"</span><span class="p">,</span>               <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"base_nt_address"</span><span class="p">,</span>        <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"vram_address_increment"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"sprite_pt_address"</span><span class="p">,</span>      <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"background_pt_address"</span><span class="p">,</span>  <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"sprite_size"</span><span class="p">,</span>            <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"ppu_leader_follower"</span><span class="p">,</span>    <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"generate_nmi"</span><span class="p">,</span>           <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
             <span class="p">]}</span>
         <span class="p">)),</span>
         <span class="p">(</span><span class="s2">"reg"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">)]</span></div>
@@ -252,6 +240,9 @@
 <span class="sd">        :attr:`~purenes.ppu.PPU.mask` property of the</span>
 <span class="sd">        :class:`~purenes.ppu.PPU`. The documentation of this class is included</span>
 <span class="sd">        as a reference for testing and debugging.</span>
+
+<span class="sd">    The values detailed below can be accessed using the</span>
+<span class="sd">    :attr:`~purenes.ppu._Mask.flags` attribute of this class.</span>
 
 <span class="sd">    https://www.nesdev.org/wiki/PPU_registers#PPUMASK</span>
 
@@ -296,16 +287,10 @@
 
 <span class="sd">    https://www.nesdev.org/wiki/PPU_registers#PPUSTATUS</span>
 
-<span class="sd">    * na (.....) - Unused</span>
-
-<span class="sd">    * sprite_overflow (O) - Sprite overflow. Intended to be set when more than</span>
-<span class="sd">      eight sprites appear on a scanline.</span>
-
-<span class="sd">    * sprite_zero_hit (S) - Set when a nonzero pixel of sprite 0 overlaps a</span>
-<span class="sd">      nonzero background pixel.</span>
-
-<span class="sd">    * vertical_blank (V) - Vertical blank has started (0: not in vblank; 1: in</span>
-<span class="sd">      vblank).</span>
+<span class="sd">    * na              (.....) - Unused</span>
+<span class="sd">    * sprite_overflow (O) - Set when more than 8 sprites appear on a scanline.</span>
+<span class="sd">    * sprite_zero_hit (S) - Pixel &gt; 0 of sprite 0 overlaps a background pixel.</span>
+<span class="sd">    * vertical_blank  (V) - (0: not in VBLANK; 1: in VBLANK).</span>
 <span class="sd">    """</span>
     <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span><span class="s2">"flags"</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span>
@@ -354,16 +339,13 @@
 <span class="sd">        ||| ++-------------- nametable select</span>
 <span class="sd">        +++----------------- fine Y scroll</span>
 
-<span class="sd">    The values detailed above be accessed using the</span>
+<span class="sd">    The values detailed below can be accessed using the</span>
 <span class="sd">    :attr:`~purenes.ppu._Address.flags` attribute of this class.</span>
 
-<span class="sd">    * coarse_x (XXXXX) - The coarse X value to use when scrolling.</span>
-
-<span class="sd">    * coarse_y (YYYYY) - The coarse Y value to use when scrolling.</span>
-
+<span class="sd">    * coarse_x  (XXXXX) - The coarse X value to use when scrolling.</span>
+<span class="sd">    * coarse_y  (YYYYY) - The coarse Y value to use when scrolling.</span>
 <span class="sd">    * nt_select (NN) - Nametable select.</span>
-
-<span class="sd">    * fine_y (yyy) - The fine y value to use when scrolling.</span>
+<span class="sd">    * fine_y    (yyy) - The fine y value to use when scrolling.</span>
 <span class="sd">    """</span>
     <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span><span class="s2">"flags"</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span>
