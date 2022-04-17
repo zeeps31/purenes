@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>purenes.ppu - PureNES 0.16.2 documentation</title>
+        <title>purenes.ppu - PureNES 0.17.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -120,7 +120,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PureNES 0.16.2 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PureNES 0.17.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -143,7 +143,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">PureNES 0.16.2 documentation</span>
+  <span class="sidebar-brand-text">PureNES 0.17.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -239,6 +239,44 @@
                 <span class="p">(</span><span class="s2">"sprite_size"</span><span class="p">,</span>                <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
                 <span class="p">(</span><span class="s2">"ppu_leader_follower_select"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
                 <span class="p">(</span><span class="s2">"generate_nmi"</span><span class="p">,</span>               <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="p">]}</span>
+        <span class="p">)),</span>
+        <span class="p">(</span><span class="s2">"reg"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="_Mask"><a class="viewcode-back" href="../../purenes.html#purenes.ppu._Mask">[docs]</a><span class="k">class</span> <span class="nc">_Mask</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">Union</span><span class="p">):</span>
+    <span class="sd">"""A class to represent the PPUMASK $2001 register.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This class should only be directly accessed through the read-only</span>
+<span class="sd">        :attr:`~purenes.ppu.PPU.mask` property of the</span>
+<span class="sd">        :class:`~purenes.ppu.PPU`. The documentation of this class is included</span>
+<span class="sd">        as a reference for testing and debugging.</span>
+
+<span class="sd">    https://www.nesdev.org/wiki/PPU_registers#PPUMASK</span>
+
+<span class="sd">    * greyscale                (G) - (0: normal , 1: greyscale)</span>
+<span class="sd">    * show_background_leftmost (m) - (1: show, 0: hide)</span>
+<span class="sd">    * show_sprites_leftmost    (M) - (1: show , 0: hide)</span>
+<span class="sd">    * show_background          (b) - (1: show background)</span>
+<span class="sd">    * show_sprites             (s) - (1: show sprites)</span>
+<span class="sd">    * emphasize_red            (R) - Emphasize red</span>
+<span class="sd">    * emphasize_green          (G) - Emphasize green</span>
+<span class="sd">    * emphasize_blue           (B) - Emphasize blue</span>
+<span class="sd">    """</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">"flags"</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span>
+            <span class="s2">"_PPUMASK"</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">LittleEndianStructure</span><span class="p">,),</span>
+            <span class="p">{</span><span class="s2">"_fields_"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s2">"greyscale"</span><span class="p">,</span>                <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"show_background_leftmost"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"show_sprites_leftmost"</span><span class="p">,</span>    <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"show_background"</span><span class="p">,</span>          <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"show_sprites"</span><span class="p">,</span>             <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"emphasize_red"</span><span class="p">,</span>            <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"emphasize_green"</span><span class="p">,</span>          <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"emphasize_blue"</span><span class="p">,</span>           <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
             <span class="p">]}</span>
         <span class="p">)),</span>
         <span class="p">(</span><span class="s2">"reg"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">)]</span></div>
@@ -441,7 +479,8 @@
 
     <span class="c1"># Internal registers</span>
     <span class="n">_control</span> <span class="o">=</span> <span class="n">_Control</span><span class="p">()</span>  <span class="c1"># $2000</span>
-    <span class="n">_status</span> <span class="o">=</span> <span class="n">_Status</span><span class="p">()</span>  <span class="c1"># $2002</span>
+    <span class="n">_mask</span> <span class="o">=</span> <span class="n">_Mask</span><span class="p">()</span>        <span class="c1"># $2001</span>
+    <span class="n">_status</span> <span class="o">=</span> <span class="n">_Status</span><span class="p">()</span>    <span class="c1"># $2002</span>
 
     <span class="c1"># Loopy Registers</span>
     <span class="n">_vram</span> <span class="o">=</span> <span class="n">_Address</span><span class="p">()</span>       <span class="c1"># Loopy v $2006</span>
@@ -529,6 +568,9 @@
                 <span class="n">nt_select</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_control</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">base_nt_address</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_vram_temp</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">nt_select</span> <span class="o">=</span> <span class="n">nt_select</span>
 
+            <span class="k">elif</span> <span class="n">_address</span> <span class="o">==</span> <span class="mh">0x0001</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_mask</span><span class="o">.</span><span class="n">reg</span> <span class="o">=</span> <span class="n">data</span>
+
             <span class="k">elif</span> <span class="n">_address</span> <span class="o">==</span> <span class="mh">0x0005</span><span class="p">:</span>
                 <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram_temp</span>  <span class="c1"># Preserve space</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_latch</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -589,6 +631,7 @@
 <span class="sd">            None</span>
 <span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_control</span><span class="o">.</span><span class="n">reg</span> <span class="o">=</span> <span class="mh">0x00</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mask</span><span class="o">.</span><span class="n">reg</span> <span class="o">=</span> <span class="mh">0x00</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">reg</span> <span class="o">=</span> <span class="mh">0x00</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">reg</span> <span class="o">=</span> <span class="mh">0x00</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vram_temp</span><span class="o">.</span><span class="n">reg</span> <span class="o">=</span> <span class="mh">0x00</span>
@@ -608,6 +651,19 @@
 <span class="sd">            _Control: The internal Control register class</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_control</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Mask</span><span class="p">:</span>
+        <span class="sd">"""Read-only access to the internal PPUMASK register $2001. This should</span>
+<span class="sd">        only be used for testing and debugging purposes</span>
+
+<span class="sd">        Accessing the register through this property will not impact any of</span>
+<span class="sd">        the other registers, so it is safe to do so.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            _Mask: The internal Mask register class</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Status</span><span class="p">:</span>

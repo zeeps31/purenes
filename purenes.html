@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>purenes package - PureNES 0.16.2 documentation</title>
+        <title>purenes package - PureNES 0.17.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -121,7 +121,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">PureNES 0.16.2 documentation</div></a>
+      <a href="index.html"><div class="brand">PureNES 0.17.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -144,7 +144,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">PureNES 0.16.2 documentation</span>
+  <span class="sidebar-brand-text">PureNES 0.17.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -425,6 +425,22 @@ the other registers, so it is safe to do so.</p>
 </dl>
 </dd></dl>
 <dl class="py property">
+<dt class="sig sig-object py" id="purenes.ppu.PPU.mask">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mask</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.ppu._Mask" title="purenes.ppu._Mask"><span class="pre">purenes.ppu._Mask</span></a></em><a class="headerlink" href="#purenes.ppu.PPU.mask" title="Permalink to this definition">#</a></dt>
+<dd><p>Read-only access to the internal PPUMASK register $2001. This should
+only be used for testing and debugging purposes</p>
+<p>Accessing the register through this property will not impact any of
+the other registers, so it is safe to do so.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The internal Mask register class</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#purenes.ppu._Mask" title="purenes.ppu._Mask">_Mask</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py property">
 <dt class="sig sig-object py" id="purenes.ppu.PPU.status">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.ppu._Status" title="purenes.ppu._Status"><span class="pre">purenes.ppu._Status</span></a></em><a class="headerlink" href="#purenes.ppu.PPU.status" title="Permalink to this definition">#</a></dt>
 <dd><p>Read-only access to the internal PPUSTATUS register $2002. This
@@ -658,6 +674,40 @@ interval (0: off; 1: on)</p></li>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="purenes.ppu._Control.reg">
 <span class="sig-name descname"><span class="pre">reg</span></span><a class="headerlink" href="#purenes.ppu._Control.reg" title="Permalink to this definition">#</a></dt>
+<dd><p>Structure/Union member</p>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="purenes.ppu._Mask">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">purenes.ppu.</span></span><span class="sig-name descname"><span class="pre">_Mask</span></span><a class="reference internal" href="_modules/purenes/ppu.html#_Mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.ppu._Mask" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_ctypes.Union</span></code></p>
+<p>A class to represent the PPUMASK $2001 register.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This class should only be directly accessed through the read-only
+<a class="reference internal" href="#purenes.ppu.PPU.mask" title="purenes.ppu.PPU.mask"><code class="xref py py-attr docutils literal notranslate"><span class="pre">mask</span></code></a> property of the
+<a class="reference internal" href="#purenes.ppu.PPU" title="purenes.ppu.PPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PPU</span></code></a>. The documentation of this class is included
+as a reference for testing and debugging.</p>
+</div>
+<p><a class="reference external" href="https://www.nesdev.org/wiki/PPU_registers#PPUMASK">https://www.nesdev.org/wiki/PPU_registers#PPUMASK</a></p>
+<ul class="simple">
+<li><p>greyscale                (G) - (0: normal , 1: greyscale)</p></li>
+<li><p>show_background_leftmost (m) - (1: show, 0: hide)</p></li>
+<li><p>show_sprites_leftmost    (M) - (1: show , 0: hide)</p></li>
+<li><p>show_background          (b) - (1: show background)</p></li>
+<li><p>show_sprites             (s) - (1: show sprites)</p></li>
+<li><p>emphasize_red            (R) - Emphasize red</p></li>
+<li><p>emphasize_green          (G) - Emphasize green</p></li>
+<li><p>emphasize_blue           (B) - Emphasize blue</p></li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu._Mask.flags">
+<span class="sig-name descname"><span class="pre">flags</span></span><a class="headerlink" href="#purenes.ppu._Mask.flags" title="Permalink to this definition">#</a></dt>
+<dd><p>Structure/Union member</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu._Mask.reg">
+<span class="sig-name descname"><span class="pre">reg</span></span><a class="headerlink" href="#purenes.ppu._Mask.reg" title="Permalink to this definition">#</a></dt>
 <dd><p>Structure/Union member</p>
 </dd></dl>
 </dd></dl>
