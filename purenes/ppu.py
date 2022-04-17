@@ -344,7 +344,7 @@ class PPU(object):
                 nt_select = self._control.flags.base_nt_address
                 self._vram_temp.flags.nt_select = nt_select
 
-            if _address == 0x0005:
+            elif _address == 0x0005:
                 t = self._vram_temp  # Preserve space
                 if self._write_latch == 0:
                     # On the first write bits 3-7 are used to set coarse_x in
@@ -364,7 +364,7 @@ class PPU(object):
                     t.flags.fine_y = data & 0x07
                     self._write_latch = 0
 
-            if _address == 0x0006:
+            elif _address == 0x0006:
                 t = self._vram_temp.reg  # Preserve space
                 if self._write_latch == 0:
                     # Set bits 8-13 of vram_temp. The bitwise AND with 0x3F
@@ -383,7 +383,7 @@ class PPU(object):
                     self._vram.reg = self._vram_temp.reg
                     self._write_latch = 0
 
-            if _address == 0x0007:
+            elif _address == 0x0007:
                 # Preserve space
                 i = self._control.flags.vram_address_increment
 
