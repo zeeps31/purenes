@@ -167,10 +167,10 @@ class _Address(ctypes.Union):
             "_PPUADDRESS",
             (ctypes.LittleEndianStructure,),
             {"_fields_": [
-                ("coarse_x",  ctypes.c_uint8, 5),
-                ("coarse_y",  ctypes.c_uint8, 5),
-                ("nt_select", ctypes.c_uint8, 2),
-                ("fine_y",    ctypes.c_uint8, 3),
+                ("coarse_x",  ctypes.c_uint16, 5),
+                ("coarse_y",  ctypes.c_uint16, 5),
+                ("nt_select", ctypes.c_uint16, 2),
+                ("fine_y",    ctypes.c_uint16, 3),
             ]}
         )),
         ("reg", ctypes.c_uint16)]
