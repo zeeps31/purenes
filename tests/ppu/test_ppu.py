@@ -103,9 +103,9 @@ class TestPPU(object):
         # Verifies on the first write vram_temp is updated correctly and the
         # write_latch is set to 1 and on the second write verifies the internal
         # write_latch is set to 0 and the full address is transferred from
-        # t -> v.
+        # t -> v and all of the flags are set correctly.
         address = 0x2006
-        test_object.read(0x2002)  # Init/reset write latch
+        vram_address = (data << 8) | data  # Full 16-bit address
 
         vram = test_object.vram
         vram_temp = test_object.vram_temp
@@ -123,6 +123,10 @@ class TestPPU(object):
         # Verify v: <...all bits...> <- t: <...all bits...>
         assert(vram.reg == vram_temp.reg)
         assert(test_object.write_latch == 0)
+        # Assert flags set correctly
+        assert(vram.flags.coarse_x == vram_address & 0x1F)
+        assert(vram.flags.coarse_y == (vram_address >> 5) & 0x1F)
+        assert(vram.flags.nt_select == (vram_address >> 10) & 0x03)
 
     def test_data_write_x_increment(self, test_object, mock_ppu_bus, mocker):
         # Test PPUDATA $2007 write x increment.
