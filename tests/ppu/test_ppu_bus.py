@@ -20,7 +20,7 @@ class TestPPUBus(object):
         for address in address_range:
             data: int = test_object.read(address)
 
-            assert(data == 0x00)
+            assert data == 0x00
 
     def test_write_to_vram(self, test_object):
         address_range = [x for x in range(0x2000, 0x2FFF)]
@@ -29,7 +29,7 @@ class TestPPUBus(object):
         for address in address_range:
             test_object.write(address, data)
 
-            assert(test_object.read(address) == data)
+            assert test_object.read(address) == data
 
     def test_read_invalid_address_raises_exception(self, test_object):
         invalid_address = 0x10000
@@ -37,7 +37,7 @@ class TestPPUBus(object):
         with pytest.raises(Exception) as exception:
             test_object.read(invalid_address)
 
-        assert(str(exception.value) == self.INVALID_ADDRESS_EXCEPTION_MESSAGE)
+        assert str(exception.value) == self.INVALID_ADDRESS_EXCEPTION_MESSAGE
 
     def test_write_invalid_address_raises_exception(self, test_object):
         invalid_address = 0x10000
@@ -45,4 +45,4 @@ class TestPPUBus(object):
         with pytest.raises(Exception) as exception:
             test_object.write(invalid_address, 0x01)
 
-        assert(str(exception.value) == self.INVALID_ADDRESS_EXCEPTION_MESSAGE)
+        assert str(exception.value) == self.INVALID_ADDRESS_EXCEPTION_MESSAGE

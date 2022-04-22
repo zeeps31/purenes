@@ -19,11 +19,11 @@ class TestPPU(object):
     def test_ppu_reset(self, test_object):
         test_object.reset()
 
-        assert(test_object.control.reg == 0)
-        assert(test_object.status.reg == 0)
-        assert(test_object.vram.reg == 0)
-        assert(test_object.vram_temp.reg == 0)
-        assert(test_object.write_latch == 0)
+        assert test_object.control.reg == 0
+        assert test_object.status.reg == 0
+        assert test_object.vram.reg == 0
+        assert test_object.vram_temp.reg == 0
+        assert test_object.write_latch == 0
 
     # Test internal registers
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
@@ -38,16 +38,16 @@ class TestPPU(object):
         control = test_object.control
         vram = test_object.vram
         vram_temp = test_object.vram_temp
-        assert(control.reg == data)
-        assert(vram.reg == 0)  # Assert not updated
-        assert(control.flags.base_nt_address == (data >> 0) & 3)
-        assert(control.flags.vram_address_increment == (data >> 2) & 1)
-        assert(control.flags.sprite_pt_address == (data >> 3) & 1)
-        assert(control.flags.background_pt_address == (data >> 4) & 1)
-        assert(control.flags.sprite_size == (data >> 5) & 1)
-        assert(control.flags.ppu_leader_follower == (data >> 6) & 1)
-        assert(control.flags.generate_nmi == (data >> 7) & 1)
-        assert(vram_temp.flags.nt_select == (data >> 0) & 3)
+        assert control.reg == data
+        assert vram.reg == 0  # Assert not updated
+        assert control.flags.base_nt_address == (data >> 0) & 3
+        assert control.flags.vram_address_increment == (data >> 2) & 1
+        assert control.flags.sprite_pt_address == (data >> 3) & 1
+        assert control.flags.background_pt_address == (data >> 4) & 1
+        assert control.flags.sprite_size == (data >> 5) & 1
+        assert control.flags.ppu_leader_follower == (data >> 6) & 1
+        assert control.flags.generate_nmi == (data >> 7) & 1
+        assert vram_temp.flags.nt_select == (data >> 0) & 3
 
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
     def test_mask_write(self, test_object, data):
@@ -59,14 +59,14 @@ class TestPPU(object):
         test_object.write(address, data)
 
         mask = test_object.mask
-        assert(mask.flags.greyscale == (data >> 0) & 1)
-        assert(mask.flags.show_background_leftmost == (data >> 1) & 1)
-        assert(mask.flags.show_sprites_leftmost == (data >> 2) & 1)
-        assert(mask.flags.show_background == (data >> 3) & 1)
-        assert(mask.flags.show_sprites == (data >> 4) & 1)
-        assert(mask.flags.emphasize_red == (data >> 5) & 1)
-        assert(mask.flags.emphasize_green == (data >> 6) & 1)
-        assert(mask.flags.emphasize_blue == (data >> 7) & 1)
+        assert mask.flags.greyscale == (data >> 0) & 1
+        assert mask.flags.show_background_leftmost == (data >> 1) & 1
+        assert mask.flags.show_sprites_leftmost == (data >> 2) & 1
+        assert mask.flags.show_background == (data >> 3) & 1
+        assert mask.flags.show_sprites == (data >> 4) & 1
+        assert mask.flags.emphasize_red == (data >> 5) & 1
+        assert mask.flags.emphasize_green == (data >> 6) & 1
+        assert mask.flags.emphasize_blue == (data >> 7) & 1
 
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
     def test_scroll_write(self, test_object, data):
@@ -83,16 +83,16 @@ class TestPPU(object):
         test_object.write(address, data)
 
         vram_temp = test_object.vram_temp
-        assert(vram_temp.flags.coarse_x == data >> 3)
-        assert(test_object.fine_x == data & 0x07)
-        assert(test_object.write_latch == 1)
+        assert vram_temp.flags.coarse_x == data >> 3
+        assert test_object.fine_x == data & 0x07
+        assert test_object.write_latch == 1
 
         # Second write
         test_object.write(address, data)
 
-        assert(vram_temp.flags.coarse_y == data >> 3)
-        assert(vram_temp.flags.fine_y == data & 0x07)
-        assert(test_object.write_latch == 0)
+        assert vram_temp.flags.coarse_y == data >> 3
+        assert vram_temp.flags.fine_y == data & 0x07
+        assert test_object.write_latch == 0
 
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
     def test_vram_address_write(self, test_object, data):
@@ -113,20 +113,20 @@ class TestPPU(object):
         test_object.write(address, data)
 
         # Verify t: .CDEFGH ........ <- d: ..CDEFGH
-        assert(((vram_temp.reg >> 8) & 0x3F) == (data & 0x3F))
-        assert(test_object.write_latch == 1)
+        assert ((vram_temp.reg >> 8) & 0x3F) == (data & 0x3F)
+        assert test_object.write_latch == 1
 
         test_object.write(address, data)
 
         # Verify t: ....... ABCDEFGH <- d: ABCDEFGH
-        assert(vram.reg == ((data & 0x3F) << 8) | data)
+        assert vram.reg == ((data & 0x3F) << 8) | data
         # Verify v: <...all bits...> <- t: <...all bits...>
-        assert(vram.reg == vram_temp.reg)
-        assert(test_object.write_latch == 0)
+        assert vram.reg == vram_temp.reg
+        assert test_object.write_latch == 0
         # Assert flags set correctly
-        assert(vram.flags.coarse_x == vram_address & 0x1F)
-        assert(vram.flags.coarse_y == (vram_address >> 5) & 0x1F)
-        assert(vram.flags.nt_select == (vram_address >> 10) & 0x03)
+        assert vram.flags.coarse_x == vram_address & 0x1F
+        assert vram.flags.coarse_y == (vram_address >> 5) & 0x1F
+        assert vram.flags.nt_select == (vram_address >> 10) & 0x03
 
     def test_data_write_x_increment(self, test_object, mock_ppu_bus, mocker):
         # Test PPUDATA $2007 write x increment.
@@ -152,7 +152,7 @@ class TestPPU(object):
         address = 0x2007
         data = 0x01
 
-        test_object.write(0x2000, 0x4)
+        test_object.write(0x2000, 0x4)  # Set the increment mode
 
         test_object.write(address, data)
         test_object.write(address, data)
@@ -167,7 +167,7 @@ class TestPPU(object):
 
         test_object.read(address)
 
-        assert(test_object.write_latch == 0)
+        assert test_object.write_latch == 0
 
     def test_data_read_x_increment(self, test_object, mock_ppu_bus, mocker):
         # Test PPUDATA $2007 x increment.
@@ -220,7 +220,7 @@ class TestPPU(object):
         actual_values.append(test_object.read(address))
         actual_values.append(test_object.read(address))
 
-        assert(actual_values == expected_values)
+        assert actual_values == expected_values
 
     def test_data_read_buffer_palette_address(self, test_object, mock_ppu_bus):
         # Tests PPUDATA $2007 read for addresses >= $3F00.
@@ -243,4 +243,4 @@ class TestPPU(object):
         actual_values.append(test_object.read(address))
         actual_values.append(test_object.read(address))
 
-        assert(actual_values == expected_values)
+        assert actual_values == expected_values
