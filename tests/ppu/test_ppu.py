@@ -25,6 +25,36 @@ class TestPPU(object):
         assert test_object.vram_temp.reg == 0
         assert test_object.write_latch == 0
 
+    def test_coarse_x_increment(self, test_object):
+        # Test coarse_x increment without scrolling offsets
+        #
+        # Sets coarse_x = 0 and clocks the PPU 256 times. Verifies that
+        # coarse_x is 31 (the last tile of the nametable) and that the
+        # nametable address was not wrapped around.
+        test_object.write(0x2006, 0x20)
+        test_object.write(0x2006, 0x00)
+
+        for i in range(0, 257):
+            test_object.clock()
+
+        assert test_object.vram.flags.coarse_x == 0x1F
+        assert test_object.vram.flags.nt_select == 0
+
+    def test_coarse_x_increment_wrap(self, test_object):
+        # Test coarse_x increment with scrolling offsets
+        #
+        # Sets coarse_x = 1 and clocks the PPU 256 times. Verifies that
+        # coarse_x is 0 (the first tile of the next nametable) and that the
+        # nametable address is wrapped around.
+        test_object.write(0x2006, 0x20)
+        test_object.write(0x2006, 0x01)
+
+        for i in range(0, 257):
+            test_object.clock()
+
+        assert test_object.vram.flags.coarse_x == 0x00
+        assert test_object.vram.flags.nt_select == 1
+
     # Test internal registers
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
     def test_control_write(self, test_object, data):
