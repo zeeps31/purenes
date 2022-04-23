@@ -344,8 +344,6 @@ class PPU(object):
                     else:
                         self._increment_coarse_x()
 
-        # Increment cycle and scanline if this is the last cycle on the
-        # scanline
         self._increment_cycle()
 
     def read(self, address: int) -> int:
