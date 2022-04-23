@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>purenes.ppu - PureNES 0.18.0 documentation</title>
+        <title>purenes.ppu - PureNES 0.19.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -120,7 +120,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PureNES 0.18.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PureNES 0.19.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -143,7 +143,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">PureNES 0.18.0 documentation</span>
+  <span class="sidebar-brand-text">PureNES 0.19.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -459,6 +459,10 @@
 
     <span class="n">_REGISTER_ADDRESS_MASK</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="mh">0x08</span>
 
+    <span class="c1"># NTSC cycle and scanline maximums</span>
+    <span class="n">_MAX_SCANLINE</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="mi">260</span>
+    <span class="n">_MAX_CYCLE</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="mi">340</span>
+
     <span class="c1"># Internal registers</span>
     <span class="n">_control</span> <span class="o">=</span> <span class="n">_Control</span><span class="p">()</span>  <span class="c1"># $2000</span>
     <span class="n">_mask</span> <span class="o">=</span> <span class="n">_Mask</span><span class="p">()</span>        <span class="c1"># $2001</span>
@@ -525,7 +529,7 @@
                     <span class="k">else</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">_increment_coarse_x</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cycle</span> <span class="o">+=</span> <span class="mi">1</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_increment_cycle</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="PPU.read"><a class="viewcode-back" href="../../purenes.html#purenes.ppu.PPU.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sd">"""Public read method exposed by the PPU for communication with the</span>
@@ -750,6 +754,28 @@
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fine_x</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">scanline</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">"""Read-only access to the internal scanline counter.</span>
+
+<span class="sd">        This should only be used for testing and debugging purposes.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The value of the current scanline</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scanline</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">"""Read-only access to the internal scanline cycle counter.</span>
+
+<span class="sd">        This should only be used for testing and debugging purposes.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The value of the current cycle within a scanline</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cycle</span>
+
     <span class="k">def</span> <span class="nf">_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="c1"># Internal read.</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ppu_bus</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
@@ -757,6 +783,18 @@
     <span class="k">def</span> <span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Internal write.</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ppu_bus</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_increment_cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Increment cycle and scanline, handle resets.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cycle</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MAX_CYCLE</span><span class="p">:</span>
+            <span class="c1"># This is the last cycle on this scanline, reset the counter</span>
+            <span class="c1"># increment or reset the scanline.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cycle</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scanline</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scanline</span> <span class="o">+</span> <span class="mi">1</span>
+                              <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scanline</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MAX_SCANLINE</span>
+                              <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cycle</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="k">def</span> <span class="nf">_increment_coarse_x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Increment coarse_x after every 8 cycles. If coarse_x reaches the</span>
