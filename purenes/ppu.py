@@ -274,6 +274,10 @@ class PPU(object):
 
     _REGISTER_ADDRESS_MASK: Final = 0x08
 
+    # NTSC cycle and scanline totals.
+    _MAX_SCANLINE: Final = 260
+    _MAX_CYCLE: Final = 340
+
     # Internal registers
     _control = _Control()  # $2000
     _mask = _Mask()        # $2001
@@ -340,7 +344,9 @@ class PPU(object):
                     else:
                         self._increment_coarse_x()
 
-        self._cycle += 1
+        # Increment cycle and scanline if this is the last cycle on the
+        # scanline
+        self._increment_cycle()
 
     def read(self, address: int) -> int:
         """Public read method exposed by the PPU for communication with the
@@ -565,6 +571,28 @@ class PPU(object):
         """
         return self._fine_x
 
+    @property
+    def scanline(self) -> int:
+        """Read-only access to the internal scanline counter.
+
+        This should only be used for testing and debugging purposes.
+
+        Returns:
+            int: The value of the current scanline
+        """
+        return self._scanline
+
+    @property
+    def cycle(self) -> int:
+        """Read-only access to the internal scanline cycle counter.
+
+        This should only be used for testing and debugging purposes.
+
+        Returns:
+            int: The value of the current cycle within a scanline
+        """
+        return self._cycle
+
     def _read(self, address: int) -> int:
         # Internal read.
         return self._ppu_bus.read(address)
@@ -572,6 +600,18 @@ class PPU(object):
     def _write(self, address: int, data: int) -> None:
         # Internal write.
         return self._ppu_bus.write(address, data)
+
+    def _increment_cycle(self):
+        # Increment cycle and scanline, handle resets.
+        if self._cycle == self._MAX_CYCLE:
+            # This is the last cycle on this scanline, reset the counter
+            # increment or reset the scanline.
+            self._cycle = 0
+            self._scanline = (self._scanline + 1
+                              if self._scanline < self._MAX_SCANLINE
+                              else -1)
+        else:
+            self._cycle += 1
 
     def _increment_coarse_x(self):
         # Increment coarse_x after every 8 cycles. If coarse_x reaches the

@@ -55,6 +55,29 @@ class TestPPU(object):
         assert test_object.vram.flags.coarse_x == 0x00
         assert test_object.vram.flags.nt_select == 1
 
+    def test_cycle_incremented_at_maximum(self, test_object: PPU):
+        """Test incrementing of cycles within a scanline resets at the maximum
+        and that the scanline is incremented by 1.
+
+        There are 341 cycles per scanline. The PPU is clocked 341 times to
+        verify the cycle counter is reset when the maximum is reached and the
+        scanline is incremented.
+        """
+        for _ in range(0, 341):
+            test_object.clock()
+
+        assert test_object.cycle == 0
+        assert test_object.scanline == 0
+
+    def test_scanline_resets_at_maximum(self, test_object: PPU):
+        """Test scanline is reset to the pre-render scanline when the maximum
+        scanline and scanline cycles have been reached.
+        """
+        for _ in range(0, 341 * 262):  # 341 cycles and 261 scanlines
+            test_object.clock()
+
+        assert test_object.scanline == -1
+
     # Test internal registers
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
     def test_control_write(self, test_object, data):
