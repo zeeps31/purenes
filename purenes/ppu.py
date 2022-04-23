@@ -288,6 +288,10 @@ class PPU(object):
     # $2007 read buffer used to preserve data across frames.
     _data_read_buffer: int
 
+    # Counters
+    _scanline: int = -1  # Current scanline
+    _cycle: int = 0      # Current cycle within a scanline
+
     _ppu_bus: PPUBus
 
     def __init__(self, ppu_bus: PPUBus):
@@ -301,6 +305,42 @@ class PPU(object):
             ppu_bus (PPUBus): An instance of a :class:`~purenes.ppu.PPUBus`
         """
         self._ppu_bus = ppu_bus
+
+    def clock(self) -> None:
+        """Perform one clock of the PPU.
+
+        The action performed for each clock cycle is contingent upon the
+        current scanline, cycle and state of the PPU.
+
+        https://www.nesdev.org/wiki/PPU_rendering
+
+        Returns:
+            None
+        """
+        # Preserve space
+        scanline = self._scanline
+        cycle = self._cycle
+
+        # Visible scanline (0-239).
+        if -1 <= scanline <= 239:
+
+            if (1 <= cycle <= 256) or (321 <= cycle <= 340):
+                # Some of the rendering process repeats itself every 8 cycles
+                # The process does not start until cycle 1, the rendering_cycle
+                # value is decremented by 1 to improve readability.
+                rendering_cycle = (cycle - 1) % 8
+                if rendering_cycle == 0:
+                    pass
+
+                elif rendering_cycle == 7:
+                    if cycle == 256:
+                        # This is the last cycle of the visible part of the
+                        # scanline. Increment coarse_y.
+                        pass
+                    else:
+                        self._increment_coarse_x()
+
+        self._cycle += 1
 
     def read(self, address: int) -> int:
         """Public read method exposed by the PPU for communication with the
@@ -532,3 +572,13 @@ class PPU(object):
     def _write(self, address: int, data: int) -> None:
         # Internal write.
         return self._ppu_bus.write(address, data)
+
+    def _increment_coarse_x(self):
+        # Increment coarse_x after every 8 cycles. If coarse_x reaches the
+        # maximum number of tiles in the nametable, the lower bit of the
+        # nametable_select value is inverted (wrapped around).
+        if self._vram.flags.coarse_x == 31:
+            self._vram.flags.coarse_x = 0
+            self._vram.flags.nt_select ^= 1
+        else:
+            self._vram.flags.coarse_x += 1
