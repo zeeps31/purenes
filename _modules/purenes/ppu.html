@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>purenes.ppu - PureNES 0.17.3 documentation</title>
+        <title>purenes.ppu - PureNES 0.18.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -120,7 +120,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PureNES 0.17.3 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PureNES 0.18.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -143,7 +143,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">PureNES 0.17.3 documentation</span>
+  <span class="sidebar-brand-text">PureNES 0.18.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -473,6 +473,10 @@
     <span class="c1"># $2007 read buffer used to preserve data across frames.</span>
     <span class="n">_data_read_buffer</span><span class="p">:</span> <span class="nb">int</span>
 
+    <span class="c1"># Counters</span>
+    <span class="n">_scanline</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># Current scanline</span>
+    <span class="n">_cycle</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>      <span class="c1"># Current cycle within a scanline</span>
+
     <span class="n">_ppu_bus</span><span class="p">:</span> <span class="n">PPUBus</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ppu_bus</span><span class="p">:</span> <span class="n">PPUBus</span><span class="p">):</span>
@@ -486,6 +490,42 @@
 <span class="sd">            ppu_bus (PPUBus): An instance of a :class:`~purenes.ppu.PPUBus`</span>
 <span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ppu_bus</span> <span class="o">=</span> <span class="n">ppu_bus</span>
+
+<div class="viewcode-block" id="PPU.clock"><a class="viewcode-back" href="../../purenes.html#purenes.ppu.PPU.clock">[docs]</a>    <span class="k">def</span> <span class="nf">clock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">"""Perform one clock of the PPU.</span>
+
+<span class="sd">        The action performed for each clock cycle is contingent upon the</span>
+<span class="sd">        current scanline, cycle and state of the PPU.</span>
+
+<span class="sd">        https://www.nesdev.org/wiki/PPU_rendering</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
+        <span class="c1"># Preserve space</span>
+        <span class="n">scanline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scanline</span>
+        <span class="n">cycle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cycle</span>
+
+        <span class="c1"># Visible scanline (0-239).</span>
+        <span class="k">if</span> <span class="o">-</span><span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">scanline</span> <span class="o">&lt;=</span> <span class="mi">239</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">cycle</span> <span class="o">&lt;=</span> <span class="mi">256</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="mi">321</span> <span class="o">&lt;=</span> <span class="n">cycle</span> <span class="o">&lt;=</span> <span class="mi">340</span><span class="p">):</span>
+                <span class="c1"># Some of the rendering process repeats itself every 8 cycles</span>
+                <span class="c1"># The process does not start until cycle 1, the rendering_cycle</span>
+                <span class="c1"># value is decremented by 1 to improve readability.</span>
+                <span class="n">rendering_cycle</span> <span class="o">=</span> <span class="p">(</span><span class="n">cycle</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">8</span>
+                <span class="k">if</span> <span class="n">rendering_cycle</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">pass</span>
+
+                <span class="k">elif</span> <span class="n">rendering_cycle</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">cycle</span> <span class="o">==</span> <span class="mi">256</span><span class="p">:</span>
+                        <span class="c1"># This is the last cycle of the visible part of the</span>
+                        <span class="c1"># scanline. Increment coarse_y.</span>
+                        <span class="k">pass</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_increment_coarse_x</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cycle</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
 <div class="viewcode-block" id="PPU.read"><a class="viewcode-back" href="../../purenes.html#purenes.ppu.PPU.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sd">"""Public read method exposed by the PPU for communication with the</span>
@@ -716,7 +756,17 @@
 
     <span class="k">def</span> <span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Internal write.</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ppu_bus</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ppu_bus</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_increment_coarse_x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Increment coarse_x after every 8 cycles. If coarse_x reaches the</span>
+        <span class="c1"># maximum number of tiles in the nametable, the lower bit of the</span>
+        <span class="c1"># nametable_select value is inverted (wrapped around).</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_x</span> <span class="o">==</span> <span class="mi">31</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_x</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">nt_select</span> <span class="o">^=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_x</span> <span class="o">+=</span> <span class="mi">1</span></div>
 </pre></div>
         </article>
       </div>
