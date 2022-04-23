@@ -194,8 +194,8 @@ class TestPPU(object):
     def test_data_write_x_increment(
             self,
             test_object: PPU,
-            mock_ppu_bus,
-            mocker
+            mock_ppu_bus: Mock,
+            mocker: MockFixture
     ):
         """Test PPUDATA $2007 write x increment.
 
