@@ -274,7 +274,7 @@ class PPU(object):
 
     _REGISTER_ADDRESS_MASK: Final = 0x08
 
-    # NTSC cycle and scanline totals.
+    # NTSC cycle and scanline maximums
     _MAX_SCANLINE: Final = 260
     _MAX_CYCLE: Final = 340
 
