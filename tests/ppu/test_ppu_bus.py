@@ -14,7 +14,10 @@ class TestPPUBus(object):
         ppu_bus: PPUBus = PPUBus()
         yield ppu_bus
 
-    def test_read_from_vram(self, test_object):
+    def test_read_from_vram(self, test_object: PPUBus):
+        """Test that reads from VRAM for addresses 0x2000-0x2FFF return
+        the correct values.
+        """
         address_range = [x for x in range(0x2000, 0x2FFF)]
 
         for address in address_range:
@@ -22,7 +25,10 @@ class TestPPUBus(object):
 
             assert data == 0x00
 
-    def test_write_to_vram(self, test_object):
+    def test_write_to_vram(self, test_object: PPUBus):
+        """Test that writes to VRAM for addresses 0x2000-0x2FFF return
+        the correct values.
+        """
         address_range = [x for x in range(0x2000, 0x2FFF)]
         data = 0x01
 
@@ -31,7 +37,10 @@ class TestPPUBus(object):
 
             assert test_object.read(address) == data
 
-    def test_read_invalid_address_raises_exception(self, test_object):
+    def test_read_invalid_address_raises_exception(self, test_object: PPUBus):
+        """Test that a read from an address not in the addressable range of the
+        PPU throws an exception.
+        """
         invalid_address = 0x10000
 
         with pytest.raises(Exception) as exception:
@@ -39,7 +48,10 @@ class TestPPUBus(object):
 
         assert str(exception.value) == self.INVALID_ADDRESS_EXCEPTION_MESSAGE
 
-    def test_write_invalid_address_raises_exception(self, test_object):
+    def test_write_invalid_address_raises_exception(self, test_object: PPUBus):
+        """Test that writes to an address not in the addressable range of the
+        PPU throws an exception.
+        """
         invalid_address = 0x10000
 
         with pytest.raises(Exception) as exception:
