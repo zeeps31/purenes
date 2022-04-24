@@ -26,8 +26,8 @@ class TestPPUBus(object):
             assert data == 0x00
 
     def test_write_to_vram(self, test_object: PPUBus):
-        """Test that writes to VRAM for addresses 0x2000-0x2FFF return
-        the correct values.
+        """Test that writes to VRAM for addresses 0x2000-0x2FFF write the
+        correct values to the correct location.
         """
         address_range = [x for x in range(0x2000, 0x2FFF)]
         data = 0x01
