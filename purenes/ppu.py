@@ -328,6 +328,10 @@ class PPU(object):
         # Visible scanline (0-239).
         if -1 <= scanline <= 239:
 
+            if cycle == 257:
+                # Last cycle of visible scanline, reset coarse_x
+                self._vram.flags.coarse_x = self._vram_temp.flags.coarse_x
+
             if (1 <= cycle <= 256) or (321 <= cycle <= 340):
                 # Some of the rendering process repeats itself every 8 cycles
                 # The process does not start until cycle 1, the rendering_cycle
