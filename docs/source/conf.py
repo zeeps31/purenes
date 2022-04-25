@@ -22,7 +22,7 @@ copyright = '2022, Stephen Brady'
 author = 'Stephen Brady'
 
 # The full version, including alpha/beta/rc tags
-release = '0.19.4'
+release = '0.20.0'
 
 
 # -- General configuration ---------------------------------------------------

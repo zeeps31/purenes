@@ -64,6 +64,20 @@ class TestPPU(object):
         assert test_object.vram.flags.coarse_x == 0x00
         assert test_object.vram.flags.nt_select == 1
 
+    def test_horizontal_coarse_scroll_resets_after_rendering_a_scanline(
+            self,
+            test_object: PPU
+    ):
+        """Tests coarse_x reset at cycle 257 in a scanline during rendering.
+
+        Clocks the PPU 258 times (cycles 0 - 257) and verifies that coarse_x is
+        reset at cycle 257.
+        """
+        for i in range(0, 258):
+            test_object.clock()
+
+        assert test_object.vram.flags.coarse_x == 0
+
     def test_cycle_resets_at_maximum(self, test_object: PPU):
         """Test incrementing of cycles within a scanline resets at the maximum
         and that the scanline is incremented by 1.
