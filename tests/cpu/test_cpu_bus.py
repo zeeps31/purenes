@@ -37,7 +37,10 @@ class TestCpuBus(object):
 
             assert test_object.read(address) == data
 
-    def test_read_invalid_address_raises_exception(self, test_object: CPUBus):
+    def test_read_from_an_incorrect_address_is_invalid(
+            self,
+            test_object: CPUBus
+    ):
         """Test that a read from an address not in the addressable range of the
         CPU throws an exception.
         """
@@ -48,7 +51,10 @@ class TestCpuBus(object):
 
         assert str(exception.value) == self.INVALID_ADDRESS_EXCEPTION_MESSAGE
 
-    def test_write_invalid_address_raises_exception(self, test_object: CPUBus):
+    def test_write_to_an_incorrect_address_is_invalid(
+            self,
+            test_object: CPUBus
+    ):
         """Test that a write to an address not in the addressable range of the
         CPU throws an exception.
         """

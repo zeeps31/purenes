@@ -5,8 +5,10 @@ from purenes.cpu import CPU
 
 class TestCPU(object):
 
-    def test_clock(self, mocker: MockFixture):
-        """Test CPU reset sets the program counter with the values stored at
+    def test_reset(self, mocker: MockFixture):
+        """Test CPU reset cycle.
+
+        Verifies the program counter is updated with the values stored at
         the reset vector addresses and the next CPU clock reads from the
         CPUBus using the address stored in the program counter.
         """
