@@ -29,7 +29,7 @@ class TestPPU(object):
         assert test_object.vram_temp.reg == 0
         assert test_object.write_latch == 0
 
-    def test_coarse_x_increment(self, test_object: PPU):
+    def test_coarse_scroll_horizontal_increment(self, test_object: PPU):
         """Test coarse_x increment without scrolling offsets
 
         Sets coarse_x = 0 and clocks the PPU 256 times. Verifies that
@@ -45,7 +45,10 @@ class TestPPU(object):
         assert test_object.vram.flags.coarse_x == 0x1F
         assert test_object.vram.flags.nt_select == 0
 
-    def test_coarse_x_increment_wrap(self, test_object: PPU):
+    def test_coarse_scroll_horizontal_increment_wraps_around_at_maximum(
+            self,
+            test_object: PPU
+    ):
         """Test coarse_x increment with scrolling offsets
 
         Sets coarse_x = 1 and clocks the PPU 256 times. Verifies that
@@ -61,7 +64,7 @@ class TestPPU(object):
         assert test_object.vram.flags.coarse_x == 0x00
         assert test_object.vram.flags.nt_select == 1
 
-    def test_cycle_incremented_at_maximum(self, test_object: PPU):
+    def test_cycle_resets_at_maximum(self, test_object: PPU):
         """Test incrementing of cycles within a scanline resets at the maximum
         and that the scanline is incremented by 1.
 
@@ -86,7 +89,7 @@ class TestPPU(object):
 
     # Test internal registers
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
-    def test_control_write(self, test_object: PPU, data: int):
+    def test_write_to_control_register(self, test_object: PPU, data: int):
         """Test write to $2000. Verifies the flags of the control register are
         updated and that the vram_temp.nt_select attribute is updated when a
         write to $2000 occurs.
@@ -110,7 +113,7 @@ class TestPPU(object):
         assert vram_temp.flags.nt_select == (data >> 0) & 3
 
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
-    def test_mask_write(self, test_object: PPU, data: int):
+    def test_write_to_mask_register(self, test_object: PPU, data: int):
         """Test PPUMASK $2001 write.
 
         Verifies that all flags are set appropriately for a given input.
@@ -129,8 +132,23 @@ class TestPPU(object):
         assert mask.flags.emphasize_green == (data >> 6) & 1
         assert mask.flags.emphasize_blue == (data >> 7) & 1
 
+    def test_read_from_status_register_resets_write_latch(
+            self,
+            test_object: PPU
+    ):
+        """Test PPUSTATUS $2002
+
+        Verifies the internal write latch is reset for each read from this
+        address location.
+        """
+        address = 0x2002
+
+        test_object.read(address)
+
+        assert test_object.write_latch == 0
+
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
-    def test_scroll_write(self, test_object: PPU, data: int):
+    def test_write_to_scroll_register(self, test_object: PPU, data: int):
         """Test PPUSCROLL $2005 write.
 
         Verifies that on the first write to $2005 bits 3-7 of the input data
@@ -157,14 +175,13 @@ class TestPPU(object):
         assert test_object.write_latch == 0
 
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
-    def test_vram_address_write(self, test_object: PPU, data: int):
-        # TODO: https://github.com/zeeps31/purenes/issues/28
+    def test_write_to_vram_address_register(self, test_object: PPU, data: int):
         """Test writes to $2006. Writing to $2006 requires two writes to set
         the VRAM address.
 
         Verifies on the first write vram_temp is updated correctly and the
-        write_latch is set to 1 and on the second write verifies the internal
-        write_latch is set to 0 and the full address is transferred from
+        write_latch is set to 1. On the second write verifies the internal
+        write_latch is set to 0, the full address is transferred from
         t -> v and all of the flags are set correctly.
         """
         address = 0x2006
@@ -191,7 +208,7 @@ class TestPPU(object):
         assert vram.flags.coarse_y == (vram_address >> 5) & 0x1F
         assert vram.flags.nt_select == (vram_address >> 10) & 0x03
 
-    def test_data_write_x_increment(
+    def test_write_to_data_register_with_horizontal_increment_mode(
             self,
             test_object: PPU,
             mock_ppu_bus: Mock,
@@ -213,7 +230,7 @@ class TestPPU(object):
             mocker.call.write(0x0001, 0x01)
         ])
 
-    def test_data_write_y_increment(
+    def test_write_to_data_register_with_vertical_increment_mode(
             self,
             test_object: PPU,
             mock_ppu_bus: Mock,
@@ -222,7 +239,7 @@ class TestPPU(object):
         """Test PPUDATA $2007 write y increment.
 
         Test that successive writes to the data register with increment_mode
-        1 increments the vram address by 32 bytes.
+        1 increment the vram address by 32 bytes.
         """
         address = 0x2007
         data = 0x01
@@ -237,14 +254,7 @@ class TestPPU(object):
             mocker.call.write(0x0020, 0x01)
         ])
 
-    def test_status_read(self, test_object: PPU):
-        address = 0x2002
-
-        test_object.read(address)
-
-        assert test_object.write_latch == 0
-
-    def test_data_read_x_increment(
+    def test_read_from_data_register_with_horizontal_increment_mode(
             self,
             test_object: PPU,
             mock_ppu_bus: Mock,
@@ -252,8 +262,8 @@ class TestPPU(object):
     ):
         """Test PPUDATA $2007 x increment.
 
-        Test that successive writes to the data register with increment_mode
-        0 increments the vram address by one byte.
+        Test that successive reads from the data register with increment_mode
+        0 increment the vram address by one byte.
         """
         address = 0x2007
 
@@ -265,7 +275,7 @@ class TestPPU(object):
             mocker.call.read(0x0001)
         ])
 
-    def test_data_read_y_increment(
+    def test_read_from_data_register_with_vertical_increment_mode(
             self,
             test_object: PPU,
             mock_ppu_bus: Mock,
@@ -273,7 +283,7 @@ class TestPPU(object):
     ):
         """Test PPUDATA $2007 y increment.
 
-        Test that successive writes to the data register with increment_mode
+        Test that successive reads from the data register with increment_mode
         1 increments the vram address by 32 bytes.
         """
         address = 0x2007
@@ -288,7 +298,11 @@ class TestPPU(object):
             mocker.call.read(0x0020)
         ])
 
-    def test_data_read_buffer(self, test_object: PPU, mock_ppu_bus: Mock):
+    def test_read_from_data_register_non_palette_address_buffers_value(
+            self,
+            test_object: PPU,
+            mock_ppu_bus: Mock
+    ):
         """Test PPUDATA $2007 read for non-palette address 0-$3EFF.
 
         Test that successive reads from $2007 for VVRAM addresses <= $3EFF
@@ -310,7 +324,7 @@ class TestPPU(object):
 
         assert actual_values == expected_values
 
-    def test_data_read_buffer_palette_address(
+    def test_read_from_data_register_palette_address_does_not_buffer_value(
             self,
             test_object: PPU,
             mock_ppu_bus: Mock

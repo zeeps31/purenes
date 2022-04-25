@@ -37,7 +37,10 @@ class TestPPUBus(object):
 
             assert test_object.read(address) == data
 
-    def test_read_invalid_address_raises_exception(self, test_object: PPUBus):
+    def test_read_from_an_incorrect_address_is_invalid(
+            self,
+            test_object: PPUBus
+    ):
         """Test that a read from an address not in the addressable range of the
         PPU throws an exception.
         """
@@ -48,7 +51,10 @@ class TestPPUBus(object):
 
         assert str(exception.value) == self.INVALID_ADDRESS_EXCEPTION_MESSAGE
 
-    def test_write_invalid_address_raises_exception(self, test_object: PPUBus):
+    def test_write_to_an_incorrect_address_is_invalid(
+            self,
+            test_object: PPUBus
+    ):
         """Test that writes to an address not in the addressable range of the
         PPU throws an exception.
         """
