@@ -43,7 +43,7 @@ class TestPPU(object):
             test_object.clock()
 
         assert test_object.vram.flags.coarse_x == 0x1F
-        assert test_object.vram.flags.nt_select == 0
+        assert test_object.vram.flags.nt_select_x == 0
 
     def test_coarse_scroll_horizontal_increment_wraps_around_at_maximum(
             self,
@@ -62,7 +62,7 @@ class TestPPU(object):
             test_object.clock()
 
         assert test_object.vram.flags.coarse_x == 0x00
-        assert test_object.vram.flags.nt_select == 1
+        assert test_object.vram.flags.nt_select_x == 1
 
     def test_horizontal_coarse_scroll_resets_after_rendering_a_scanline(
             self,
@@ -92,7 +92,7 @@ class TestPPU(object):
 
         assert test_object.vram.flags.fine_y == 1
         assert test_object.vram.flags.coarse_y == 0
-        assert test_object.vram.flags.nt_select == 0
+        assert test_object.vram.flags.nt_select_y == 0
 
     def test_vertical_scrolling_overflows_at_maximum(
             self,
@@ -112,7 +112,7 @@ class TestPPU(object):
 
         assert test_object.vram.flags.fine_y == 0
         assert test_object.vram.flags.coarse_y == 1
-        assert test_object.vram.flags.nt_select & 0x02 == 0
+        assert test_object.vram.flags.nt_select_y == 0
 
     def test_vertical_scrolling_wraps_around_nametable_at_maximum(
             self,
@@ -132,7 +132,7 @@ class TestPPU(object):
 
         assert test_object.vram.flags.fine_y == 0
         assert test_object.vram.flags.coarse_y == 0
-        assert (test_object.vram.flags.nt_select & 0x02) >> 1 == 1
+        assert test_object.vram.flags.nt_select_y == 1
 
     def test_cycle_resets_at_maximum(self, test_object: PPU):
         """Test incrementing of cycles within a scanline resets at the maximum
@@ -161,8 +161,8 @@ class TestPPU(object):
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
     def test_write_to_control_register(self, test_object: PPU, data: int):
         """Test write to $2000. Verifies the flags of the control register are
-        updated and that the vram_temp.nt_select attribute is updated when a
-        write to $2000 occurs.
+        updated and that the vram_temp.nt_select_x and vram_temp.nt_select_y
+        attributes are updated when a write to $2000 occurs.
         """
         address = 0x2000
 
@@ -180,7 +180,8 @@ class TestPPU(object):
         assert control.flags.sprite_size == (data >> 5) & 1
         assert control.flags.ppu_leader_follower == (data >> 6) & 1
         assert control.flags.generate_nmi == (data >> 7) & 1
-        assert vram_temp.flags.nt_select == (data >> 0) & 3
+        assert vram_temp.flags.nt_select_x == (data >> 0) & 0x01
+        assert vram_temp.flags.nt_select_y == (data >> 1) & 0x01
 
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
     def test_write_to_mask_register(self, test_object: PPU, data: int):
@@ -276,7 +277,8 @@ class TestPPU(object):
         # Assert flags set correctly
         assert vram.flags.coarse_x == vram_address & 0x1F
         assert vram.flags.coarse_y == (vram_address >> 5) & 0x1F
-        assert vram.flags.nt_select == (vram_address >> 10) & 0x03
+        assert vram.flags.nt_select_x == (vram_address >> 10) & 0x01
+        assert vram.flags.nt_select_y == (vram_address >> 11) & 0x01
 
     def test_write_to_data_register_with_horizontal_increment_mode(
             self,
