@@ -157,20 +157,22 @@ class _Address(ctypes.Union):
     The values detailed below can be accessed using the
     :attr:`~purenes.ppu._Address.flags` attribute of this class.
 
-    * coarse_x  (XXXXX) - The coarse X value to use when scrolling.
-    * coarse_y  (YYYYY) - The coarse Y value to use when scrolling.
-    * nt_select (NN) - Nametable select.
-    * fine_y    (yyy) - The fine y value to use when scrolling.
+    * coarse_x    (XXXXX) - The coarse X value to use when scrolling.
+    * coarse_y    (YYYYY) - The coarse Y value to use when scrolling.
+    * nt_select_x (N) - Horizontal nametable select.
+    * nt_select_y (N) - Vertical nametable select.
+    * fine_y      (yyy) - The fine y value to use when scrolling.
     """
     _fields_ = [
         ("flags", type(
             "_PPUADDRESS",
             (ctypes.LittleEndianStructure,),
             {"_fields_": [
-                ("coarse_x",  ctypes.c_uint16, 5),
-                ("coarse_y",  ctypes.c_uint16, 5),
-                ("nt_select", ctypes.c_uint16, 2),
-                ("fine_y",    ctypes.c_uint16, 3),
+                ("coarse_x",    ctypes.c_uint16, 5),
+                ("coarse_y",    ctypes.c_uint16, 5),
+                ("nt_select_x", ctypes.c_uint16, 1),
+                ("nt_select_y", ctypes.c_uint16, 1),
+                ("fine_y",      ctypes.c_uint16, 3),
             ]}
         )),
         ("reg", ctypes.c_uint16)]
@@ -407,7 +409,8 @@ class PPU(object):
             if _address == 0x0000:
                 self._control.reg = data
                 nt_select = self._control.flags.base_nt_address
-                self._vram_temp.flags.nt_select = nt_select
+                self._vram_temp.flags.nt_select_x = nt_select & 0x01
+                self._vram_temp.flags.nt_select_y = (nt_select >> 1) & 0x01
 
             elif _address == 0x0001:
                 self._mask.reg = data
@@ -617,7 +620,7 @@ class PPU(object):
         # nametable_select value is inverted (wrapped around).
         if self._vram.flags.coarse_x == 31:
             self._vram.flags.coarse_x = 0
-            self._vram.flags.nt_select ^= 1
+            self._vram.flags.nt_select_x ^= 1
         else:
             self._vram.flags.coarse_x += 1
 
@@ -633,7 +636,7 @@ class PPU(object):
             if self._vram.flags.coarse_y == 29:
                 self._vram.flags.coarse_y = 0
                 # Wrap vertical nametable
-                self._vram.flags.nt_select ^= 0x02
+                self._vram.flags.nt_select_y ^= 1
             # TODO: https://github.com/zeeps31/purenes/issues/48
             else:
                 self._vram.flags.coarse_y += 1
