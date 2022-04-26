@@ -78,6 +78,62 @@ class TestPPU(object):
 
         assert test_object.vram.flags.coarse_x == 0
 
+    def test_vertical_scrolling(self, test_object: PPU):
+        """Test vertical scrolling without any vertical scrolling offsets.
+
+        Sets fine_y = 0 and clocks the PPU 256 times. Verifies that fine_y is
+        incremented by 1 without overflowing into coarse_y
+        """
+        test_object.write(0x2005, 0x00)
+        test_object.write(0x2000, 0x00)
+
+        for i in range(0, 257):
+            test_object.clock()
+
+        assert test_object.vram.flags.fine_y == 1
+        assert test_object.vram.flags.coarse_y == 0
+        assert test_object.vram.flags.nt_select == 0
+
+    def test_vertical_scrolling_overflows_at_maximum(
+            self,
+            test_object: PPU
+    ):
+        """Test vertical scrolling with a fine_y offset of 1 overflows into
+        coarse_y after one tile is rendered.
+
+        Sets fine_y = 1 and clocks the PPU 2,720 times. Verifies that fine_y
+        is reset and coarse_y is incremented once the maximum is reached.
+        """
+        test_object.write(0x2005, 0x00)
+        test_object.write(0x2000, 0x01)
+
+        for i in range(0, 340 * 8):
+            test_object.clock()
+
+        assert test_object.vram.flags.fine_y == 0
+        assert test_object.vram.flags.coarse_y == 1
+        assert test_object.vram.flags.nt_select & 0x02 == 0
+
+    def test_vertical_scrolling_wraps_around_nametable_at_maximum(
+            self,
+            test_object: PPU
+    ):
+        """Test vertical scrolling with a fine_y offset of 1 wraps around the
+        nametable after one frame is rendered.
+
+        Sets fine_y = 1 and clocks the PPU 81,840 times. Verifies that the
+        vertical nametable is wrapped around once the maximum is reached.
+        """
+        test_object.write(0x2005, 0x00)
+        test_object.write(0x2000, 0x01)  # Set fine_y
+
+        for i in range(0, 341 * 240):
+            test_object.clock()
+
+        assert test_object.vram.flags.fine_y == 0
+        assert test_object.vram.flags.coarse_y == 0
+        assert (test_object.vram.flags.nt_select & 0x02) >> 1 == 1
+
     def test_cycle_resets_at_maximum(self, test_object: PPU):
         """Test incrementing of cycles within a scanline resets at the maximum
         and that the scanline is incremented by 1.
