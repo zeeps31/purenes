@@ -341,12 +341,8 @@ class PPU(object):
                     pass
 
                 elif rendering_cycle == 7:
-                    if cycle == 256:
-                        # This is the last cycle of the visible part of the
-                        # scanline. Increment coarse_y.
-                        pass
-                    else:
-                        self._increment_coarse_x()
+                    (self._increment_y() if cycle == 256
+                     else self._increment_coarse_x())
 
         self._increment_cycle()
 
@@ -624,3 +620,20 @@ class PPU(object):
             self._vram.flags.nt_select ^= 1
         else:
             self._vram.flags.coarse_x += 1
+
+    def _increment_y(self):
+        # Increment fine_y after every 8 cycles. If fine_y > 7 it overflows to
+        # coarse_y. If coarse_y exceeds the maximum number of vertical tiles
+        # (29) the nametable wraps around.
+        if self._vram.flags.fine_y < 7:
+            self._vram.flags.fine_y += 1
+        else:
+            self._vram.flags.fine_y = 0
+
+            if self._vram.flags.coarse_y == 29:
+                self._vram.flags.coarse_y = 0
+                # Wrap vertical nametable
+                self._vram.flags.nt_select ^= 0x02
+            # TODO: https://github.com/zeeps31/purenes/issues/48
+            else:
+                self._vram.flags.coarse_y += 1
