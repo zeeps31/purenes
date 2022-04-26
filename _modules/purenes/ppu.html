@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>purenes.ppu - PureNES 0.20.0 documentation</title>
+        <title>purenes.ppu - PureNES 0.21.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -120,7 +120,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PureNES 0.20.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PureNES 0.21.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -143,7 +143,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">PureNES 0.20.0 documentation</span>
+  <span class="sidebar-brand-text">PureNES 0.21.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -526,12 +526,8 @@
                     <span class="k">pass</span>
 
                 <span class="k">elif</span> <span class="n">rendering_cycle</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">cycle</span> <span class="o">==</span> <span class="mi">256</span><span class="p">:</span>
-                        <span class="c1"># This is the last cycle of the visible part of the</span>
-                        <span class="c1"># scanline. Increment coarse_y.</span>
-                        <span class="k">pass</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_increment_coarse_x</span><span class="p">()</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_increment_y</span><span class="p">()</span> <span class="k">if</span> <span class="n">cycle</span> <span class="o">==</span> <span class="mi">256</span>
+                     <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_increment_coarse_x</span><span class="p">())</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_increment_cycle</span><span class="p">()</span></div>
 
@@ -808,7 +804,24 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_x</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">nt_select</span> <span class="o">^=</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_x</span> <span class="o">+=</span> <span class="mi">1</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_x</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">_increment_y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Increment fine_y after every 8 cycles. If fine_y &gt; 7 it overflows to</span>
+        <span class="c1"># coarse_y. If coarse_y exceeds the maximum number of vertical tiles</span>
+        <span class="c1"># (29) the nametable wraps around.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">fine_y</span> <span class="o">&lt;</span> <span class="mi">7</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">fine_y</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">fine_y</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_y</span> <span class="o">==</span> <span class="mi">29</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_y</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="c1"># Wrap vertical nametable</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">nt_select</span> <span class="o">^=</span> <span class="mh">0x02</span>
+            <span class="c1"># TODO: https://github.com/zeeps31/purenes/issues/48</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_y</span> <span class="o">+=</span> <span class="mi">1</span></div>
 </pre></div>
         </article>
       </div>
