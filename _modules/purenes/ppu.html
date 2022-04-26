@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>purenes.ppu - PureNES 0.21.0 documentation</title>
+        <title>purenes.ppu - PureNES 0.22.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -120,7 +120,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PureNES 0.21.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PureNES 0.22.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -143,7 +143,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">PureNES 0.21.0 documentation</span>
+  <span class="sidebar-brand-text">PureNES 0.22.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -342,20 +342,22 @@
 <span class="sd">    The values detailed below can be accessed using the</span>
 <span class="sd">    :attr:`~purenes.ppu._Address.flags` attribute of this class.</span>
 
-<span class="sd">    * coarse_x  (XXXXX) - The coarse X value to use when scrolling.</span>
-<span class="sd">    * coarse_y  (YYYYY) - The coarse Y value to use when scrolling.</span>
-<span class="sd">    * nt_select (NN) - Nametable select.</span>
-<span class="sd">    * fine_y    (yyy) - The fine y value to use when scrolling.</span>
+<span class="sd">    * coarse_x    (XXXXX) - The coarse X value to use when scrolling.</span>
+<span class="sd">    * coarse_y    (YYYYY) - The coarse Y value to use when scrolling.</span>
+<span class="sd">    * nt_select_x (N) - Horizontal nametable select.</span>
+<span class="sd">    * nt_select_y (N) - Vertical nametable select.</span>
+<span class="sd">    * fine_y      (yyy) - The fine y value to use when scrolling.</span>
 <span class="sd">    """</span>
     <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span><span class="s2">"flags"</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span>
             <span class="s2">"_PPUADDRESS"</span><span class="p">,</span>
             <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">LittleEndianStructure</span><span class="p">,),</span>
             <span class="p">{</span><span class="s2">"_fields_"</span><span class="p">:</span> <span class="p">[</span>
-                <span class="p">(</span><span class="s2">"coarse_x"</span><span class="p">,</span>  <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint16</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">"coarse_y"</span><span class="p">,</span>  <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint16</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">"nt_select"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint16</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">"fine_y"</span><span class="p">,</span>    <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint16</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"coarse_x"</span><span class="p">,</span>    <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint16</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"coarse_y"</span><span class="p">,</span>    <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint16</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"nt_select_x"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint16</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"nt_select_y"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint16</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"fine_y"</span><span class="p">,</span>      <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint16</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
             <span class="p">]}</span>
         <span class="p">)),</span>
         <span class="p">(</span><span class="s2">"reg"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint16</span><span class="p">)]</span></div>
@@ -592,7 +594,8 @@
             <span class="k">if</span> <span class="n">_address</span> <span class="o">==</span> <span class="mh">0x0000</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_control</span><span class="o">.</span><span class="n">reg</span> <span class="o">=</span> <span class="n">data</span>
                 <span class="n">nt_select</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_control</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">base_nt_address</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_vram_temp</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">nt_select</span> <span class="o">=</span> <span class="n">nt_select</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_vram_temp</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">nt_select_x</span> <span class="o">=</span> <span class="n">nt_select</span> <span class="o">&amp;</span> <span class="mh">0x01</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_vram_temp</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">nt_select_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">nt_select</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x01</span>
 
             <span class="k">elif</span> <span class="n">_address</span> <span class="o">==</span> <span class="mh">0x0001</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_mask</span><span class="o">.</span><span class="n">reg</span> <span class="o">=</span> <span class="n">data</span>
@@ -802,7 +805,7 @@
         <span class="c1"># nametable_select value is inverted (wrapped around).</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_x</span> <span class="o">==</span> <span class="mi">31</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_x</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">nt_select</span> <span class="o">^=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">nt_select_x</span> <span class="o">^=</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_x</span> <span class="o">+=</span> <span class="mi">1</span>
 
@@ -818,7 +821,7 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_y</span> <span class="o">==</span> <span class="mi">29</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_y</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="c1"># Wrap vertical nametable</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">nt_select</span> <span class="o">^=</span> <span class="mh">0x02</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">nt_select_y</span> <span class="o">^=</span> <span class="mi">1</span>
             <span class="c1"># TODO: https://github.com/zeeps31/purenes/issues/48</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_y</span> <span class="o">+=</span> <span class="mi">1</span></div>
