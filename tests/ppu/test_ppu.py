@@ -29,6 +29,39 @@ class TestPPU(object):
         assert test_object.vram_temp.reg == 0
         assert test_object.write_latch == 0
 
+    def test_nametable_reads_during_a_scanline_cycle(
+            self,
+            test_object: PPU,
+            mock_ppu_bus: Mock,
+            mocker: MockFixture
+    ):
+        """Test reads to retrieve nametable data during scanline cycles.
+
+        Note:
+            This test uses the pre-render scanline to perform tests. Memory
+            access during this scanline is the same as a normal scanline.
+
+        Verifies that reads to retrieve nametable data for the current scanline
+        (cycles 0-256) and the next scanline (cycles 321-340) are correct.
+        """
+        test_object.write(0x2006, 0x20)
+        test_object.write(0x2006, 0x00)
+
+        for _ in range(0, 341):
+            test_object.clock()
+
+        current_scanline_reads = [
+            mocker.call.read(0x2000 + coarse_x) for coarse_x in range(0, 32)
+        ]
+        # Unused fetches at the end of the scanline are not included in testing
+        next_scanline_reads = [
+            mocker.call.read(0x2000 + coarse_x) for coarse_x in range(0, 2)
+        ]
+
+        mock_ppu_bus.read.assert_has_calls(
+            current_scanline_reads + next_scanline_reads
+        )
+
     def test_coarse_scroll_horizontal_increment(self, test_object: PPU):
         """Test coarse_x increment without scrolling offsets
 
