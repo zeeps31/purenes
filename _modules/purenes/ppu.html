@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>purenes.ppu - PureNES 0.22.0 documentation</title>
+        <title>purenes.ppu - PureNES 0.23.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -120,7 +120,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PureNES 0.22.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PureNES 0.23.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -143,7 +143,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">PureNES 0.22.0 documentation</span>
+  <span class="sidebar-brand-text">PureNES 0.23.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -479,6 +479,10 @@
     <span class="c1"># $2007 read buffer used to preserve data across frames.</span>
     <span class="n">_data_read_buffer</span><span class="p">:</span> <span class="nb">int</span>
 
+    <span class="c1"># Internal latches used to store values before they are loaded into shift</span>
+    <span class="c1"># registers</span>
+    <span class="n">_nametable_latch</span><span class="p">:</span> <span class="nb">int</span>  <span class="c1"># A nametable tile ID</span>
+
     <span class="c1"># Counters</span>
     <span class="n">_scanline</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># Current scanline</span>
     <span class="n">_cycle</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>      <span class="c1"># Current cycle within a scanline</span>
@@ -525,7 +529,9 @@
                 <span class="c1"># value is decremented by 1 to improve readability.</span>
                 <span class="n">rendering_cycle</span> <span class="o">=</span> <span class="p">(</span><span class="n">cycle</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">8</span>
                 <span class="k">if</span> <span class="n">rendering_cycle</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="k">pass</span>
+                    <span class="c1"># 0x2000 + low 12-bits of (v)</span>
+                    <span class="n">nt_address</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mh">0x2000</span> <span class="o">|</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">reg</span> <span class="o">&amp;</span> <span class="mh">0x0FFF</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_nametable_latch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="n">nt_address</span><span class="p">)</span>
 
                 <span class="k">elif</span> <span class="n">rendering_cycle</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
                     <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_increment_y</span><span class="p">()</span> <span class="k">if</span> <span class="n">cycle</span> <span class="o">==</span> <span class="mi">256</span>
