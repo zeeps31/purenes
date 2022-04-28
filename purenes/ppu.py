@@ -294,6 +294,10 @@ class PPU(object):
     # $2007 read buffer used to preserve data across frames.
     _data_read_buffer: int
 
+    # Internal latches used to store values before they are loaded into shift
+    # registers
+    _nametable_latch: int  # A nametable tile ID
+
     # Counters
     _scanline: int = -1  # Current scanline
     _cycle: int = 0      # Current cycle within a scanline
@@ -340,7 +344,9 @@ class PPU(object):
                 # value is decremented by 1 to improve readability.
                 rendering_cycle = (cycle - 1) % 8
                 if rendering_cycle == 0:
-                    pass
+                    # 0x2000 + low 12-bits of (v)
+                    nt_address: int = 0x2000 | (self._vram.reg & 0x0FFF)
+                    self._nametable_latch = self._read(nt_address)
 
                 elif rendering_cycle == 7:
                     (self._increment_y() if cycle == 256
