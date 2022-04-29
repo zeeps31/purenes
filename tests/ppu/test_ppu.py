@@ -130,9 +130,9 @@ class TestPPU(object):
         """Test vertical scrolling with a fine_y offset of 1 overflows into
         coarse_y after one tile is rendered.
 
-        Sets fine_y = 1 and clocks the PPU 2,720 times (total cycles to render
-        a full row of 8x8 tiles). Verifies that fine_y is reset and coarse_y is
-        incremented once the maximum is reached.
+        Sets fine_y = 1 and clocks the PPU for the total number of cycles
+        required to render a full row of 8x8 tiles. Verifies that fine_y is
+        reset and coarse_y is incremented once the maximum is reached.
         """
         ppu.write(0x2005, 0x00)
         ppu.write(0x2000, 0x01)
@@ -170,11 +170,10 @@ class TestPPU(object):
         """Test incrementing of cycles within a scanline resets at the maximum
         and that the scanline is incremented by 1.
 
-        There are 341 cycles per scanline. The PPU is clocked 341 times to
-        verify the cycle counter is reset when the maximum is reached and the
-        scanline is incremented.
+        The PPU is clocked for one full scanline to verify the cycle counter
+        is reset when the maximum is reached and the scanline is incremented.
         """
-        for _ in range(0, 341):
+        for _ in range(0, self.TOTAL_SCANLINE_CYCLES):
             ppu.clock()
 
         assert ppu.cycle == 0
