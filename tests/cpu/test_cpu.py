@@ -7,7 +7,7 @@ from purenes.cpu import CPU
 
 class TestCPU(object):
 
-    def test_reset(self, mock_cpu_bus: Mock, mocker: MockFixture):
+    def test_reset(self, cpu: CPU, mock_cpu_bus: Mock, mocker: MockFixture):
         """Test CPU reset cycle.
 
         Verifies the program counter is updated with the values stored at
@@ -20,10 +20,9 @@ class TestCPU(object):
             0x00,  # data at program counter
         ]
 
-        test_object = CPU(mock_cpu_bus)
-        test_object.reset()
+        cpu.reset()
 
-        test_object.clock()
+        cpu.clock()
 
         calls = [
             mocker.call.read(0xFFFC),  # reset vector low byte address
