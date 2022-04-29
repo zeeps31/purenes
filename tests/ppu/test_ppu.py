@@ -123,7 +123,7 @@ class TestPPU(object):
             ppu: PPU
     ):
         """Tests vertical scrolling with a fine_y offset of 1 overflows into
-        coarse_y after one tile is rendered.
+        coarse_y after one row of tiles is rendered.
 
         Sets fine_y = 1 and clocks the PPU for the total number of cycles
         required to render a full row of 8x8 tiles. Verifies that fine_y is
