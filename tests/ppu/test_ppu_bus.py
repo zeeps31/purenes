@@ -9,23 +9,18 @@ class TestPPUBus(object):
                                          "0x10000. Address should "
                                          "be between 0x0000 - 0x3FFF")
 
-    @pytest.fixture()
-    def test_object(self):
-        ppu_bus: PPUBus = PPUBus()
-        yield ppu_bus
-
-    def test_read_from_vram(self, test_object: PPUBus):
+    def test_read_from_vram(self, ppu_bus: PPUBus):
         """Test that reads from VRAM for addresses 0x2000-0x2FFF return
         the correct values.
         """
         address_range = [x for x in range(0x2000, 0x2FFF)]
 
         for address in address_range:
-            data: int = test_object.read(address)
+            data: int = ppu_bus.read(address)
 
             assert data == 0x00
 
-    def test_write_to_vram(self, test_object: PPUBus):
+    def test_write_to_vram(self, ppu_bus: PPUBus):
         """Test that writes to VRAM for addresses 0x2000-0x2FFF write the
         correct values to the correct location.
         """
@@ -33,13 +28,13 @@ class TestPPUBus(object):
         data = 0x01
 
         for address in address_range:
-            test_object.write(address, data)
+            ppu_bus.write(address, data)
 
-            assert test_object.read(address) == data
+            assert ppu_bus.read(address) == data
 
     def test_read_from_an_incorrect_address_is_invalid(
             self,
-            test_object: PPUBus
+            ppu_bus: PPUBus
     ):
         """Test that a read from an address not in the addressable range of the
         PPU throws an exception.
@@ -47,13 +42,13 @@ class TestPPUBus(object):
         invalid_address = 0x10000
 
         with pytest.raises(Exception) as exception:
-            test_object.read(invalid_address)
+            ppu_bus.read(invalid_address)
 
         assert str(exception.value) == self.INVALID_ADDRESS_EXCEPTION_MESSAGE
 
     def test_write_to_an_incorrect_address_is_invalid(
             self,
-            test_object: PPUBus
+            ppu_bus: PPUBus
     ):
         """Test that writes to an address not in the addressable range of the
         PPU throws an exception.
@@ -61,6 +56,6 @@ class TestPPUBus(object):
         invalid_address = 0x10000
 
         with pytest.raises(Exception) as exception:
-            test_object.write(invalid_address, 0x01)
+            ppu_bus.write(invalid_address, 0x01)
 
         assert str(exception.value) == self.INVALID_ADDRESS_EXCEPTION_MESSAGE
