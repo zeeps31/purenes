@@ -1,11 +1,10 @@
-import semver
 from setuptools import setup
 from setuptools import find_packages
 
-version = semver.VersionInfo.parse('0.23.3')
+__version__ = "0.23.3"
 
 setup(name='purenes',
-      version=str(version),
+      version=__version__,
       description='A NES emulator in Python',
       author='Stephen Brady',
       author_email='stephen.brady86@gmail.com',
@@ -16,9 +15,9 @@ setup(name='purenes',
             "pytest-mock==3.7.0"
       ],
       setup_requires=[
-            "semver>=2.13.0",
             "sphinx==4.5.0",
-            "furo==2022.3.4"
+            "furo==2022.3.4",
+            "python-semantic-release==7.28.1"
       ],
-      packages=find_packages(exclude=["tests"]),
+      packages=find_packages(exclude=["tests", "tests.*"]),
       )
