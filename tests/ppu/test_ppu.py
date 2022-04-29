@@ -7,6 +7,14 @@ from purenes.ppu import PPU
 
 class TestPPU(object):
 
+    TOTAL_SCANLINES: int = 262
+
+    TOTAL_VISIBLE_SCANLINES: int = 240
+
+    TOTAL_SCANLINE_CYCLES: int = 341
+
+    TOTAL_VISIBLE_SCANLINE_CYCLES: int = 257
+
     def test_ppu_reset(self, ppu: PPU):
         ppu.reset()
 
@@ -34,7 +42,7 @@ class TestPPU(object):
         ppu.write(0x2006, 0x20)
         ppu.write(0x2006, 0x00)
 
-        for _ in range(0, 341):
+        for _ in range(0, self.TOTAL_SCANLINE_CYCLES):
             ppu.clock()
 
         current_scanline_reads = [
@@ -59,7 +67,7 @@ class TestPPU(object):
         ppu.write(0x2006, 0x20)
         ppu.write(0x2006, 0x00)
 
-        for i in range(0, 257):
+        for _ in range(0, self.TOTAL_VISIBLE_SCANLINE_CYCLES):
             ppu.clock()
 
         assert ppu.vram.flags.coarse_x == 0x1F
@@ -78,7 +86,7 @@ class TestPPU(object):
         ppu.write(0x2006, 0x20)
         ppu.write(0x2006, 0x01)
 
-        for i in range(0, 257):
+        for _ in range(0, self.TOTAL_VISIBLE_SCANLINE_CYCLES):
             ppu.clock()
 
         assert ppu.vram.flags.coarse_x == 0x00
@@ -93,7 +101,7 @@ class TestPPU(object):
         Clocks the PPU 258 times (cycles 0 - 257) and verifies that coarse_x is
         reset at cycle 257.
         """
-        for i in range(0, 258):
+        for _ in range(0, self.TOTAL_VISIBLE_SCANLINE_CYCLES + 1):
             ppu.clock()
 
         assert ppu.vram.flags.coarse_x == 0
@@ -101,13 +109,14 @@ class TestPPU(object):
     def test_vertical_scrolling(self, ppu: PPU):
         """Test vertical scrolling without any vertical scrolling offsets.
 
-        Sets fine_y = 0 and clocks the PPU 256 times. Verifies that fine_y is
-        incremented by 1 without overflowing into coarse_y
+        Sets fine_y = 0 and clocks the PPU 257 (include cycle 256) times.
+        Verifies that fine_y is incremented by 1 without overflowing into
+        coarse_y
         """
         ppu.write(0x2005, 0x00)
         ppu.write(0x2000, 0x00)
 
-        for i in range(0, 257):
+        for _ in range(0, self.TOTAL_VISIBLE_SCANLINE_CYCLES):
             ppu.clock()
 
         assert ppu.vram.flags.fine_y == 1
@@ -121,13 +130,14 @@ class TestPPU(object):
         """Test vertical scrolling with a fine_y offset of 1 overflows into
         coarse_y after one tile is rendered.
 
-        Sets fine_y = 1 and clocks the PPU 2,720 times. Verifies that fine_y
-        is reset and coarse_y is incremented once the maximum is reached.
+        Sets fine_y = 1 and clocks the PPU 2,720 times (total cycles to render
+        a full row of 8x8 tiles). Verifies that fine_y is reset and coarse_y is
+        incremented once the maximum is reached.
         """
         ppu.write(0x2005, 0x00)
         ppu.write(0x2000, 0x01)
 
-        for i in range(0, 340 * 8):
+        for _ in range(0, self.TOTAL_SCANLINE_CYCLES * 8):
             ppu.clock()
 
         assert ppu.vram.flags.fine_y == 0
@@ -141,13 +151,15 @@ class TestPPU(object):
         """Test vertical scrolling with a fine_y offset of 1 wraps around the
         nametable after one frame is rendered.
 
-        Sets fine_y = 1 and clocks the PPU 81,840 times. Verifies that the
+        Sets fine_y = 1 and clocks the PPU . Verifies that the
         vertical nametable is wrapped around once the maximum is reached.
         """
         ppu.write(0x2005, 0x00)
         ppu.write(0x2000, 0x01)  # Set fine_y
 
-        for i in range(0, 341 * 240):
+        range_max: int = (self.TOTAL_SCANLINE_CYCLES *
+                          self.TOTAL_VISIBLE_SCANLINES)
+        for _ in range(0, range_max):
             ppu.clock()
 
         assert ppu.vram.flags.fine_y == 0
@@ -172,7 +184,7 @@ class TestPPU(object):
         """Test scanline is reset to the pre-render scanline when the maximum
         scanline and scanline cycles have been reached.
         """
-        for _ in range(0, 341 * 262):  # 341 cycles and 261 scanlines
+        for _ in range(0, self.TOTAL_SCANLINE_CYCLES * self.TOTAL_SCANLINES):
             ppu.clock()
 
         assert ppu.scanline == -1
