@@ -39,30 +39,39 @@ Good Examples (same test names adjusted to adhere to naming guidelines):
 More information about this naming policy can be found in this 
 [article](https://enterprisecraftsmanship.com/posts/you-naming-tests-wrong/).
 
-# Versioning 
+# Commit Messages 
 
-This package uses [semantic versioning](https://semver.org/).
-Version numbers should adhere to the following:
+This package uses the [python-semantic-release](https://github.com/relekang/python-semantic-release)
+package to handle versioning and releases. Commit messages need to adhere to 
+the [angular commit guidelines](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commits)
+to be compatible with the python-semantic-release package. 
 
+To verify that the commit message adheres to the correct guidelines, the 
+following command can be executed. 
 
-Given a version number MAJOR.MINOR.PATCH, increment the:
-
-1. MAJOR version when you make incompatible API changes,
-2. MINOR version when you add functionality in a backwards compatible manner, and
-3. PATCH version when you make backwards compatible bug fixes.
-Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
-   
-The version can be checked by performing the following:
-
-#### To check the version
-```
-pysemver check 0.1.0
-```
-
-#### To determine the next version 
+Example commit message:
 
 ```
-pysemver bump [major | minor | patch] 0.1.0
+feat: add semantic versioning
 ```
 
-Once the correct version is determined, it should be updated in `setup.py`
+Testing the version change:
+
+```
+semantic-release print-version
+```
+
+Example output:
+
+```
+0.24.0
+```
+
+If you are still unsure how to describe the change correctly feel free to ask 
+in your PR. 
+
+# Releases
+
+This package is released by the [python-semantic-release](https://github.com/relekang/python-semantic-release)
+package on each push to main. If there are changes that result in a new release
+it will happen when the build is green, and the change is merged into main. 
