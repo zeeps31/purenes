@@ -17,7 +17,9 @@ def ppu_bus():
 @pytest.fixture()
 def mock_ppu_bus(mocker: MockFixture):
     """A Mock to represent the PPUBus."""
-    yield mocker.Mock()
+    mock_ppu_bus: Mock = mocker.Mock()
+    mock_ppu_bus.read.return_value = 0x00  # Default return value
+    yield mock_ppu_bus
 
 
 @pytest.fixture()

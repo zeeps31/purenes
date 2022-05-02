@@ -297,6 +297,7 @@ class PPU(object):
     # Internal latches used to store values before they are loaded into shift
     # registers
     _nametable_latch: int  # A nametable tile ID
+    _palette_latch: int    # Palette selection from attribute table
 
     # Counters
     _scanline: int = -1  # Current scanline
@@ -347,6 +348,24 @@ class PPU(object):
                     # 0x2000 + low 12-bits of (v)
                     nt_address: int = 0x2000 | (self._vram.reg & 0x0FFF)
                     self._nametable_latch = self._read(nt_address)
+
+                elif rendering_cycle == 2:
+                    # TODO: https://github.com/zeeps31/purenes/issues/58
+                    attr_address: int = (
+                            0x23C0 |  # Attr offset 0x2000 + 0x23C0 (960 bytes)
+                            (self._vram.reg & 0x0C00) |  # NT select
+                            ((self._vram.flags.coarse_y << 1) & 0x38) |
+                            ((self._vram.flags.coarse_x >> 2) & 0x07)
+                    )
+                    attr_value: int = self._read(attr_address)
+
+                    if self._vram.flags.coarse_y % 4 >= 2:
+                        attr_value >>= 4
+
+                    if self._vram.flags.coarse_x % 4 >= 2:
+                        attr_value >>= 2
+
+                    self._palette_latch = attr_value & 0x03
 
                 elif rendering_cycle == 7:
                     (self._increment_y() if cycle == 256

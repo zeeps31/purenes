@@ -54,7 +54,46 @@ class TestPPU(object):
         ]
 
         mock_ppu_bus.read.assert_has_calls(
-            current_scanline_reads + next_scanline_reads
+            current_scanline_reads + next_scanline_reads,
+            any_order=True
+        )
+
+    def test_attribute_table_reads_during_a_scanline_cycle(
+            self,
+            ppu: PPU,
+            mock_ppu_bus: Mock,
+            mocker: MockFixture
+    ):
+        """Tests reads to retrieve nametable data during scanline cycles.
+
+        Note:
+            This test uses the pre-render scanline to perform tests. Memory
+            access during this scanline is the same as a normal scanline.
+
+        Verifies that reads to retrieve attribute table bytes for the current
+        scanline (cycles 0-256) and the next scanline (cycles 321-340) are
+        correct.
+        """
+        ppu.write(0x2006, 0x20)
+        ppu.write(0x2006, 0x00)
+
+        for _ in range(0, self.TOTAL_SCANLINE_CYCLES):
+            ppu.clock()
+
+        # Each attribute table byte "controls" one 4x4 section of tiles. There
+        # are 8 sections of 4 tiles across the horizontal axis for the visible
+        # part of the scanline and 4 calls should be made to the same address
+        # for one section.
+        current_scanline_reads = [
+            mocker.call.read(0x23C0 + coarse_x) for _ in range(0, 4)
+            for coarse_x in range(0, 8)
+        ]
+        # Unused fetches at the end of the scanline are not included in testing
+        next_scanline_reads = [mocker.call.read(0x23C0) for _ in range(0, 2)]
+
+        mock_ppu_bus.read.assert_has_calls(
+            current_scanline_reads + next_scanline_reads,
+            any_order=True
         )
 
     def test_coarse_scroll_horizontal_increment(self, ppu: PPU):
