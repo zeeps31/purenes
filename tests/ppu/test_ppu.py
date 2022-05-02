@@ -64,7 +64,7 @@ class TestPPU(object):
             mock_ppu_bus: Mock,
             mocker: MockFixture
     ):
-        """Tests reads to retrieve nametable data during scanline cycles.
+        """Tests reads to retrieve attribute table data during scanline cycles.
 
         Note:
             This test uses the pre-render scanline to perform tests. Memory
