@@ -482,6 +482,7 @@
     <span class="c1"># Internal latches used to store values before they are loaded into shift</span>
     <span class="c1"># registers</span>
     <span class="n">_nametable_latch</span><span class="p">:</span> <span class="nb">int</span>  <span class="c1"># A nametable tile ID</span>
+    <span class="n">_palette_latch</span><span class="p">:</span> <span class="nb">int</span>    <span class="c1"># Palette selection from attribute table</span>
 
     <span class="c1"># Counters</span>
     <span class="n">_scanline</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># Current scanline</span>
@@ -532,6 +533,24 @@
                     <span class="c1"># 0x2000 + low 12-bits of (v)</span>
                     <span class="n">nt_address</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mh">0x2000</span> <span class="o">|</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">reg</span> <span class="o">&amp;</span> <span class="mh">0x0FFF</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_nametable_latch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="n">nt_address</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">rendering_cycle</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="c1"># TODO: https://github.com/zeeps31/purenes/issues/58</span>
+                    <span class="n">attr_address</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="mh">0x23C0</span> <span class="o">|</span>  <span class="c1"># Attr offset 0x2000 + 0x23C0 (960 bytes)</span>
+                            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">reg</span> <span class="o">&amp;</span> <span class="mh">0x0C00</span><span class="p">)</span> <span class="o">|</span>  <span class="c1"># NT select</span>
+                            <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_y</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x38</span><span class="p">)</span> <span class="o">|</span>
+                            <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_x</span> <span class="o">&gt;&gt;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x07</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">attr_value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="n">attr_address</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_y</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                        <span class="n">attr_value</span> <span class="o">&gt;&gt;=</span> <span class="mi">4</span>
+
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_x</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                        <span class="n">attr_value</span> <span class="o">&gt;&gt;=</span> <span class="mi">2</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_palette_latch</span> <span class="o">=</span> <span class="n">attr_value</span> <span class="o">&amp;</span> <span class="mh">0x03</span>
 
                 <span class="k">elif</span> <span class="n">rendering_cycle</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
                     <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_increment_y</span><span class="p">()</span> <span class="k">if</span> <span class="n">cycle</span> <span class="o">==</span> <span class="mi">256</span>
