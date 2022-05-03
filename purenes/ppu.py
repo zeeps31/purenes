@@ -350,12 +350,12 @@ class PPU(object):
                     self._nametable_latch = self._read(nt_address)
 
                 elif rendering_cycle == 2:
-                    # TODO: https://github.com/zeeps31/purenes/issues/58
+                    # https://zeeps31.github.io/purenes/topic_guides/ppu/
                     attr_address: int = (
                             0x23C0 |  # Attr offset 0x2000 + 0x23C0 (960 bytes)
-                            (self._vram.reg & 0x0C00) |  # NT select
-                            ((self._vram.flags.coarse_y << 1) & 0x38) |
-                            ((self._vram.flags.coarse_x >> 2) & 0x07)
+                            self._vram.reg & 0x0C00 |  # NT select
+                            (self._vram.flags.coarse_y // 4) * 8 |
+                            self._vram.flags.coarse_x // 4
                     )
                     attr_value: int = self._read(attr_address)
 
