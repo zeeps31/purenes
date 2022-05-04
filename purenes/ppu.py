@@ -294,10 +294,13 @@ class PPU(object):
     # $2007 read buffer used to preserve data across frames.
     _data_read_buffer: int
 
-    # Internal latches used to store values before they are loaded into shift
-    # registers
+    # Internal latches and caches used to store values before they are loaded
+    # into shift registers
     _nametable_latch: int  # A nametable tile ID
     _palette_latch: int    # Palette selection from attribute table
+    _pt_address: int       # Caches 16-bit pattern table address between reads
+    _pt_latch_lo: int      # Low byte of pattern table tile
+    _pt_latch_hi: int      # High byte of pattern table tile
 
     # Counters
     _scanline: int = -1  # Current scanline
@@ -366,6 +369,20 @@ class PPU(object):
                         attr_value >>= 2
 
                     self._palette_latch = attr_value & 0x03
+
+                elif rendering_cycle == 4:
+                    # https://www.nesdev.org/wiki/PPU_pattern_tables
+                    self._pt_address = (
+                            self._control.flags.background_pt_address << 12 |
+                            self._read(self._nametable_latch) << 4 |
+                            self._vram.flags.fine_y
+                    )
+
+                    self._pt_latch_lo = self._read(self._pt_address)
+
+                elif rendering_cycle == 6:
+                    # Pattern table tiles (low and high) are 8 bytes apart
+                    self._pt_latch_hi = self._read(self._pt_address + 8)
 
                 elif rendering_cycle == 7:
                     (self._increment_y() if cycle == 256

@@ -96,6 +96,61 @@ class TestPPU(object):
             any_order=True
         )
 
+    def test_pattern_table_reads_during_a_scanline_cycle(
+            self,
+            ppu: PPU,
+            mock_ppu_bus: Mock,
+            mocker: MockFixture
+    ):
+        """Tests reads to retrieve low and high pattern table tiles during a
+        scanline cycle.
+
+        Note:
+            This test uses the pre-render scanline to perform tests. Memory
+            access during this scanline is the same as a normal scanline.
+
+        Verifies that each rendering cycle makes two calls to retrieve the low
+        and high bytes of a pattern table tile correctly.
+
+        In this test the the background_pt_address in the _Control register is
+        set to 0 (by default) and fine_y is explicitly set to 0.
+        """
+        ppu.write(0x2005, 0x00)
+        ppu.write(0x2000, 0x00)  # Set fine_y to 0
+
+        ppu.write(0x2006, 0x20)
+        ppu.write(0x2006, 0x00)
+
+        mock_ppu_bus.read.return_value = 0x01  # Pattern tile ID
+
+        for _ in range(0, self.TOTAL_SCANLINE_CYCLES):
+            ppu.clock()
+
+        # background_pt_address and fine_y are set to 0 and the pattern tile
+        # returned from the mocked PPUBus is 0x01
+        expected_pt_address: int = 0x10
+        current_scanline_reads = []
+        next_scanline_reads = []
+
+        for _ in range(0, 32):
+            current_scanline_reads.append(
+                mocker.call.read(expected_pt_address))
+            current_scanline_reads.append(
+                mocker.call.read(expected_pt_address + 8))
+
+        # fine_y is incremented by 1 at the end of the visible scanline cycles
+        # for the prefetches at the end of the scanline.
+        for _ in range(0, 2):
+            next_scanline_reads.append(
+                mocker.call.read(expected_pt_address + 1))
+            next_scanline_reads.append(
+                mocker.call.read(expected_pt_address + 1 + 8))
+
+        mock_ppu_bus.read.assert_has_calls(
+            current_scanline_reads + next_scanline_reads,
+            any_order=True
+        )
+
     def test_coarse_scroll_horizontal_increment(self, ppu: PPU):
         """Tests coarse_x increment without scrolling offsets
 
