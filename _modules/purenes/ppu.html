@@ -489,10 +489,13 @@
     <span class="c1"># $2007 read buffer used to preserve data across frames.</span>
     <span class="n">_data_read_buffer</span><span class="p">:</span> <span class="nb">int</span>
 
-    <span class="c1"># Internal latches used to store values before they are loaded into shift</span>
-    <span class="c1"># registers</span>
+    <span class="c1"># Internal latches and caches used to store values before they are loaded</span>
+    <span class="c1"># into shift registers</span>
     <span class="n">_nametable_latch</span><span class="p">:</span> <span class="nb">int</span>  <span class="c1"># A nametable tile ID</span>
     <span class="n">_palette_latch</span><span class="p">:</span> <span class="nb">int</span>    <span class="c1"># Palette selection from attribute table</span>
+    <span class="n">_pt_address</span><span class="p">:</span> <span class="nb">int</span>       <span class="c1"># Caches 16-bit pattern table address between reads</span>
+    <span class="n">_pt_latch_lo</span><span class="p">:</span> <span class="nb">int</span>      <span class="c1"># Low byte of pattern table tile</span>
+    <span class="n">_pt_latch_hi</span><span class="p">:</span> <span class="nb">int</span>      <span class="c1"># High byte of pattern table tile</span>
 
     <span class="c1"># Counters</span>
     <span class="n">_scanline</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># Current scanline</span>
@@ -561,6 +564,20 @@
                         <span class="n">attr_value</span> <span class="o">&gt;&gt;=</span> <span class="mi">2</span>
 
                     <span class="bp">self</span><span class="o">.</span><span class="n">_palette_latch</span> <span class="o">=</span> <span class="n">attr_value</span> <span class="o">&amp;</span> <span class="mh">0x03</span>
+
+                <span class="k">elif</span> <span class="n">rendering_cycle</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+                    <span class="c1"># https://www.nesdev.org/wiki/PPU_pattern_tables</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_pt_address</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_control</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">background_pt_address</span> <span class="o">&lt;&lt;</span> <span class="mi">12</span> <span class="o">|</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nametable_latch</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span> <span class="o">|</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">fine_y</span>
+                    <span class="p">)</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_pt_latch_lo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pt_address</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">rendering_cycle</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+                    <span class="c1"># Pattern table tiles (low and high) are 8 bytes apart</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_pt_latch_hi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pt_address</span> <span class="o">+</span> <span class="mi">8</span><span class="p">)</span>
 
                 <span class="k">elif</span> <span class="n">rendering_cycle</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
                     <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_increment_y</span><span class="p">()</span> <span class="k">if</span> <span class="n">cycle</span> <span class="o">==</span> <span class="mi">256</span>
