@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.27.0 (2022-05-07)
+### Feature
+* **ppu:** Implement pattern table shift registers ([#64](https://github.com/zeeps31/purenes/issues/64)) ([`8218fed`](https://github.com/zeeps31/purenes/commit/8218fed23f12ac4c59dd3a71499d874b4e65ca1e))
+
 ## v0.26.0 (2022-05-07)
 ### Feature
 * **ppu:** Implement attribute table shift registers ([#63](https://github.com/zeeps31/purenes/issues/63)) ([`13e061a`](https://github.com/zeeps31/purenes/commit/13e061aebde6a0302cce880da75087a5e5281ab1))
