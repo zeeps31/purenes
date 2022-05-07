@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>purenes.ppu - PureNES 0.24.0 documentation</title>
+        <title>purenes.ppu - PureNES 0.25.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -120,7 +120,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PureNES 0.24.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PureNES 0.25.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -143,7 +143,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">PureNES 0.24.0 documentation</span>
+  <span class="sidebar-brand-text">PureNES 0.25.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -497,6 +497,11 @@
     <span class="n">_pt_latch_lo</span><span class="p">:</span> <span class="nb">int</span>      <span class="c1"># Low byte of pattern table tile</span>
     <span class="n">_pt_latch_hi</span><span class="p">:</span> <span class="nb">int</span>      <span class="c1"># High byte of pattern table tile</span>
 
+    <span class="c1"># Shift registers used during background pixel rendering</span>
+    <span class="c1"># https://www.nesdev.org/wiki/PPU_rendering</span>
+    <span class="n">_at_shift_hi</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">_at_shift_lo</span><span class="p">:</span> <span class="nb">int</span>
+
     <span class="c1"># Counters</span>
     <span class="n">_scanline</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># Current scanline</span>
     <span class="n">_cycle</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>      <span class="c1"># Current cycle within a scanline</span>
@@ -536,13 +541,19 @@
             <span class="k">if</span> <span class="n">cycle</span> <span class="o">==</span> <span class="mi">257</span><span class="p">:</span>
                 <span class="c1"># Last cycle of visible scanline, reset coarse_x</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram_temp</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_x</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_load_shift_registers</span><span class="p">()</span>
 
             <span class="k">if</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">cycle</span> <span class="o">&lt;=</span> <span class="mi">256</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="mi">321</span> <span class="o">&lt;=</span> <span class="n">cycle</span> <span class="o">&lt;=</span> <span class="mi">340</span><span class="p">):</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">_shift_background_registers</span><span class="p">()</span>
+
                 <span class="c1"># Some of the rendering process repeats itself every 8 cycles</span>
                 <span class="c1"># The process does not start until cycle 1, the rendering_cycle</span>
                 <span class="c1"># value is decremented by 1 to improve readability.</span>
                 <span class="n">rendering_cycle</span> <span class="o">=</span> <span class="p">(</span><span class="n">cycle</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">8</span>
                 <span class="k">if</span> <span class="n">rendering_cycle</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_load_shift_registers</span><span class="p">()</span>
+
                     <span class="c1"># 0x2000 + low 12-bits of (v)</span>
                     <span class="n">nt_address</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mh">0x2000</span> <span class="o">|</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">reg</span> <span class="o">&amp;</span> <span class="mh">0x0FFF</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_nametable_latch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="n">nt_address</span><span class="p">)</span>
@@ -718,7 +729,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_vram_temp</span><span class="o">.</span><span class="n">reg</span> <span class="o">=</span> <span class="mh">0x00</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_latch</span> <span class="o">=</span> <span class="mh">0x00</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fine_x</span> <span class="o">=</span> <span class="mh">0x00</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_data_read_buffer</span> <span class="o">=</span> <span class="mh">0x00</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_read_buffer</span> <span class="o">=</span> <span class="mh">0x00</span>
+
+        <span class="c1"># Reset latches and shift registers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_palette_latch</span> <span class="o">=</span> <span class="mh">0x00</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_at_shift_hi</span> <span class="o">=</span> <span class="mh">0x00</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_at_shift_lo</span> <span class="o">=</span> <span class="mh">0x00</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">control</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Control</span><span class="p">:</span>
@@ -831,6 +847,30 @@
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cycle</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">at_shift_hi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">"""Read-only access to the high-order bytes of the attribute table</span>
+<span class="sd">        shift register</span>
+
+<span class="sd">        This should only be used for testing and debugging purposes.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The high-order bytes of the attribute table shift register</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_at_shift_hi</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">at_shift_lo</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">"""Read-only access to the low-order bytes of the attribute table shift</span>
+<span class="sd">        register</span>
+
+<span class="sd">        This should only be used for testing and debugging purposes.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The low-order bytes of the attribute table shift register</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_at_shift_lo</span>
+
     <span class="k">def</span> <span class="nf">_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="c1"># Internal read.</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ppu_bus</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
@@ -876,7 +916,22 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">nt_select_y</span> <span class="o">^=</span> <span class="mi">1</span>
             <span class="c1"># TODO: https://github.com/zeeps31/purenes/issues/48</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_y</span> <span class="o">+=</span> <span class="mi">1</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">coarse_y</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">_load_shift_registers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Transfer the values from internal latches to shift registers for</span>
+        <span class="c1"># background rendering.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_at_shift_hi</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_at_shift_hi</span> <span class="o">&amp;</span> <span class="mh">0xFF00</span> <span class="o">|</span>
+                             <span class="p">(</span><span class="mh">0xFF</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_palette_latch</span> <span class="o">&amp;</span> <span class="mh">0x02</span>
+                              <span class="k">else</span> <span class="mh">0x00</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_at_shift_lo</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_at_shift_hi</span> <span class="o">&amp;</span> <span class="mh">0xFF00</span> <span class="o">|</span>
+                             <span class="p">(</span><span class="mh">0xFF</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_palette_latch</span> <span class="o">&amp;</span> <span class="mh">0x01</span>
+                              <span class="k">else</span> <span class="mh">0x00</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_shift_background_registers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Shift the bits in background shift registers by one.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_at_shift_hi</span> <span class="o">&lt;&lt;=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_at_shift_lo</span> <span class="o">&lt;&lt;=</span> <span class="mi">1</span></div>
 </pre></div>
         </article>
       </div>

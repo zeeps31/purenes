@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>purenes package - PureNES 0.24.0 documentation</title>
+        <title>purenes package - PureNES 0.25.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -121,7 +121,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">PureNES 0.24.0 documentation</div></a>
+      <a href="index.html"><div class="brand">PureNES 0.25.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -144,7 +144,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">PureNES 0.24.0 documentation</span>
+  <span class="sidebar-brand-text">PureNES 0.25.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -414,6 +414,36 @@ every 8 bytes through $3FFF.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="purenes.ppu.PPU.at_shift_hi">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">at_shift_hi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPU.at_shift_hi" title="Permalink to this definition">#</a></dt>
+<dd><p>Read-only access to the high-order bytes of the attribute table
+shift register</p>
+<p>This should only be used for testing and debugging purposes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The high-order bytes of the attribute table shift register</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="purenes.ppu.PPU.at_shift_lo">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">at_shift_lo</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPU.at_shift_lo" title="Permalink to this definition">#</a></dt>
+<dd><p>Read-only access to the low-order bytes of the attribute table shift
+register</p>
+<p>This should only be used for testing and debugging purposes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The low-order bytes of the attribute table shift register</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
