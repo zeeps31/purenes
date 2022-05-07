@@ -302,6 +302,11 @@ class PPU(object):
     _pt_latch_lo: int      # Low byte of pattern table tile
     _pt_latch_hi: int      # High byte of pattern table tile
 
+    # Shift registers used during background pixel rendering
+    # https://www.nesdev.org/wiki/PPU_rendering
+    _at_shift_hi: int
+    _at_shift_lo: int
+
     # Counters
     _scanline: int = -1  # Current scanline
     _cycle: int = 0      # Current cycle within a scanline
@@ -341,13 +346,19 @@ class PPU(object):
             if cycle == 257:
                 # Last cycle of visible scanline, reset coarse_x
                 self._vram.flags.coarse_x = self._vram_temp.flags.coarse_x
+                self._load_shift_registers()
 
             if (1 <= cycle <= 256) or (321 <= cycle <= 340):
+
+                self._shift_background_registers()
+
                 # Some of the rendering process repeats itself every 8 cycles
                 # The process does not start until cycle 1, the rendering_cycle
                 # value is decremented by 1 to improve readability.
                 rendering_cycle = (cycle - 1) % 8
                 if rendering_cycle == 0:
+                    self._load_shift_registers()
+
                     # 0x2000 + low 12-bits of (v)
                     nt_address: int = 0x2000 | (self._vram.reg & 0x0FFF)
                     self._nametable_latch = self._read(nt_address)
@@ -525,6 +536,11 @@ class PPU(object):
         self._fine_x = 0x00
         self._data_read_buffer = 0x00
 
+        # Reset latches and shift registers
+        self._palette_latch = 0x00
+        self._at_shift_hi = 0x00
+        self._at_shift_lo = 0x00
+
     @property
     def control(self) -> _Control:
         """Read-only access to the internal PPUCTRL register $2000. This should
@@ -636,6 +652,30 @@ class PPU(object):
         """
         return self._cycle
 
+    @property
+    def at_shift_hi(self) -> int:
+        """Read-only access to the high-order bytes of the attribute table
+        shift register
+
+        This should only be used for testing and debugging purposes.
+
+        Returns:
+            int: The high-order bytes of the attribute table shift register
+        """
+        return self._at_shift_hi
+
+    @property
+    def at_shift_lo(self) -> int:
+        """Read-only access to the low-order bytes of the attribute table shift
+        register
+
+        This should only be used for testing and debugging purposes.
+
+        Returns:
+            int: The low-order bytes of the attribute table shift register
+        """
+        return self._at_shift_lo
+
     def _read(self, address: int) -> int:
         # Internal read.
         return self._ppu_bus.read(address)
@@ -682,3 +722,18 @@ class PPU(object):
             # TODO: https://github.com/zeeps31/purenes/issues/48
             else:
                 self._vram.flags.coarse_y += 1
+
+    def _load_shift_registers(self):
+        # Transfer the values from internal latches to shift registers for
+        # background rendering.
+        self._at_shift_hi = (self._at_shift_hi & 0xFF00 |
+                             (0xFF if self._palette_latch & 0x02
+                              else 0x00))
+        self._at_shift_lo = (self._at_shift_hi & 0xFF00 |
+                             (0xFF if self._palette_latch & 0x01
+                              else 0x00))
+
+    def _shift_background_registers(self):
+        # Shift the bits in background shift registers by one.
+        self._at_shift_hi <<= 1
+        self._at_shift_lo <<= 1
