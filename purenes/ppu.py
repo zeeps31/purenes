@@ -304,6 +304,8 @@ class PPU(object):
 
     # Shift registers used during background pixel rendering
     # https://www.nesdev.org/wiki/PPU_rendering
+    _pt_shift_hi: int
+    _pt_shift_lo: int
     _at_shift_hi: int
     _at_shift_lo: int
 
@@ -538,6 +540,10 @@ class PPU(object):
 
         # Reset latches and shift registers
         self._palette_latch = 0x00
+        self._pt_latch_hi = 0x00
+        self._pt_latch_lo = 0x00
+        self._pt_shift_hi = 0x00
+        self._pt_shift_lo = 0x00
         self._at_shift_hi = 0x00
         self._at_shift_lo = 0x00
 
@@ -676,6 +682,30 @@ class PPU(object):
         """
         return self._at_shift_lo
 
+    @property
+    def pt_shift_hi(self) -> int:
+        """Read-only access to the high-order bytes of the pattern table
+        shift register
+
+        This should only be used for testing and debugging purposes.
+
+        Returns:
+            int: The high-order bytes of the pattern table shift register
+        """
+        return self._pt_shift_hi
+
+    @property
+    def pt_shift_lo(self) -> int:
+        """Read-only access to the low-order bytes of the pattern table shift
+        register
+
+        This should only be used for testing and debugging purposes.
+
+        Returns:
+            int: The low-order bytes of the pattern table shift register
+        """
+        return self._pt_shift_lo
+
     def _read(self, address: int) -> int:
         # Internal read.
         return self._ppu_bus.read(address)
@@ -726,6 +756,9 @@ class PPU(object):
     def _load_shift_registers(self):
         # Transfer the values from internal latches to shift registers for
         # background rendering.
+        self._pt_shift_hi = (self._pt_shift_hi & 0xFF00) | self._pt_latch_hi
+        self._pt_shift_lo = (self._pt_shift_lo & 0xFF00) | self._pt_latch_lo
+
         self._at_shift_hi = (self._at_shift_hi & 0xFF00 |
                              (0xFF if self._palette_latch & 0x02
                               else 0x00))
@@ -735,5 +768,8 @@ class PPU(object):
 
     def _shift_background_registers(self):
         # Shift the bits in background shift registers by one.
+        self._pt_shift_hi <<= 1
+        self._pt_shift_lo <<= 1
+
         self._at_shift_hi <<= 1
         self._at_shift_lo <<= 1

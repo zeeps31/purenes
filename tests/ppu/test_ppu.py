@@ -279,7 +279,8 @@ class TestPPU(object):
         assert ppu.scanline == -1
 
     @pytest.mark.parametrize(
-        "cycle_count, at_shift_hi, at_shift_lo", [
+        "cycle_count, shift_hi, shift_lo",
+        [
             (10, 255, 255),
             (18, 65535, 65535),
             (258, 65535, 65535),
@@ -287,25 +288,28 @@ class TestPPU(object):
             (330, 65535, 65535)
         ]
     )
-    def test_palette_selection_while_rendering(
+    def test_shift_registers_while_rendering(
             self,
             ppu: PPU,
             mock_ppu_bus: Mock,
             cycle_count,
-            at_shift_hi,
-            at_shift_lo
+            shift_hi,
+            shift_lo,
     ):
-        """Tests attribute table shift registers are loaded and shifted
-        correctly during rendering cycles.
+        """Tests shift registers are loaded and shifted correctly during
+        rendering cycles.
 
-        The shift registers are reloaded during cycles 9, 17, 25, ..., 257
-        and cycles 329 and 327.
+        This test currently loads the same values into the attribute and
+        pattern shifters. The shift registers are reloaded during cycles
+        9, 17, 25, ..., 257 and cycles 329 and 327.
         """
-        # Return value for attribute table reads
+        # Return value for pattern and attribute reads
         mock_ppu_bus.read.return_value = 0xFF
 
         for _ in range(0, cycle_count):
             ppu.clock()
 
-        assert ppu.at_shift_hi == at_shift_hi
-        assert ppu.at_shift_lo == at_shift_lo
+        assert ppu.at_shift_hi == shift_hi
+        assert ppu.at_shift_lo == shift_lo
+        assert ppu.pt_shift_hi == shift_hi
+        assert ppu.pt_shift_lo == shift_lo
