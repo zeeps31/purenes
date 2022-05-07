@@ -1,5 +1,6 @@
 from unittest.mock import Mock
 
+import pytest
 from pytest_mock import MockFixture
 
 from purenes.ppu import PPU
@@ -276,3 +277,35 @@ class TestPPU(object):
             ppu.clock()
 
         assert ppu.scanline == -1
+
+    @pytest.mark.parametrize(
+        "cycle_count, at_shift_hi, at_shift_lo", [
+            (10, 255, 255),
+            (18, 65535, 65535),
+            (258, 65535, 65535),
+            (322, 65535, 65535),
+            (330, 65535, 65535)
+        ]
+    )
+    def test_palette_selection_while_rendering(
+            self,
+            ppu: PPU,
+            mock_ppu_bus: Mock,
+            cycle_count,
+            at_shift_hi,
+            at_shift_lo
+    ):
+        """Tests attribute table shift registers are loaded and shifted
+        correctly during rendering cycles.
+
+        The shift registers are reloaded during cycles 9, 17, 25, ..., 257
+        and cycles 329 and 327.
+        """
+        # Return value for attribute table reads
+        mock_ppu_bus.read.return_value = 0xFF
+
+        for _ in range(0, cycle_count):
+            ppu.clock()
+
+        assert ppu.at_shift_hi == at_shift_hi
+        assert ppu.at_shift_lo == at_shift_lo
