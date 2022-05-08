@@ -1,8 +1,10 @@
 # Python 3.7 and 3.8 support
 try:
-    from typing import Final  # pragma: no cover
+    from typing import Final      # pragma: no cover
+    from typing import TypedDict  # pragma: no cover
 except ImportError:  # pragma: no cover
-    from typing_extensions import Final  # pragma: no cover
+    from typing_extensions import Final      # pragma: no cover
+    from typing_extensions import TypedDict  # pragma: no cover
 import ctypes
 from typing import List
 
@@ -12,8 +14,8 @@ class _Control(ctypes.Union):
     replaced with more readable alternatives. A mapping is provided below.
 
     Note:
-        This class should only be directly accessed through the read-only
-        :attr:`~purenes.ppu.PPU.control` property of the
+        This class should only be directly accessed through the
+        :attr:`~purenes.ppu.PPU.read_only_values` property of the
         :class:`~purenes.ppu.PPU`. The documentation of this class is included
         as a reference for testing and debugging.
 
@@ -51,8 +53,8 @@ class _Mask(ctypes.Union):
     """A class to represent the PPUMASK $2001 register.
 
     Note:
-        This class should only be directly accessed through the read-only
-        :attr:`~purenes.ppu.PPU.mask` property of the
+        This class should only be directly accessed through the
+        :attr:`~purenes.ppu.PPU.read_only_values` property of the
         :class:`~purenes.ppu.PPU`. The documentation of this class is included
         as a reference for testing and debugging.
 
@@ -92,8 +94,8 @@ class _Status(ctypes.Union):
     """A class to represent the PPUSTATUS $2002 register.
 
     Note:
-        This class should only be directly accessed through the read-only
-        :attr:`~purenes.ppu.PPU.status` property of the
+        This class should only be directly accessed through the
+        :attr:`~purenes.ppu.PPU.read_only_values` property of the
         :class:`~purenes.ppu.PPU`. The documentation of this class is included
         as a reference for testing and debugging.
 
@@ -125,9 +127,9 @@ class _Address(ctypes.Union):
     """A class to represent the PPU $2006 register.
 
     Note:
-        This class should only be directly accessed through the read-only
-        :attr:`~purenes.ppu.PPU.vram` and :attr:`~purenes.ppu.PPU.vram_temp`
-        properties of the :class:`~purenes.ppu.PPU`. The documentation of this
+        This class should only be directly accessed through the
+        :attr:`~purenes.ppu.PPU.read_only_values`
+        property of the :class:`~purenes.ppu.PPU`. The documentation of this
         class is included as a reference for testing and debugging.
 
     During writes from the CPU through $2006 this register behaves as a
@@ -176,6 +178,32 @@ class _Address(ctypes.Union):
             ]}
         )),
         ("reg", ctypes.c_uint16)]
+
+
+class PPUReadOnlyValues(TypedDict):
+    """Read-only container of PPU internal values.
+
+    This class should only be used for testing and debugging purposes.
+    """
+    # Internal registers
+    control:   _Control
+    mask:      _Mask
+    status:    _Status
+    vram:      _Address
+    vram_temp: _Address
+
+    # Counters
+    scanline: int
+    cycle:    int
+
+    # Shifters
+    pt_shift_hi: int
+    pt_shift_lo: int
+    at_shift_hi: int
+    at_shift_lo: int
+
+    fine_x:      int
+    write_latch: int
 
 
 class PPUBus(object):
@@ -548,163 +576,24 @@ class PPU(object):
         self._at_shift_lo = 0x00
 
     @property
-    def control(self) -> _Control:
-        """Read-only access to the internal PPUCTRL register $2000. This should
-        only be used for testing and debugging purposes
-
-        Accessing the register through this property will not impact any of
-        the other registers, so it is safe to do so.
-
-        Returns:
-            _Control: The internal Control register class
+    def read_only_values(self) -> PPUReadOnlyValues:
+        """Read-only access to internal values for testing and debugging.
         """
-        return self._control
-
-    @property
-    def mask(self) -> _Mask:
-        """Read-only access to the internal PPUMASK register $2001. This should
-        only be used for testing and debugging purposes
-
-        Accessing the register through this property will not impact any of
-        the other registers, so it is safe to do so.
-
-        Returns:
-            _Mask: The internal Mask register class
-        """
-        return self._mask
-
-    @property
-    def status(self) -> _Status:
-        """Read-only access to the internal PPUSTATUS register $2002. This
-        should only be used for testing and debugging purposes
-
-        Accessing the register through this property will not impact any of
-        the other registers, so it is safe to do so.
-
-        Returns:
-            _Status: The internal Status register class
-        """
-        return self._status
-
-    @property
-    def vram(self) -> _Address:
-        """Read-only access to the internal PPUADDR register $2006 (v).
-
-        This should only be used for testing and debugging purposes.
-
-        Accessing the register through this property will not impact any of
-        the other registers, so it is safe to do so.
-
-        Returns:
-            _Address
-        """
-        return self._vram
-
-    @property
-    def vram_temp(self) -> _Address:
-        """Read-only access to the internal PPUADDR register $2006 (t).
-
-        This should only be used for testing and debugging purposes.
-
-        Accessing the register through this property will not impact any of
-        the other registers, so it is safe to do so.
-
-        Returns:
-            _Address
-        """
-        return self._vram_temp
-
-    @property
-    def write_latch(self) -> int:
-        """Read-only access to the internal write latch (w).
-
-        This should only be used for testing and debugging purposes.
-
-        Returns:
-            int: (0 first write, 1 second)
-        """
-        return self._write_latch
-
-    @property
-    def fine_x(self) -> int:
-        """Read-only access to the internal fine x scroll value (x).
-
-        This should only be used for testing and debugging purposes.
-
-        Returns:
-            int: The value of the fine x scroll
-        """
-        return self._fine_x
-
-    @property
-    def scanline(self) -> int:
-        """Read-only access to the internal scanline counter.
-
-        This should only be used for testing and debugging purposes.
-
-        Returns:
-            int: The value of the current scanline
-        """
-        return self._scanline
-
-    @property
-    def cycle(self) -> int:
-        """Read-only access to the internal scanline cycle counter.
-
-        This should only be used for testing and debugging purposes.
-
-        Returns:
-            int: The value of the current cycle within a scanline
-        """
-        return self._cycle
-
-    @property
-    def at_shift_hi(self) -> int:
-        """Read-only access to the high-order bytes of the attribute table
-        shift register
-
-        This should only be used for testing and debugging purposes.
-
-        Returns:
-            int: The high-order bytes of the attribute table shift register
-        """
-        return self._at_shift_hi
-
-    @property
-    def at_shift_lo(self) -> int:
-        """Read-only access to the low-order bytes of the attribute table shift
-        register
-
-        This should only be used for testing and debugging purposes.
-
-        Returns:
-            int: The low-order bytes of the attribute table shift register
-        """
-        return self._at_shift_lo
-
-    @property
-    def pt_shift_hi(self) -> int:
-        """Read-only access to the high-order bytes of the pattern table
-        shift register
-
-        This should only be used for testing and debugging purposes.
-
-        Returns:
-            int: The high-order bytes of the pattern table shift register
-        """
-        return self._pt_shift_hi
-
-    @property
-    def pt_shift_lo(self) -> int:
-        """Read-only access to the low-order bytes of the pattern table shift
-        register
-
-        This should only be used for testing and debugging purposes.
-
-        Returns:
-            int: The low-order bytes of the pattern table shift register
-        """
-        return self._pt_shift_lo
+        return {
+            "control":     self._control,
+            "mask":        self._mask,
+            "status":      self._status,
+            "vram":        self._vram,
+            "vram_temp":   self._vram_temp,
+            "scanline":    self._scanline,
+            "cycle":       self._cycle,
+            "pt_shift_hi": self._pt_shift_hi,
+            "pt_shift_lo": self._pt_shift_lo,
+            "at_shift_hi": self._at_shift_hi,
+            "at_shift_lo": self._at_shift_lo,
+            "fine_x":      self._fine_x,
+            "write_latch": self._write_latch
+        }
 
     def _read(self, address: int) -> int:
         # Internal read.
