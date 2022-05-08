@@ -23,9 +23,9 @@ class TestPPURegisters(object):
 
         ppu.write(address, data)
 
-        control = ppu.control
-        vram = ppu.vram
-        vram_temp = ppu.vram_temp
+        control = ppu.read_only_values["control"]
+        vram = ppu.read_only_values["vram"]
+        vram_temp = ppu.read_only_values["vram_temp"]
         assert control.reg == data
         assert vram.reg == 0  # Assert not updated
         assert control.flags.base_nt_address == (data >> 0) & 3
@@ -48,7 +48,7 @@ class TestPPURegisters(object):
 
         ppu.write(address, data)
 
-        mask = ppu.mask
+        mask = ppu.read_only_values["mask"]
         assert mask.flags.greyscale == (data >> 0) & 1
         assert mask.flags.show_background_leftmost == (data >> 1) & 1
         assert mask.flags.show_sprites_leftmost == (data >> 2) & 1
@@ -71,7 +71,7 @@ class TestPPURegisters(object):
 
         ppu.read(address)
 
-        assert ppu.write_latch == 0
+        assert ppu.read_only_values["write_latch"] == 0
 
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
     def test_write_to_scroll_register(self, ppu: PPU, data: int):
@@ -88,17 +88,17 @@ class TestPPURegisters(object):
         # First write
         ppu.write(address, data)
 
-        vram_temp = ppu.vram_temp
+        vram_temp = ppu.read_only_values["vram_temp"]
         assert vram_temp.flags.coarse_x == data >> 3
-        assert ppu.fine_x == data & 0x07
-        assert ppu.write_latch == 1
+        assert ppu.read_only_values["fine_x"] == data & 0x07
+        assert ppu.read_only_values["write_latch"] == 1
 
         # Second write
         ppu.write(address, data)
 
         assert vram_temp.flags.coarse_y == data >> 3
         assert vram_temp.flags.fine_y == data & 0x07
-        assert ppu.write_latch == 0
+        assert ppu.read_only_values["write_latch"] == 0
 
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
     def test_write_to_vram_address_register(self, ppu: PPU, data: int):
@@ -113,14 +113,14 @@ class TestPPURegisters(object):
         address = 0x2006
         vram_address = (data << 8) | data  # Full 16-bit address
 
-        vram = ppu.vram
-        vram_temp = ppu.vram_temp
+        vram = ppu.read_only_values["vram"]
+        vram_temp = ppu.read_only_values["vram_temp"]
 
         ppu.write(address, data)
 
         # Verify t: .CDEFGH ........ <- d: ..CDEFGH
         assert ((vram_temp.reg >> 8) & 0x3F) == (data & 0x3F)
-        assert ppu.write_latch == 1
+        assert ppu.read_only_values["write_latch"] == 1
 
         ppu.write(address, data)
 
@@ -128,7 +128,7 @@ class TestPPURegisters(object):
         assert vram.reg == ((data & 0x3F) << 8) | data
         # Verify v: <...all bits...> <- t: <...all bits...>
         assert vram.reg == vram_temp.reg
-        assert ppu.write_latch == 0
+        assert ppu.read_only_values["write_latch"] == 0
         # Assert flags set correctly
         assert vram.flags.coarse_x == vram_address & 0x1F
         assert vram.flags.coarse_y == (vram_address >> 5) & 0x1F

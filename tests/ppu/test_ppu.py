@@ -19,11 +19,13 @@ class TestPPU(object):
     def test_ppu_reset(self, ppu: PPU):
         ppu.reset()
 
-        assert ppu.control.reg == 0
-        assert ppu.status.reg == 0
-        assert ppu.vram.reg == 0
-        assert ppu.vram_temp.reg == 0
-        assert ppu.write_latch == 0
+        values = ppu.read_only_values
+
+        assert values["control"].reg == 0
+        assert values["status"].reg == 0
+        assert values["vram"].reg == 0
+        assert values["vram_temp"].reg == 0
+        assert values["write_latch"] == 0
 
     def test_nametable_reads_during_a_scanline_cycle(
             self,
@@ -164,8 +166,9 @@ class TestPPU(object):
         for _ in range(0, self.TOTAL_VISIBLE_SCANLINE_CYCLES):
             ppu.clock()
 
-        assert ppu.vram.flags.coarse_x == 0x1F
-        assert ppu.vram.flags.nt_select_x == 0
+        vram = ppu.read_only_values["vram"]
+        assert vram.flags.coarse_x == 0x1F
+        assert vram.flags.nt_select_x == 0
 
     def test_coarse_scroll_horizontal_increment_wraps_around_at_maximum(
             self,
@@ -183,8 +186,9 @@ class TestPPU(object):
         for _ in range(0, self.TOTAL_VISIBLE_SCANLINE_CYCLES):
             ppu.clock()
 
-        assert ppu.vram.flags.coarse_x == 0x00
-        assert ppu.vram.flags.nt_select_x == 1
+        vram = ppu.read_only_values["vram"]
+        assert vram.flags.coarse_x == 0x00
+        assert vram.flags.nt_select_x == 1
 
     def test_horizontal_coarse_scroll_resets_after_rendering_a_scanline(
             self,
@@ -195,7 +199,7 @@ class TestPPU(object):
         for _ in range(0, self.TOTAL_VISIBLE_SCANLINE_CYCLES + 1):
             ppu.clock()
 
-        assert ppu.vram.flags.coarse_x == 0
+        assert ppu.read_only_values["vram"].flags.coarse_x == 0
 
     def test_vertical_scrolling(self, ppu: PPU):
         """Tests vertical scrolling without any vertical scrolling offsets.
@@ -209,9 +213,10 @@ class TestPPU(object):
         for _ in range(0, self.TOTAL_VISIBLE_SCANLINE_CYCLES):
             ppu.clock()
 
-        assert ppu.vram.flags.fine_y == 1
-        assert ppu.vram.flags.coarse_y == 0
-        assert ppu.vram.flags.nt_select_y == 0
+        vram = ppu.read_only_values["vram"]
+        assert vram.flags.fine_y == 1
+        assert vram.flags.coarse_y == 0
+        assert vram.flags.nt_select_y == 0
 
     def test_vertical_scrolling_overflows_at_maximum(
             self,
@@ -230,9 +235,10 @@ class TestPPU(object):
         for _ in range(0, self.TOTAL_SCANLINE_CYCLES * 8):
             ppu.clock()
 
-        assert ppu.vram.flags.fine_y == 0
-        assert ppu.vram.flags.coarse_y == 1
-        assert ppu.vram.flags.nt_select_y == 0
+        vram = ppu.read_only_values["vram"]
+        assert vram.flags.fine_y == 0
+        assert vram.flags.coarse_y == 1
+        assert vram.flags.nt_select_y == 0
 
     def test_vertical_scrolling_wraps_around_nametable_at_maximum(
             self,
@@ -252,9 +258,10 @@ class TestPPU(object):
         for _ in range(0, range_max):
             ppu.clock()
 
-        assert ppu.vram.flags.fine_y == 0
-        assert ppu.vram.flags.coarse_y == 0
-        assert ppu.vram.flags.nt_select_y == 1
+        vram = ppu.read_only_values["vram"]
+        assert vram.flags.fine_y == 0
+        assert vram.flags.coarse_y == 0
+        assert vram.flags.nt_select_y == 1
 
     def test_cycle_resets_at_maximum(self, ppu: PPU):
         """Tests incrementing of cycles within a scanline resets at the maximum
@@ -266,8 +273,8 @@ class TestPPU(object):
         for _ in range(0, self.TOTAL_SCANLINE_CYCLES):
             ppu.clock()
 
-        assert ppu.cycle == 0
-        assert ppu.scanline == 0
+        assert ppu.read_only_values["cycle"] == 0
+        assert ppu.read_only_values["scanline"] == 0
 
     def test_scanline_resets_at_maximum(self, ppu: PPU):
         """Tests scanline is reset to the pre-render scanline when the maximum
@@ -276,7 +283,7 @@ class TestPPU(object):
         for _ in range(0, self.TOTAL_SCANLINE_CYCLES * self.TOTAL_SCANLINES):
             ppu.clock()
 
-        assert ppu.scanline == -1
+        assert ppu.read_only_values["scanline"] == -1
 
     @pytest.mark.parametrize(
         "cycle_count, shift_hi, shift_lo",
@@ -309,7 +316,7 @@ class TestPPU(object):
         for _ in range(0, cycle_count):
             ppu.clock()
 
-        assert ppu.at_shift_hi == shift_hi
-        assert ppu.at_shift_lo == shift_lo
-        assert ppu.pt_shift_hi == shift_hi
-        assert ppu.pt_shift_lo == shift_lo
+        assert ppu.read_only_values["at_shift_hi"] == shift_hi
+        assert ppu.read_only_values["at_shift_lo"] == shift_lo
+        assert ppu.read_only_values["pt_shift_hi"] == shift_hi
+        assert ppu.read_only_values["pt_shift_lo"] == shift_lo
