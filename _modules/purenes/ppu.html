@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>purenes.ppu - PureNES 0.26.0 documentation</title>
+        <title>purenes.ppu - PureNES 0.27.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -120,7 +120,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PureNES 0.26.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PureNES 0.27.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -143,7 +143,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">PureNES 0.26.0 documentation</span>
+  <span class="sidebar-brand-text">PureNES 0.27.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -195,9 +195,11 @@
           <h1>Source code for purenes.ppu</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Python 3.7 and 3.8 support</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Final</span>  <span class="c1"># pragma: no cover</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Final</span>      <span class="c1"># pragma: no cover</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypedDict</span>  <span class="c1"># pragma: no cover</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-    <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Final</span>  <span class="c1"># pragma: no cover</span>
+    <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Final</span>      <span class="c1"># pragma: no cover</span>
+    <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">TypedDict</span>  <span class="c1"># pragma: no cover</span>
 <span class="kn">import</span> <span class="nn">ctypes</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
@@ -207,8 +209,8 @@
 <span class="sd">    replaced with more readable alternatives. A mapping is provided below.</span>
 
 <span class="sd">    Note:</span>
-<span class="sd">        This class should only be directly accessed through the read-only</span>
-<span class="sd">        :attr:`~purenes.ppu.PPU.control` property of the</span>
+<span class="sd">        This class should only be directly accessed through the</span>
+<span class="sd">        :attr:`~purenes.ppu.PPU.read_only_values` property of the</span>
 <span class="sd">        :class:`~purenes.ppu.PPU`. The documentation of this class is included</span>
 <span class="sd">        as a reference for testing and debugging.</span>
 
@@ -246,8 +248,8 @@
     <span class="sd">"""A class to represent the PPUMASK $2001 register.</span>
 
 <span class="sd">    Note:</span>
-<span class="sd">        This class should only be directly accessed through the read-only</span>
-<span class="sd">        :attr:`~purenes.ppu.PPU.mask` property of the</span>
+<span class="sd">        This class should only be directly accessed through the</span>
+<span class="sd">        :attr:`~purenes.ppu.PPU.read_only_values` property of the</span>
 <span class="sd">        :class:`~purenes.ppu.PPU`. The documentation of this class is included</span>
 <span class="sd">        as a reference for testing and debugging.</span>
 
@@ -287,8 +289,8 @@
     <span class="sd">"""A class to represent the PPUSTATUS $2002 register.</span>
 
 <span class="sd">    Note:</span>
-<span class="sd">        This class should only be directly accessed through the read-only</span>
-<span class="sd">        :attr:`~purenes.ppu.PPU.status` property of the</span>
+<span class="sd">        This class should only be directly accessed through the</span>
+<span class="sd">        :attr:`~purenes.ppu.PPU.read_only_values` property of the</span>
 <span class="sd">        :class:`~purenes.ppu.PPU`. The documentation of this class is included</span>
 <span class="sd">        as a reference for testing and debugging.</span>
 
@@ -320,9 +322,9 @@
     <span class="sd">"""A class to represent the PPU $2006 register.</span>
 
 <span class="sd">    Note:</span>
-<span class="sd">        This class should only be directly accessed through the read-only</span>
-<span class="sd">        :attr:`~purenes.ppu.PPU.vram` and :attr:`~purenes.ppu.PPU.vram_temp`</span>
-<span class="sd">        properties of the :class:`~purenes.ppu.PPU`. The documentation of this</span>
+<span class="sd">        This class should only be directly accessed through the</span>
+<span class="sd">        :attr:`~purenes.ppu.PPU.read_only_values`</span>
+<span class="sd">        property of the :class:`~purenes.ppu.PPU`. The documentation of this</span>
 <span class="sd">        class is included as a reference for testing and debugging.</span>
 
 <span class="sd">    During writes from the CPU through $2006 this register behaves as a</span>
@@ -371,6 +373,32 @@
             <span class="p">]}</span>
         <span class="p">)),</span>
         <span class="p">(</span><span class="s2">"reg"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint16</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="PPUReadOnlyValues"><a class="viewcode-back" href="../../purenes.html#purenes.ppu.PPUReadOnlyValues">[docs]</a><span class="k">class</span> <span class="nc">PPUReadOnlyValues</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+    <span class="sd">"""Read-only container of PPU internal values.</span>
+
+<span class="sd">    This class should only be used for testing and debugging purposes.</span>
+<span class="sd">    """</span>
+    <span class="c1"># Internal registers</span>
+    <span class="n">control</span><span class="p">:</span>   <span class="n">_Control</span>
+    <span class="n">mask</span><span class="p">:</span>      <span class="n">_Mask</span>
+    <span class="n">status</span><span class="p">:</span>    <span class="n">_Status</span>
+    <span class="n">vram</span><span class="p">:</span>      <span class="n">_Address</span>
+    <span class="n">vram_temp</span><span class="p">:</span> <span class="n">_Address</span>
+
+    <span class="c1"># Counters</span>
+    <span class="n">scanline</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">cycle</span><span class="p">:</span>    <span class="nb">int</span>
+
+    <span class="c1"># Shifters</span>
+    <span class="n">pt_shift_hi</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">pt_shift_lo</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">at_shift_hi</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">at_shift_lo</span><span class="p">:</span> <span class="nb">int</span>
+
+    <span class="n">fine_x</span><span class="p">:</span>      <span class="nb">int</span>
+    <span class="n">write_latch</span><span class="p">:</span> <span class="nb">int</span></div>
 
 
 <div class="viewcode-block" id="PPUBus"><a class="viewcode-back" href="../../purenes.html#purenes.ppu.PPUBus">[docs]</a><span class="k">class</span> <span class="nc">PPUBus</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -743,163 +771,24 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_at_shift_lo</span> <span class="o">=</span> <span class="mh">0x00</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">control</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Control</span><span class="p">:</span>
-        <span class="sd">"""Read-only access to the internal PPUCTRL register $2000. This should</span>
-<span class="sd">        only be used for testing and debugging purposes</span>
-
-<span class="sd">        Accessing the register through this property will not impact any of</span>
-<span class="sd">        the other registers, so it is safe to do so.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            _Control: The internal Control register class</span>
+    <span class="k">def</span> <span class="nf">read_only_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PPUReadOnlyValues</span><span class="p">:</span>
+        <span class="sd">"""Read-only access to internal values for testing and debugging.</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_control</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Mask</span><span class="p">:</span>
-        <span class="sd">"""Read-only access to the internal PPUMASK register $2001. This should</span>
-<span class="sd">        only be used for testing and debugging purposes</span>
-
-<span class="sd">        Accessing the register through this property will not impact any of</span>
-<span class="sd">        the other registers, so it is safe to do so.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            _Mask: The internal Mask register class</span>
-<span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Status</span><span class="p">:</span>
-        <span class="sd">"""Read-only access to the internal PPUSTATUS register $2002. This</span>
-<span class="sd">        should only be used for testing and debugging purposes</span>
-
-<span class="sd">        Accessing the register through this property will not impact any of</span>
-<span class="sd">        the other registers, so it is safe to do so.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            _Status: The internal Status register class</span>
-<span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">vram</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Address</span><span class="p">:</span>
-        <span class="sd">"""Read-only access to the internal PPUADDR register $2006 (v).</span>
-
-<span class="sd">        This should only be used for testing and debugging purposes.</span>
-
-<span class="sd">        Accessing the register through this property will not impact any of</span>
-<span class="sd">        the other registers, so it is safe to do so.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            _Address</span>
-<span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">vram_temp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Address</span><span class="p">:</span>
-        <span class="sd">"""Read-only access to the internal PPUADDR register $2006 (t).</span>
-
-<span class="sd">        This should only be used for testing and debugging purposes.</span>
-
-<span class="sd">        Accessing the register through this property will not impact any of</span>
-<span class="sd">        the other registers, so it is safe to do so.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            _Address</span>
-<span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram_temp</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">write_latch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">"""Read-only access to the internal write latch (w).</span>
-
-<span class="sd">        This should only be used for testing and debugging purposes.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            int: (0 first write, 1 second)</span>
-<span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_latch</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">fine_x</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">"""Read-only access to the internal fine x scroll value (x).</span>
-
-<span class="sd">        This should only be used for testing and debugging purposes.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            int: The value of the fine x scroll</span>
-<span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fine_x</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">scanline</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">"""Read-only access to the internal scanline counter.</span>
-
-<span class="sd">        This should only be used for testing and debugging purposes.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            int: The value of the current scanline</span>
-<span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scanline</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">"""Read-only access to the internal scanline cycle counter.</span>
-
-<span class="sd">        This should only be used for testing and debugging purposes.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            int: The value of the current cycle within a scanline</span>
-<span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cycle</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">at_shift_hi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">"""Read-only access to the high-order bytes of the attribute table</span>
-<span class="sd">        shift register</span>
-
-<span class="sd">        This should only be used for testing and debugging purposes.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            int: The high-order bytes of the attribute table shift register</span>
-<span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_at_shift_hi</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">at_shift_lo</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">"""Read-only access to the low-order bytes of the attribute table shift</span>
-<span class="sd">        register</span>
-
-<span class="sd">        This should only be used for testing and debugging purposes.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            int: The low-order bytes of the attribute table shift register</span>
-<span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_at_shift_lo</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">pt_shift_hi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">"""Read-only access to the high-order bytes of the pattern table</span>
-<span class="sd">        shift register</span>
-
-<span class="sd">        This should only be used for testing and debugging purposes.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            int: The high-order bytes of the pattern table shift register</span>
-<span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pt_shift_hi</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">pt_shift_lo</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">"""Read-only access to the low-order bytes of the pattern table shift</span>
-<span class="sd">        register</span>
-
-<span class="sd">        This should only be used for testing and debugging purposes.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            int: The low-order bytes of the pattern table shift register</span>
-<span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pt_shift_lo</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"control"</span><span class="p">:</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_control</span><span class="p">,</span>
+            <span class="s2">"mask"</span><span class="p">:</span>        <span class="bp">self</span><span class="o">.</span><span class="n">_mask</span><span class="p">,</span>
+            <span class="s2">"status"</span><span class="p">:</span>      <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="p">,</span>
+            <span class="s2">"vram"</span><span class="p">:</span>        <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="p">,</span>
+            <span class="s2">"vram_temp"</span><span class="p">:</span>   <span class="bp">self</span><span class="o">.</span><span class="n">_vram_temp</span><span class="p">,</span>
+            <span class="s2">"scanline"</span><span class="p">:</span>    <span class="bp">self</span><span class="o">.</span><span class="n">_scanline</span><span class="p">,</span>
+            <span class="s2">"cycle"</span><span class="p">:</span>       <span class="bp">self</span><span class="o">.</span><span class="n">_cycle</span><span class="p">,</span>
+            <span class="s2">"pt_shift_hi"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pt_shift_hi</span><span class="p">,</span>
+            <span class="s2">"pt_shift_lo"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pt_shift_lo</span><span class="p">,</span>
+            <span class="s2">"at_shift_hi"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_at_shift_hi</span><span class="p">,</span>
+            <span class="s2">"at_shift_lo"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_at_shift_lo</span><span class="p">,</span>
+            <span class="s2">"fine_x"</span><span class="p">:</span>      <span class="bp">self</span><span class="o">.</span><span class="n">_fine_x</span><span class="p">,</span>
+            <span class="s2">"write_latch"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_latch</span>
+        <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="c1"># Internal read.</span>

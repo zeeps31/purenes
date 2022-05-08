@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>purenes package - PureNES 0.26.0 documentation</title>
+        <title>purenes package - PureNES 0.27.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -121,7 +121,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">PureNES 0.26.0 documentation</div></a>
+      <a href="index.html"><div class="brand">PureNES 0.27.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -144,7 +144,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">PureNES 0.26.0 documentation</span>
+  <span class="sidebar-brand-text">PureNES 0.27.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -418,194 +418,9 @@ every 8 bytes through $3FFF.</p>
 </dl>
 </dd></dl>
 <dl class="py property">
-<dt class="sig sig-object py" id="purenes.ppu.PPU.at_shift_hi">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">at_shift_hi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPU.at_shift_hi" title="Permalink to this definition">#</a></dt>
-<dd><p>Read-only access to the high-order bytes of the attribute table
-shift register</p>
-<p>This should only be used for testing and debugging purposes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The high-order bytes of the attribute table shift register</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="purenes.ppu.PPU.at_shift_lo">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">at_shift_lo</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPU.at_shift_lo" title="Permalink to this definition">#</a></dt>
-<dd><p>Read-only access to the low-order bytes of the attribute table shift
-register</p>
-<p>This should only be used for testing and debugging purposes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The low-order bytes of the attribute table shift register</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="purenes.ppu.PPU.control">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">control</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.ppu._Control" title="purenes.ppu._Control"><span class="pre">purenes.ppu._Control</span></a></em><a class="headerlink" href="#purenes.ppu.PPU.control" title="Permalink to this definition">#</a></dt>
-<dd><p>Read-only access to the internal PPUCTRL register $2000. This should
-only be used for testing and debugging purposes</p>
-<p>Accessing the register through this property will not impact any of
-the other registers, so it is safe to do so.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The internal Control register class</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#purenes.ppu._Control" title="purenes.ppu._Control">_Control</a></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="purenes.ppu.PPU.cycle">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cycle</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPU.cycle" title="Permalink to this definition">#</a></dt>
-<dd><p>Read-only access to the internal scanline cycle counter.</p>
-<p>This should only be used for testing and debugging purposes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The value of the current cycle within a scanline</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="purenes.ppu.PPU.fine_x">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fine_x</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPU.fine_x" title="Permalink to this definition">#</a></dt>
-<dd><p>Read-only access to the internal fine x scroll value (x).</p>
-<p>This should only be used for testing and debugging purposes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The value of the fine x scroll</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="purenes.ppu.PPU.mask">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mask</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.ppu._Mask" title="purenes.ppu._Mask"><span class="pre">purenes.ppu._Mask</span></a></em><a class="headerlink" href="#purenes.ppu.PPU.mask" title="Permalink to this definition">#</a></dt>
-<dd><p>Read-only access to the internal PPUMASK register $2001. This should
-only be used for testing and debugging purposes</p>
-<p>Accessing the register through this property will not impact any of
-the other registers, so it is safe to do so.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The internal Mask register class</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#purenes.ppu._Mask" title="purenes.ppu._Mask">_Mask</a></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="purenes.ppu.PPU.pt_shift_hi">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pt_shift_hi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPU.pt_shift_hi" title="Permalink to this definition">#</a></dt>
-<dd><p>Read-only access to the high-order bytes of the pattern table
-shift register</p>
-<p>This should only be used for testing and debugging purposes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The high-order bytes of the pattern table shift register</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="purenes.ppu.PPU.pt_shift_lo">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pt_shift_lo</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPU.pt_shift_lo" title="Permalink to this definition">#</a></dt>
-<dd><p>Read-only access to the low-order bytes of the pattern table shift
-register</p>
-<p>This should only be used for testing and debugging purposes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The low-order bytes of the pattern table shift register</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="purenes.ppu.PPU.scanline">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scanline</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPU.scanline" title="Permalink to this definition">#</a></dt>
-<dd><p>Read-only access to the internal scanline counter.</p>
-<p>This should only be used for testing and debugging purposes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The value of the current scanline</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="purenes.ppu.PPU.status">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.ppu._Status" title="purenes.ppu._Status"><span class="pre">purenes.ppu._Status</span></a></em><a class="headerlink" href="#purenes.ppu.PPU.status" title="Permalink to this definition">#</a></dt>
-<dd><p>Read-only access to the internal PPUSTATUS register $2002. This
-should only be used for testing and debugging purposes</p>
-<p>Accessing the register through this property will not impact any of
-the other registers, so it is safe to do so.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The internal Status register class</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#purenes.ppu._Status" title="purenes.ppu._Status">_Status</a></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="purenes.ppu.PPU.vram">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vram</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.ppu._Address" title="purenes.ppu._Address"><span class="pre">purenes.ppu._Address</span></a></em><a class="headerlink" href="#purenes.ppu.PPU.vram" title="Permalink to this definition">#</a></dt>
-<dd><p>Read-only access to the internal PPUADDR register $2006 (v).</p>
-<p>This should only be used for testing and debugging purposes.</p>
-<p>Accessing the register through this property will not impact any of
-the other registers, so it is safe to do so.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>_Address</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="purenes.ppu.PPU.vram_temp">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vram_temp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.ppu._Address" title="purenes.ppu._Address"><span class="pre">purenes.ppu._Address</span></a></em><a class="headerlink" href="#purenes.ppu.PPU.vram_temp" title="Permalink to this definition">#</a></dt>
-<dd><p>Read-only access to the internal PPUADDR register $2006 (t).</p>
-<p>This should only be used for testing and debugging purposes.</p>
-<p>Accessing the register through this property will not impact any of
-the other registers, so it is safe to do so.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>_Address</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="purenes.ppu.PPU.write_latch">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">write_latch</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPU.write_latch" title="Permalink to this definition">#</a></dt>
-<dd><p>Read-only access to the internal write latch (w).</p>
-<p>This should only be used for testing and debugging purposes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>(0 first write, 1 second)</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>int</p>
-</dd>
-</dl>
+<dt class="sig sig-object py" id="purenes.ppu.PPU.read_only_values">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_only_values</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.ppu.PPUReadOnlyValues" title="purenes.ppu.PPUReadOnlyValues"><span class="pre">purenes.ppu.PPUReadOnlyValues</span></a></em><a class="headerlink" href="#purenes.ppu.PPU.read_only_values" title="Permalink to this definition">#</a></dt>
+<dd><p>Read-only access to internal values for testing and debugging.</p>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
@@ -699,15 +514,74 @@ Mirrors of $3F00-$3F1F</p></td>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
+<dt class="sig sig-object py" id="purenes.ppu.PPUReadOnlyValues">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">purenes.ppu.</span></span><span class="sig-name descname"><span class="pre">PPUReadOnlyValues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/purenes/ppu.html#PPUReadOnlyValues"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.ppu.PPUReadOnlyValues" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>Read-only container of PPU internal values.</p>
+<p>This class should only be used for testing and debugging purposes.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu.PPUReadOnlyValues.at_shift_hi">
+<span class="sig-name descname"><span class="pre">at_shift_hi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPUReadOnlyValues.at_shift_hi" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu.PPUReadOnlyValues.at_shift_lo">
+<span class="sig-name descname"><span class="pre">at_shift_lo</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPUReadOnlyValues.at_shift_lo" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu.PPUReadOnlyValues.control">
+<span class="sig-name descname"><span class="pre">control</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.ppu._Control" title="purenes.ppu._Control"><span class="pre">purenes.ppu._Control</span></a></em><a class="headerlink" href="#purenes.ppu.PPUReadOnlyValues.control" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu.PPUReadOnlyValues.cycle">
+<span class="sig-name descname"><span class="pre">cycle</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPUReadOnlyValues.cycle" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu.PPUReadOnlyValues.fine_x">
+<span class="sig-name descname"><span class="pre">fine_x</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPUReadOnlyValues.fine_x" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu.PPUReadOnlyValues.mask">
+<span class="sig-name descname"><span class="pre">mask</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.ppu._Mask" title="purenes.ppu._Mask"><span class="pre">purenes.ppu._Mask</span></a></em><a class="headerlink" href="#purenes.ppu.PPUReadOnlyValues.mask" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu.PPUReadOnlyValues.pt_shift_hi">
+<span class="sig-name descname"><span class="pre">pt_shift_hi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPUReadOnlyValues.pt_shift_hi" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu.PPUReadOnlyValues.pt_shift_lo">
+<span class="sig-name descname"><span class="pre">pt_shift_lo</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPUReadOnlyValues.pt_shift_lo" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu.PPUReadOnlyValues.scanline">
+<span class="sig-name descname"><span class="pre">scanline</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPUReadOnlyValues.scanline" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu.PPUReadOnlyValues.status">
+<span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.ppu._Status" title="purenes.ppu._Status"><span class="pre">purenes.ppu._Status</span></a></em><a class="headerlink" href="#purenes.ppu.PPUReadOnlyValues.status" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu.PPUReadOnlyValues.vram">
+<span class="sig-name descname"><span class="pre">vram</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.ppu._Address" title="purenes.ppu._Address"><span class="pre">purenes.ppu._Address</span></a></em><a class="headerlink" href="#purenes.ppu.PPUReadOnlyValues.vram" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu.PPUReadOnlyValues.vram_temp">
+<span class="sig-name descname"><span class="pre">vram_temp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.ppu._Address" title="purenes.ppu._Address"><span class="pre">purenes.ppu._Address</span></a></em><a class="headerlink" href="#purenes.ppu.PPUReadOnlyValues.vram_temp" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.ppu.PPUReadOnlyValues.write_latch">
+<span class="sig-name descname"><span class="pre">write_latch</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.ppu.PPUReadOnlyValues.write_latch" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="py class">
 <dt class="sig sig-object py" id="purenes.ppu._Address">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">purenes.ppu.</span></span><span class="sig-name descname"><span class="pre">_Address</span></span><a class="reference internal" href="_modules/purenes/ppu.html#_Address"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.ppu._Address" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_ctypes.Union</span></code></p>
 <p>A class to represent the PPU $2006 register.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This class should only be directly accessed through the read-only
-<a class="reference internal" href="#purenes.ppu.PPU.vram" title="purenes.ppu.PPU.vram"><code class="xref py py-attr docutils literal notranslate"><span class="pre">vram</span></code></a> and <a class="reference internal" href="#purenes.ppu.PPU.vram_temp" title="purenes.ppu.PPU.vram_temp"><code class="xref py py-attr docutils literal notranslate"><span class="pre">vram_temp</span></code></a>
-properties of the <a class="reference internal" href="#purenes.ppu.PPU" title="purenes.ppu.PPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PPU</span></code></a>. The documentation of this
+<p>This class should only be directly accessed through the
+<a class="reference internal" href="#purenes.ppu.PPU.read_only_values" title="purenes.ppu.PPU.read_only_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">read_only_values</span></code></a>
+property of the <a class="reference internal" href="#purenes.ppu.PPU" title="purenes.ppu.PPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PPU</span></code></a>. The documentation of this
 class is included as a reference for testing and debugging.</p>
 </div>
 <p>During writes from the CPU through $2006 this register behaves as a
@@ -755,8 +629,8 @@ PPU in a different way.</p>
 replaced with more readable alternatives. A mapping is provided below.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This class should only be directly accessed through the read-only
-<a class="reference internal" href="#purenes.ppu.PPU.control" title="purenes.ppu.PPU.control"><code class="xref py py-attr docutils literal notranslate"><span class="pre">control</span></code></a> property of the
+<p>This class should only be directly accessed through the
+<a class="reference internal" href="#purenes.ppu.PPU.read_only_values" title="purenes.ppu.PPU.read_only_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">read_only_values</span></code></a> property of the
 <a class="reference internal" href="#purenes.ppu.PPU" title="purenes.ppu.PPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PPU</span></code></a>. The documentation of this class is included
 as a reference for testing and debugging.</p>
 </div>
@@ -790,8 +664,8 @@ as a reference for testing and debugging.</p>
 <p>A class to represent the PPUMASK $2001 register.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This class should only be directly accessed through the read-only
-<a class="reference internal" href="#purenes.ppu.PPU.mask" title="purenes.ppu.PPU.mask"><code class="xref py py-attr docutils literal notranslate"><span class="pre">mask</span></code></a> property of the
+<p>This class should only be directly accessed through the
+<a class="reference internal" href="#purenes.ppu.PPU.read_only_values" title="purenes.ppu.PPU.read_only_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">read_only_values</span></code></a> property of the
 <a class="reference internal" href="#purenes.ppu.PPU" title="purenes.ppu.PPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PPU</span></code></a>. The documentation of this class is included
 as a reference for testing and debugging.</p>
 </div>
@@ -826,8 +700,8 @@ as a reference for testing and debugging.</p>
 <p>A class to represent the PPUSTATUS $2002 register.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This class should only be directly accessed through the read-only
-<a class="reference internal" href="#purenes.ppu.PPU.status" title="purenes.ppu.PPU.status"><code class="xref py py-attr docutils literal notranslate"><span class="pre">status</span></code></a> property of the
+<p>This class should only be directly accessed through the
+<a class="reference internal" href="#purenes.ppu.PPU.read_only_values" title="purenes.ppu.PPU.read_only_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">read_only_values</span></code></a> property of the
 <a class="reference internal" href="#purenes.ppu.PPU" title="purenes.ppu.PPU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PPU</span></code></a>. The documentation of this class is included
 as a reference for testing and debugging.</p>
 </div>
