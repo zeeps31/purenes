@@ -437,12 +437,16 @@
 
     <span class="n">_VRAM_ADDRESS_MASK</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="mh">0x07FF</span>
 
+    <span class="n">_PALETTE_ADDRESS_MASK</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="mh">0x1F</span>  <span class="c1"># Palette mirrored every 32 bytes</span>
+
     <span class="c1"># The 2KB video ram (VRAM) dedicated to the PPU, normally mapped to the</span>
     <span class="c1"># nametable address space from $2000-2FFF,</span>
-    <span class="n">_vram</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">_vram</span><span class="p">:</span>         <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">_vram_palette</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">]</span> <span class="o">*</span> <span class="mh">0x0800</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vram_palette</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x00</span><span class="p">]</span> <span class="o">*</span> <span class="mh">0x20</span>
 
 <div class="viewcode-block" id="PPUBus.read"><a class="viewcode-back" href="../../purenes.html#purenes.ppu.PPUBus.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sd">"""Reads a value from the appropriate resource connected to the PPU.</span>
@@ -456,6 +460,13 @@
         <span class="c1"># TODO: https://github.com/zeeps31/purenes/issues/14</span>
         <span class="k">if</span> <span class="mh">0x2000</span> <span class="o">&lt;=</span> <span class="n">address</span> <span class="o">&lt;=</span> <span class="mh">0x2FFF</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="p">[</span><span class="n">address</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_VRAM_ADDRESS_MASK</span><span class="p">]</span>
+
+        <span class="k">elif</span> <span class="mh">0x3F00</span> <span class="o">&lt;=</span> <span class="n">address</span> <span class="o">&lt;=</span> <span class="mh">0x3FFF</span><span class="p">:</span>
+            <span class="c1"># Addresses 0x3F10, 0x3F14, 0x3F18 and 0x3F1C are mirrored back to</span>
+            <span class="c1"># 0x3F00 0x3F04 0x3F08 and 0x3F0C. Each address is 16 bytes apart.</span>
+            <span class="n">address</span> <span class="o">-=</span> <span class="mh">0x10</span> <span class="k">if</span> <span class="n">address</span> <span class="o">&amp;</span> <span class="mh">0x13</span> <span class="o">==</span> <span class="mh">0x10</span> <span class="k">else</span> <span class="mi">0</span>
+
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram_palette</span><span class="p">[</span><span class="n">address</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PALETTE_ADDRESS_MASK</span><span class="p">]</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
@@ -477,6 +488,11 @@
         <span class="c1"># TODO: https://github.com/zeeps31/purenes/issues/14</span>
         <span class="k">if</span> <span class="mh">0x2000</span> <span class="o">&lt;=</span> <span class="n">address</span> <span class="o">&lt;=</span> <span class="mh">0x2FFF</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="p">[</span><span class="n">address</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_VRAM_ADDRESS_MASK</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+
+        <span class="k">elif</span> <span class="mh">0x3F00</span> <span class="o">&lt;=</span> <span class="n">address</span> <span class="o">&lt;=</span> <span class="mh">0x3FFF</span><span class="p">:</span>
+            <span class="n">address</span> <span class="o">-=</span> <span class="mh">0x10</span> <span class="k">if</span> <span class="n">address</span> <span class="o">&amp;</span> <span class="mh">0x13</span> <span class="o">==</span> <span class="mh">0x10</span> <span class="k">else</span> <span class="mi">0</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vram_palette</span><span class="p">[</span><span class="n">address</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PALETTE_ADDRESS_MASK</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
@@ -661,6 +677,7 @@
                 <span class="c1"># Reading palette data from $3F00-$3FFF returns the</span>
                 <span class="c1"># current result.</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">reg</span> <span class="o">&gt;=</span> <span class="mh">0x3F00</span><span class="p">:</span>
+                    <span class="c1"># TODO: https://github.com/zeeps31/purenes/issues/66</span>
                     <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_read_buffer</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">_vram</span><span class="o">.</span><span class="n">reg</span> <span class="o">+=</span> <span class="n">address_increment</span>
