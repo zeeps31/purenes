@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.28.0 (2022-05-09)
+### Feature
+* **ppu:** Implement palette reads and writes ([#68](https://github.com/zeeps31/purenes/issues/68)) ([`e7367b3`](https://github.com/zeeps31/purenes/commit/e7367b3bbc0dcaf0685de89e93bd51a1c80829d3))
+
 ## v0.27.0 (2022-05-07)
 ### Feature
 * **ppu:** Implement pattern table shift registers ([#64](https://github.com/zeeps31/purenes/issues/64)) ([`8218fed`](https://github.com/zeeps31/purenes/commit/8218fed23f12ac4c59dd3a71499d874b4e65ca1e))
