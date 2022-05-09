@@ -242,12 +242,16 @@ class PPUBus(object):
 
     _VRAM_ADDRESS_MASK: Final = 0x07FF
 
+    _PALETTE_ADDRESS_MASK: Final = 0x1F  # Palette mirrored every 32 bytes
+
     # The 2KB video ram (VRAM) dedicated to the PPU, normally mapped to the
     # nametable address space from $2000-2FFF,
-    _vram: List[int]
+    _vram:         List[int]
+    _vram_palette: List[int]
 
     def __init__(self):
         self._vram = [0x00] * 0x0800
+        self._vram_palette = [0x00] * 0x20
 
     def read(self, address: int) -> int:
         """Reads a value from the appropriate resource connected to the PPU.
@@ -261,6 +265,13 @@ class PPUBus(object):
         # TODO: https://github.com/zeeps31/purenes/issues/14
         if 0x2000 <= address <= 0x2FFF:
             return self._vram[address & self._VRAM_ADDRESS_MASK]
+
+        elif 0x3F00 <= address <= 0x3FFF:
+            # Addresses 0x3F10, 0x3F14, 0x3F18 and 0x3F1C are mirrored back to
+            # 0x3F00 0x3F04 0x3F08 and 0x3F0C. Each address is 16 bytes apart.
+            address -= 0x10 if address & 0x13 == 0x10 else 0
+
+            return self._vram_palette[address & self._PALETTE_ADDRESS_MASK]
 
         else:
             raise Exception(
@@ -282,6 +293,11 @@ class PPUBus(object):
         # TODO: https://github.com/zeeps31/purenes/issues/14
         if 0x2000 <= address <= 0x2FFF:
             self._vram[address & self._VRAM_ADDRESS_MASK] = data
+
+        elif 0x3F00 <= address <= 0x3FFF:
+            address -= 0x10 if address & 0x13 == 0x10 else 0
+
+            self._vram_palette[address & self._PALETTE_ADDRESS_MASK] = data
 
         else:
             raise Exception(
@@ -466,6 +482,7 @@ class PPU(object):
                 # Reading palette data from $3F00-$3FFF returns the
                 # current result.
                 if self._vram.reg >= 0x3F00:
+                    # TODO: https://github.com/zeeps31/purenes/issues/66
                     data = self._data_read_buffer
 
                 self._vram.reg += address_increment
