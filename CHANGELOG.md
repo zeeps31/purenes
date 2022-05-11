@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.29.0 (2022-05-11)
+### Feature
+* **ppu:** Implement background pixel output ([#69](https://github.com/zeeps31/purenes/issues/69)) ([`0c7bb0e`](https://github.com/zeeps31/purenes/commit/0c7bb0ebdc763c36ed13f37ac8a30a43b2d184fc))
+
 ## v0.28.0 (2022-05-09)
 ### Feature
 * **ppu:** Implement palette reads and writes ([#68](https://github.com/zeeps31/purenes/issues/68)) ([`e7367b3`](https://github.com/zeeps31/purenes/commit/e7367b3bbc0dcaf0685de89e93bd51a1c80829d3))
