@@ -7,6 +7,9 @@ except ImportError:  # pragma: no cover
     from typing_extensions import TypedDict  # pragma: no cover
 import ctypes
 from typing import List
+from typing import Tuple
+
+from purenes.palette import PPU_PALETTE
 
 
 class _Control(ctypes.Union):
@@ -357,6 +360,9 @@ class PPU(object):
     _scanline: int = -1  # Current scanline
     _cycle: int = 0      # Current cycle within a scanline
 
+    # A list of RGB tuples to represent each pixel color
+    _pixel_values: List[Tuple[int, int, int]] = [(0, 0, 0)] * (256 * 240)
+
     _ppu_bus: PPUBus
 
     def __init__(self, ppu_bus: PPUBus):
@@ -396,6 +402,7 @@ class PPU(object):
 
             if (1 <= cycle <= 256) or (321 <= cycle <= 340):
 
+                self._generate_pixel()
                 self._shift_background_registers()
 
                 # Some of the rendering process repeats itself every 8 cycles
@@ -592,6 +599,9 @@ class PPU(object):
         self._at_shift_hi = 0x00
         self._at_shift_lo = 0x00
 
+        # Reset pixel output
+        self._pixel_values = [(0, 0, 0)] * (256 * 240)
+
     @property
     def read_only_values(self) -> PPUReadOnlyValues:
         """Read-only access to internal values for testing and debugging.
@@ -611,6 +621,18 @@ class PPU(object):
             "fine_x":      self._fine_x,
             "write_latch": self._write_latch
         }
+
+    def get_pixel_values(self) -> List[Tuple[int, int, int]]:
+        """Get the pixel values rendered by the PPU to be displayed on screen.
+
+        This value should only be accessed when the PPU has finished rendering
+        a frame. The image will be unstable otherwise.
+
+        Returns:
+            List[Tuple[int, int, int]]: A List of RGB tuples of size
+                                        screen_width * screen_height
+        """
+        return self._pixel_values
 
     def _read(self, address: int) -> int:
         # Internal read.
@@ -679,3 +701,26 @@ class PPU(object):
 
         self._at_shift_hi <<= 1
         self._at_shift_lo <<= 1
+
+    def _generate_pixel(self) -> None:
+        palette: int = 0x00
+
+        if 0 <= self._scanline <= 240 and self._cycle <= 256:
+
+            if self._mask.flags.show_background:
+                # Select the leftmost bit from the shift registers offset by
+                # fine_x
+                background_mux: int = 0x8000 >> self._fine_x
+
+                # Create index into palette memory
+                # https://www.nesdev.org/wiki/PPU_palettes
+                palette = ((self._pt_shift_hi & background_mux) << 1 |
+                           self._pt_shift_lo & background_mux)
+                palette |= ((self._at_shift_hi & background_mux) << 1 |
+                            self._at_shift_lo & background_mux) << 2
+
+            color: Tuple[int, int, int] = PPU_PALETTE[
+                self._read(0x3F00 | palette)
+            ]
+
+            self._pixel_values[(256 * self._scanline) + self._cycle-1] = color
