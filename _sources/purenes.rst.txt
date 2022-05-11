@@ -12,6 +12,14 @@ purenes.cpu module
    :undoc-members:
    :show-inheritance:
 
+purenes.palette module
+----------------------
+
+.. automodule:: purenes.palette
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 purenes.ppu module
 ------------------
 
