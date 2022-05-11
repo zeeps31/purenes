@@ -320,3 +320,25 @@ class TestPPU(object):
         assert ppu.read_only_values["at_shift_lo"] == shift_lo
         assert ppu.read_only_values["pt_shift_hi"] == shift_hi
         assert ppu.read_only_values["pt_shift_lo"] == shift_lo
+
+    def test_background_pixel_output(self, ppu: PPU, mock_ppu_bus: Mock):
+        """Tests palette selection and pixel output for one frame.
+
+        Returns the same value for all reads to palette memory and verifies
+        the correct color is selected from the palette and added to the pixel
+        output.
+        """
+        ppu.write(0x2001, 0x08)  # Enable background rendering
+
+        mock_ppu_bus.read.return_value = 0x02
+
+        # Preserve space
+        max_cycles = (self.TOTAL_SCANLINE_CYCLES *
+                      (self.TOTAL_VISIBLE_SCANLINES + 1))
+        for _ in range(0, max_cycles):
+            ppu.clock()
+
+        colors = ppu.get_pixel_values()
+
+        for rgb_color in colors:
+            assert rgb_color == (8, 16, 144)
