@@ -28,6 +28,14 @@ purenes.ppu module
    :undoc-members:
    :show-inheritance:
 
+purenes.rom module
+------------------
+
+.. automodule:: purenes.rom
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
