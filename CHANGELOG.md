@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.30.0 (2022-05-15)
+### Feature
+* **rom:** Introduce Rom class ([#70](https://github.com/zeeps31/purenes/issues/70)) ([`e7ce476`](https://github.com/zeeps31/purenes/commit/e7ce476bc4d949943eec2b21dbd4fa2fc7b0c271))
+
 ## v0.29.0 (2022-05-11)
 ### Feature
 * **ppu:** Implement background pixel output ([#69](https://github.com/zeeps31/purenes/issues/69)) ([`0c7bb0e`](https://github.com/zeeps31/purenes/commit/0c7bb0ebdc763c36ed13f37ac8a30a43b2d184fc))

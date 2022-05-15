@@ -1,7 +1,7 @@
 from setuptools import setup
 from setuptools import find_packages
 
-__version__ = "0.29.0"
+__version__ = "0.30.0"
 
 setup(name='purenes',
       version=__version__,
