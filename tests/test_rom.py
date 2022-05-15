@@ -9,9 +9,9 @@ class TestRom(object):
 
     @pytest.fixture()
     def rom_data(self) -> bytes:
-        h: bytes = b'NES\x1a\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00'
-        h += b'\x00' * (32768 + 8192)  # Dummy data PRG size + CHR size
-        yield h
+        rom: bytes = b'NES\x1a\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+        rom += b'\x00' * (32768 + 8192)  # Dummy data PRG size + CHR size
+        yield rom
 
     def test_header_is_extracted_correctly(self, rom_data):
         """Tests that header data is correctly extracted from the header bytes.
