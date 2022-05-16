@@ -1,6 +1,14 @@
 purenes package
 ===============
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   purenes.mappers
+
 Submodules
 ----------
 

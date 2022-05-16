@@ -1,0 +1,21 @@
+purenes.mappers package
+=======================
+
+Submodules
+----------
+
+purenes.mappers.mapper0 module
+------------------------------
+
+.. automodule:: purenes.mappers.mapper0
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: purenes.mappers
+   :members:
+   :undoc-members:
+   :show-inheritance:
