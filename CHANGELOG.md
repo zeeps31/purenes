@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.31.0 (2022-05-16)
+### Feature
+* **mappers:** Introduce Mapper and Mapper0 ([#71](https://github.com/zeeps31/purenes/issues/71)) ([`cba1e8e`](https://github.com/zeeps31/purenes/commit/cba1e8e45bda6d263970f658e37b02ab56a4aecd))
+
 ## v0.30.0 (2022-05-15)
 ### Feature
 * **rom:** Introduce Rom class ([#70](https://github.com/zeeps31/purenes/issues/70)) ([`e7ce476`](https://github.com/zeeps31/purenes/commit/e7ce476bc4d949943eec2b21dbd4fa2fc7b0c271))
