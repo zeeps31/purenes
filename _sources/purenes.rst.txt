@@ -12,6 +12,14 @@ Subpackages
 Submodules
 ----------
 
+purenes.cartridge module
+------------------------
+
+.. automodule:: purenes.cartridge
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 purenes.cpu module
 ------------------
 
