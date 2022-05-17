@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.32.0 (2022-05-17)
+### Feature
+* **cartridge:** Introduce Cartridge class ([#72](https://github.com/zeeps31/purenes/issues/72)) ([`9f94b28`](https://github.com/zeeps31/purenes/commit/9f94b282f4c6a826ae80d67d5c11bf330fa7758d))
+
 ## v0.31.0 (2022-05-16)
 ### Feature
 * **mappers:** Introduce Mapper and Mapper0 ([#71](https://github.com/zeeps31/purenes/issues/71)) ([`cba1e8e`](https://github.com/zeeps31/purenes/commit/cba1e8e45bda6d263970f658e37b02ab56a4aecd))
