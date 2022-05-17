@@ -88,3 +88,9 @@ class Mapper(abc.ABC):
 
 
 from purenes.mappers.mapper0 import Mapper0
+from typing import Dict
+from typing import Type
+
+SUPPORTED_MAPPERS: Dict[int, Type[Mapper]] = {
+    0: Mapper0
+}
