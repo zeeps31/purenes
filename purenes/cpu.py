@@ -1,9 +1,63 @@
 # Python 3.7 and 3.8 support
 try:
     from typing import Final  # pragma: no cover
+    from typing import TypedDict  # pragma: no cover
 except ImportError:  # pragma: no cover
     from typing_extensions import Final  # pragma: no cover
+    from typing_extensions import TypedDict  # pragma: no cover
+import ctypes
 from typing import List
+
+
+class CPUStatus(ctypes.Union):
+    """A class to represent the CPU status register (P).
+
+    https://www.nesdev.org/wiki/Status_flags
+
+    The values detailed below can be accessed using the
+    :attr:`~purenes.cpu._Status.flags` attribute of this class.
+
+    * carry     (C) - Carry flag.
+    * zero      (Z) - Zero flag.
+    * interrupt (I) - When set, all interrupts except the NMI are inhibited.
+    * decimal   (D) - Decimal flag. On the NES, this flag has no effect.
+    * _         (ss) - Unused
+    * overflow  (V) - Overflow flag.
+    * negative  (N) - Negative flag.
+    """
+    _fields_ = [
+        ("flags", type(
+            "_CPUStatus",
+            (ctypes.LittleEndianStructure,),
+            {"_fields_": [
+                ("carry",             ctypes.c_uint8, 1),
+                ("zero",              ctypes.c_uint8, 1),
+                ("interrupt_disable", ctypes.c_uint8, 1),
+                ("decimal",           ctypes.c_uint8, 1),
+                ("na",                ctypes.c_uint8, 2),
+                ("overflow",          ctypes.c_uint8, 1),
+                ("negative",          ctypes.c_uint8, 1),
+            ]}
+        )),
+        ("reg", ctypes.c_uint8)]
+
+
+class CPUReadOnlyValues(TypedDict):
+    """Read-only container of CPU internal values.
+
+    This class should only be used for testing and debugging purposes.
+    """
+    # Internal registers
+    a: int
+    x: int
+    y: int
+    s: int
+
+    # Counters
+    pc: int
+    cycle_count: int
+
+    active_operation: int
 
 
 class CPUBus(object):
@@ -111,6 +165,8 @@ class CPU(object):
     _X: int
     _Y: int
     _PC: int
+    _S: int
+    status: CPUStatus = CPUStatus()
 
     # Tracks the total number of cycles that have been performed. This value
     # is used to synchronize the CPU and PPU
@@ -166,10 +222,12 @@ class CPU(object):
         Returns:
             None
         """
-        # Perform power-up state actions.
+        # Perform reset actions.
         self._A = 0x00
         self._X = 0x00
         self._Y = 0x00
+        self._S = 0xFD
+        self.status.reg |= 0x04
 
         pc_lo: int = self._read(self._RES)
         pc_hi: int = self._read(self._RES + 1)
@@ -179,6 +237,18 @@ class CPU(object):
         # As the reset line goes high the processor performs a start sequence
         # of 7 cycles
         self._cycle_count += 7
+
+    @property
+    def read_only_values(self) -> CPUReadOnlyValues:
+        return {
+            "a":  self._A,
+            "x":  self._X,
+            "y":  self._Y,
+            "s":  self._S,
+            "pc": self._PC,
+            "cycle_count": self._cycle_count,
+            "active_operation": self._active_operation,
+        }
 
     def _read(self, address: int) -> int:
         return self._cpu_bus.read(address)
