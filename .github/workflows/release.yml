@@ -2,8 +2,8 @@ name: release
 
 on:
   push:
-    branches:
-      - main
+    branches-ignore:
+      - '**' # TODO: https://github.com/zeeps31/purenes/issues/73
 
 jobs:
   release:
