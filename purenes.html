@@ -382,6 +382,14 @@ provided by the reset vector at $FFFC.)</p>
 </dd>
 </dl>
 </dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="purenes.cpu.CPU.read_only_values">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_only_values</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.cpu.CPUReadOnlyValues" title="purenes.cpu.CPUReadOnlyValues"><span class="pre">purenes.cpu.CPUReadOnlyValues</span></a></em><a class="headerlink" href="#purenes.cpu.CPU.read_only_values" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.cpu.CPU.status">
+<span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#purenes.cpu.CPUStatus" title="purenes.cpu.CPUStatus"><span class="pre">purenes.cpu.CPUStatus</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;purenes.cpu.CPUStatus</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#purenes.cpu.CPU.status" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="purenes.cpu.CPUBus">
@@ -469,6 +477,69 @@ Mirrors of $2000-2007 (repeats every 8 bytes)</p></td>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="purenes.cpu.CPUReadOnlyValues">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">purenes.cpu.</span></span><span class="sig-name descname"><span class="pre">CPUReadOnlyValues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/purenes/cpu.html#CPUReadOnlyValues"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.cpu.CPUReadOnlyValues" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>Read-only container of CPU internal values.</p>
+<p>This class should only be used for testing and debugging purposes.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.cpu.CPUReadOnlyValues.a">
+<span class="sig-name descname"><span class="pre">a</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.cpu.CPUReadOnlyValues.a" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.cpu.CPUReadOnlyValues.active_operation">
+<span class="sig-name descname"><span class="pre">active_operation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.cpu.CPUReadOnlyValues.active_operation" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.cpu.CPUReadOnlyValues.cycle_count">
+<span class="sig-name descname"><span class="pre">cycle_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.cpu.CPUReadOnlyValues.cycle_count" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.cpu.CPUReadOnlyValues.pc">
+<span class="sig-name descname"><span class="pre">pc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.cpu.CPUReadOnlyValues.pc" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.cpu.CPUReadOnlyValues.s">
+<span class="sig-name descname"><span class="pre">s</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.cpu.CPUReadOnlyValues.s" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.cpu.CPUReadOnlyValues.x">
+<span class="sig-name descname"><span class="pre">x</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.cpu.CPUReadOnlyValues.x" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.cpu.CPUReadOnlyValues.y">
+<span class="sig-name descname"><span class="pre">y</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.cpu.CPUReadOnlyValues.y" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="purenes.cpu.CPUStatus">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">purenes.cpu.</span></span><span class="sig-name descname"><span class="pre">CPUStatus</span></span><a class="reference internal" href="_modules/purenes/cpu.html#CPUStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.cpu.CPUStatus" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_ctypes.Union</span></code></p>
+<p>A class to represent the CPU status register (P).</p>
+<p><a class="reference external" href="https://www.nesdev.org/wiki/Status_flags">https://www.nesdev.org/wiki/Status_flags</a></p>
+<p>The values detailed below can be accessed using the
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">flags</span></code> attribute of this class.</p>
+<ul class="simple">
+<li><p>carry             (C) - Carry flag.</p></li>
+<li><p>zero              (Z) - Zero flag.</p></li>
+<li><p>interrupt_disable (I) - Interrupt disable flag.</p></li>
+<li><p>decimal           (D) - Decimal flag. On the NES, has no effect.</p></li>
+<li><p>_                 (ss) - Unused</p></li>
+<li><p>overflow          (V) - Overflow flag.</p></li>
+<li><p>negative          (N) - Negative flag.</p></li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.cpu.CPUStatus.flags">
+<span class="sig-name descname"><span class="pre">flags</span></span><a class="headerlink" href="#purenes.cpu.CPUStatus.flags" title="Permalink to this definition">#</a></dt>
+<dd><p>Structure/Union member</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.cpu.CPUStatus.reg">
+<span class="sig-name descname"><span class="pre">reg</span></span><a class="headerlink" href="#purenes.cpu.CPUStatus.reg" title="Permalink to this definition">#</a></dt>
+<dd><p>Structure/Union member</p>
 </dd></dl>
 </dd></dl>
 </section>

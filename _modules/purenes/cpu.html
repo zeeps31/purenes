@@ -196,9 +196,63 @@
 <span></span><span class="c1"># Python 3.7 and 3.8 support</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Final</span>  <span class="c1"># pragma: no cover</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypedDict</span>  <span class="c1"># pragma: no cover</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Final</span>  <span class="c1"># pragma: no cover</span>
+    <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">TypedDict</span>  <span class="c1"># pragma: no cover</span>
+<span class="kn">import</span> <span class="nn">ctypes</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+
+<div class="viewcode-block" id="CPUStatus"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPUStatus">[docs]</a><span class="k">class</span> <span class="nc">CPUStatus</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">Union</span><span class="p">):</span>
+    <span class="sd">"""A class to represent the CPU status register (P).</span>
+
+<span class="sd">    https://www.nesdev.org/wiki/Status_flags</span>
+
+<span class="sd">    The values detailed below can be accessed using the</span>
+<span class="sd">    :attr:`~purenes.cpu._Status.flags` attribute of this class.</span>
+
+<span class="sd">    * carry             (C) - Carry flag.</span>
+<span class="sd">    * zero              (Z) - Zero flag.</span>
+<span class="sd">    * interrupt_disable (I) - Interrupt disable flag.</span>
+<span class="sd">    * decimal           (D) - Decimal flag. On the NES, has no effect.</span>
+<span class="sd">    * _                 (ss) - Unused</span>
+<span class="sd">    * overflow          (V) - Overflow flag.</span>
+<span class="sd">    * negative          (N) - Negative flag.</span>
+<span class="sd">    """</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">"flags"</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span>
+            <span class="s2">"_CPUStatus"</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">LittleEndianStructure</span><span class="p">,),</span>
+            <span class="p">{</span><span class="s2">"_fields_"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s2">"carry"</span><span class="p">,</span>             <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"zero"</span><span class="p">,</span>              <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"interrupt_disable"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"decimal"</span><span class="p">,</span>           <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"na"</span><span class="p">,</span>                <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"overflow"</span><span class="p">,</span>          <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"negative"</span><span class="p">,</span>          <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="p">]}</span>
+        <span class="p">)),</span>
+        <span class="p">(</span><span class="s2">"reg"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="CPUReadOnlyValues"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPUReadOnlyValues">[docs]</a><span class="k">class</span> <span class="nc">CPUReadOnlyValues</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+    <span class="sd">"""Read-only container of CPU internal values.</span>
+
+<span class="sd">    This class should only be used for testing and debugging purposes.</span>
+<span class="sd">    """</span>
+    <span class="c1"># Internal registers</span>
+    <span class="n">a</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">x</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">y</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">s</span><span class="p">:</span> <span class="nb">int</span>
+
+    <span class="c1"># Counters</span>
+    <span class="n">pc</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">cycle_count</span><span class="p">:</span> <span class="nb">int</span>
+
+    <span class="n">active_operation</span><span class="p">:</span> <span class="nb">int</span></div>
 
 
 <div class="viewcode-block" id="CPUBus"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPUBus">[docs]</a><span class="k">class</span> <span class="nc">CPUBus</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -306,6 +360,8 @@
     <span class="n">_X</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">_Y</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">_PC</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">_S</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">status</span><span class="p">:</span> <span class="n">CPUStatus</span> <span class="o">=</span> <span class="n">CPUStatus</span><span class="p">()</span>
 
     <span class="c1"># Tracks the total number of cycles that have been performed. This value</span>
     <span class="c1"># is used to synchronize the CPU and PPU</span>
@@ -361,10 +417,12 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        """</span>
-        <span class="c1"># Perform power-up state actions.</span>
+        <span class="c1"># Perform reset actions.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_A</span> <span class="o">=</span> <span class="mh">0x00</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_X</span> <span class="o">=</span> <span class="mh">0x00</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_Y</span> <span class="o">=</span> <span class="mh">0x00</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_S</span> <span class="o">=</span> <span class="mh">0xFD</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">reg</span> <span class="o">|=</span> <span class="mh">0x04</span>
 
         <span class="n">pc_lo</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_RES</span><span class="p">)</span>
         <span class="n">pc_hi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_RES</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
@@ -374,6 +432,18 @@
         <span class="c1"># As the reset line goes high the processor performs a start sequence</span>
         <span class="c1"># of 7 cycles</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cycle_count</span> <span class="o">+=</span> <span class="mi">7</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">read_only_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CPUReadOnlyValues</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"a"</span><span class="p">:</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_A</span><span class="p">,</span>
+            <span class="s2">"x"</span><span class="p">:</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_X</span><span class="p">,</span>
+            <span class="s2">"y"</span><span class="p">:</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_Y</span><span class="p">,</span>
+            <span class="s2">"s"</span><span class="p">:</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_S</span><span class="p">,</span>
+            <span class="s2">"pc"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PC</span><span class="p">,</span>
+            <span class="s2">"cycle_count"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cycle_count</span><span class="p">,</span>
+            <span class="s2">"active_operation"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active_operation</span><span class="p">,</span>
+        <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cpu_bus</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
