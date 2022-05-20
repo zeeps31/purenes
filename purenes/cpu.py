@@ -17,13 +17,13 @@ class CPUStatus(ctypes.Union):
     The values detailed below can be accessed using the
     :attr:`~purenes.cpu._Status.flags` attribute of this class.
 
-    * carry     (C) - Carry flag.
-    * zero      (Z) - Zero flag.
-    * interrupt (I) - When set, all interrupts except the NMI are inhibited.
-    * decimal   (D) - Decimal flag. On the NES, this flag has no effect.
-    * _         (ss) - Unused
-    * overflow  (V) - Overflow flag.
-    * negative  (N) - Negative flag.
+    * carry             (C) - Carry flag.
+    * zero              (Z) - Zero flag.
+    * interrupt_disable (I) - Interrupt disable flag.
+    * decimal           (D) - Decimal flag. On the NES, has no effect.
+    * _                 (ss) - Unused
+    * overflow          (V) - Overflow flag.
+    * negative          (N) - Negative flag.
     """
     _fields_ = [
         ("flags", type(
