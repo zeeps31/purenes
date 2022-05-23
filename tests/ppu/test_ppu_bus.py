@@ -1,6 +1,6 @@
 import pytest
 
-from purenes.ppu import PPUBus
+from purenes import ppu
 
 
 class TestPPUBus(object):
@@ -9,7 +9,7 @@ class TestPPUBus(object):
                                          "0x10000. Address should "
                                          "be between 0x0000 - 0x3FFF")
 
-    def test_read_from_vram(self, ppu_bus: PPUBus):
+    def test_read_from_vram(self, ppu_bus: ppu.PPUBus):
         """Test that reads from VRAM for addresses 0x2000-0x2FFF return
         the correct values.
         """
@@ -20,7 +20,7 @@ class TestPPUBus(object):
 
             assert data == 0x00
 
-    def test_read_from_palette_vram(self, ppu_bus: PPUBus):
+    def test_read_from_palette_vram(self, ppu_bus: ppu.PPUBus):
         """Tests that reads from palette VRAM for addresses 0x3F00-0x3FFF read
         the correct values from the correct location.
         """
@@ -31,7 +31,7 @@ class TestPPUBus(object):
 
             assert data == 0x00
 
-    def test_write_to_vram(self, ppu_bus: PPUBus):
+    def test_write_to_vram(self, ppu_bus: ppu.PPUBus):
         """Test that writes to VRAM for addresses 0x2000-0x2FFF write the
         correct values to the correct location.
         """
@@ -43,7 +43,7 @@ class TestPPUBus(object):
 
             assert ppu_bus.read(address) == data
 
-    def test_write_to_palette_vram(self, ppu_bus: PPUBus):
+    def test_write_to_palette_vram(self, ppu_bus: ppu.PPUBus):
         """Tests writes to palette VRAM for addresses 0x3F00-0x3FFF write the
         correct values to the correct location.
         """
@@ -54,7 +54,7 @@ class TestPPUBus(object):
 
             assert data == 0x00
 
-    def test_palette_reads_mirror_background(self, ppu_bus: PPUBus):
+    def test_palette_reads_mirror_background(self, ppu_bus: ppu.PPUBus):
         """Tests that reads to addresses 0x3F10, 0x3F14, 0x3F18 and 0x3F1C
         return the values stored at 0x3F00, 0x3F04, 0x3F08 and 0x3F0C.
         """
@@ -68,7 +68,7 @@ class TestPPUBus(object):
         assert ppu_bus.read(0x3F18) == 0x02
         assert ppu_bus.read(0x3F1C) == 0x03
 
-    def test_palette_writes_mirror_background(self, ppu_bus: PPUBus):
+    def test_palette_writes_mirror_background(self, ppu_bus: ppu.PPUBus):
         """Tests writes to addresses 0x3F00, 0x3F04, 0x3F08 and 0x3F0C store
         the values in addresses 0x3F10, 0x3F14, 0x3F18 and 0x3F1C.
         """
@@ -84,7 +84,7 @@ class TestPPUBus(object):
 
     def test_read_from_an_incorrect_address_is_invalid(
             self,
-            ppu_bus: PPUBus
+            ppu_bus: ppu.PPUBus
     ):
         """Test that a read from an address not in the addressable range of the
         PPU throws an exception.
@@ -98,7 +98,7 @@ class TestPPUBus(object):
 
     def test_write_to_an_incorrect_address_is_invalid(
             self,
-            ppu_bus: PPUBus
+            ppu_bus: ppu.PPUBus
     ):
         """Test that writes to an address not in the addressable range of the
         PPU throws an exception.

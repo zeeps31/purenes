@@ -1,7 +1,7 @@
-from purenes.mappers import Mapper
+from purenes import mappers
 
 
-class Mapper0(Mapper):
+class Mapper0(mappers.Mapper):
     """Class to represent iNES Mapper0 (NROM).
 
     NROM refers to the Nintendo cartridge boards NES-NROM-128, NES-NROM-256,

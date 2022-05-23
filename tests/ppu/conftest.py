@@ -1,35 +1,34 @@
-from unittest.mock import Mock
+from unittest import mock
 
 import pytest
-from pytest_mock import MockFixture
+import pytest_mock
 
-from purenes.ppu import PPU
-from purenes.ppu import PPUBus
+import purenes.ppu
 
 
 @pytest.fixture()
 def ppu_bus():
     """A PPUBus instance."""
-    ppu_bus: PPUBus = PPUBus()
+    ppu_bus: purenes.ppu.PPUBus = purenes.ppu.PPUBus()
     yield ppu_bus
 
 
 @pytest.fixture()
-def mock_ppu_bus(mocker: MockFixture):
+def mock_ppu_bus(mocker: pytest_mock.MockFixture):
     """A Mock to represent the PPUBus."""
-    mock_ppu_bus: Mock = mocker.Mock()
+    mock_ppu_bus: mock.Mock = mocker.Mock()
     mock_ppu_bus.read.return_value = 0x00  # Default return value
     yield mock_ppu_bus
 
 
 @pytest.fixture()
-def ppu(mock_ppu_bus: Mock):
+def ppu(mock_ppu_bus: mock.Mock):
     """A PPU instance with a mocked PPUBus."""
-    yield PPU(mock_ppu_bus)
+    yield purenes.ppu.PPU(mock_ppu_bus)
 
 
 @pytest.fixture(autouse=True)
-def before_each(ppu: PPU):
+def before_each(ppu: purenes.ppu.PPU):
     """Reset the PPU between tests so that tests do not interfere with
     each other.
     """

@@ -5,11 +5,8 @@ except ImportError:  # pragma: no cover
 
 from typing import Type
 
-from purenes.mappers import Mapper
-from purenes.mappers import SUPPORTED_MAPPERS
-from purenes.rom import Header
-from purenes.rom import Mirroring
-from purenes.rom import Rom
+import purenes.rom
+from purenes import mappers
 
 
 class CartridgeReadOnlyValues(TypedDict):
@@ -17,7 +14,7 @@ class CartridgeReadOnlyValues(TypedDict):
 
     This class should only be used for testing and debugging purposes.
     """
-    header:      Header
+    header:      purenes.rom.Header
     mapper_name: str
 
 
@@ -41,7 +38,7 @@ class Cartridge(object):
                                   Mapper.
     """
 
-    def __init__(self, mapper: Mapper):
+    def __init__(self, mapper: mappers.Mapper):
         self._mapper = mapper
         self.nt_mirroring = mapper.rom.header.nt_mirroring
 
@@ -54,11 +51,12 @@ class Cartridge(object):
                               currently supported.
         """
         rom_data: bytes = open(file_path, "rb").read()
-        rom: Rom = Rom(rom_data)
+        rom: purenes.rom.Rom = purenes.rom.Rom(rom_data)
 
         try:
-            _mapper: Type[Mapper] = SUPPORTED_MAPPERS[rom.header.mapper_id]
-            mapper: Mapper = _mapper(rom)
+            _mapper: Type[mappers.Mapper] = mappers.SUPPORTED_MAPPERS[
+                rom.header.mapper_id]
+            mapper: mappers.Mapper = _mapper(rom)
 
         except KeyError:
             raise RuntimeError("The ROM provided uses iNES Mapper: "

@@ -1,9 +1,9 @@
-from unittest.mock import Mock
+from unittest import mock
 
 import pytest
-from pytest_mock import MockFixture
+import pytest_mock
 
-from purenes.ppu import PPU
+import purenes.ppu
 
 
 class TestPPURegisters(object):
@@ -14,7 +14,7 @@ class TestPPURegisters(object):
     """
 
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
-    def test_write_to_control_register(self, ppu: PPU, data: int):
+    def test_write_to_control_register(self, ppu: purenes.ppu.PPU, data: int):
         """Test write to $2000. Verifies the flags of the control register are
         updated and that the vram_temp.nt_select_x and vram_temp.nt_select_y
         attributes are updated when a write to $2000 occurs.
@@ -39,7 +39,7 @@ class TestPPURegisters(object):
         assert vram_temp.flags.nt_select_y == (data >> 1) & 0x01
 
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
-    def test_write_to_mask_register(self, ppu: PPU, data: int):
+    def test_write_to_mask_register(self, ppu: purenes.ppu.PPU, data: int):
         """Test PPUMASK $2001 write.
 
         Verifies that all flags are set appropriately for a given input.
@@ -60,7 +60,7 @@ class TestPPURegisters(object):
 
     def test_read_from_status_register_resets_write_latch(
             self,
-            ppu: PPU
+            ppu: purenes.ppu.PPU
     ):
         """Test PPUSTATUS $2002
 
@@ -74,7 +74,7 @@ class TestPPURegisters(object):
         assert ppu.read_only_values["write_latch"] == 0
 
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
-    def test_write_to_scroll_register(self, ppu: PPU, data: int):
+    def test_write_to_scroll_register(self, ppu: purenes.ppu.PPU, data: int):
         """Test PPUSCROLL $2005 write.
 
         Verifies that on the first write to $2005 bits 3-7 of the input data
@@ -101,7 +101,11 @@ class TestPPURegisters(object):
         assert ppu.read_only_values["write_latch"] == 0
 
     @pytest.mark.parametrize("data", list(range(0x00, 0xFF)))
-    def test_write_to_vram_address_register(self, ppu: PPU, data: int):
+    def test_write_to_vram_address_register(
+            self,
+            ppu: purenes.ppu.PPU,
+            data: int
+    ):
         """Test writes to $2006. Writing to $2006 requires two writes to set
         the VRAM address.
 
@@ -137,9 +141,9 @@ class TestPPURegisters(object):
 
     def test_write_to_data_register_with_horizontal_increment_mode(
             self,
-            ppu: PPU,
-            mock_ppu_bus: Mock,
-            mocker: MockFixture
+            ppu: purenes.ppu.PPU,
+            mock_ppu_bus: mock.Mock,
+            mocker: pytest_mock.MockFixture
     ):
         """Test PPUDATA $2007 write x increment.
 
@@ -159,9 +163,9 @@ class TestPPURegisters(object):
 
     def test_write_to_data_register_with_vertical_increment_mode(
             self,
-            ppu: PPU,
-            mock_ppu_bus: Mock,
-            mocker: MockFixture
+            ppu: purenes.ppu.PPU,
+            mock_ppu_bus: mock.Mock,
+            mocker: pytest_mock.MockFixture
     ):
         """Test PPUDATA $2007 write y increment.
 
@@ -183,9 +187,9 @@ class TestPPURegisters(object):
 
     def test_read_from_data_register_with_horizontal_increment_mode(
             self,
-            ppu: PPU,
-            mock_ppu_bus: Mock,
-            mocker: MockFixture
+            ppu: purenes.ppu.PPU,
+            mock_ppu_bus: mock.Mock,
+            mocker: pytest_mock.MockFixture
     ):
         """Test PPUDATA $2007 x increment.
 
@@ -204,9 +208,9 @@ class TestPPURegisters(object):
 
     def test_read_from_data_register_with_vertical_increment_mode(
             self,
-            ppu: PPU,
-            mock_ppu_bus: Mock,
-            mocker: MockFixture
+            ppu: purenes.ppu.PPU,
+            mock_ppu_bus: mock.Mock,
+            mocker: pytest_mock.MockFixture
     ):
         """Test PPUDATA $2007 y increment.
 
@@ -227,8 +231,8 @@ class TestPPURegisters(object):
 
     def test_read_from_data_register_non_palette_address_buffers_value(
             self,
-            ppu: PPU,
-            mock_ppu_bus: Mock
+            ppu: purenes.ppu.PPU,
+            mock_ppu_bus: mock.Mock
     ):
         """Test PPUDATA $2007 read for non-palette address 0-$3EFF.
 
@@ -253,8 +257,8 @@ class TestPPURegisters(object):
 
     def test_read_from_data_register_palette_address_does_not_buffer_value(
             self,
-            ppu: PPU,
-            mock_ppu_bus: Mock
+            ppu: purenes.ppu.PPU,
+            mock_ppu_bus: mock.Mock
     ):
         """Tests PPUDATA $2007 read for addresses >= $3F00.
 
