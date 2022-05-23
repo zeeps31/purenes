@@ -12,8 +12,7 @@ def mapper(mock_rom: mock.Mock):
 
 def test_cpu_write_is_unsupported(
         mock_rom: mock.Mock,
-        mapper: mappers.Mapper0
-):
+        mapper: mappers.Mapper0):
     """Tests that writes from the CPU are not supported and throw an
     exception.
     """
@@ -24,8 +23,7 @@ def test_cpu_write_is_unsupported(
 
 def test_ppu_write_is_unsupported(
         mock_rom: mock.Mock,
-        mapper: mappers.Mapper0
-):
+        mapper: mappers.Mapper0):
     """Tests that writes from the PPU are not supported and throw an
     exception.
     """
@@ -37,8 +35,7 @@ def test_ppu_write_is_unsupported(
 def test_cpu_read_with_multiple_prg_banks_does_not_mirror_address(
         mock_header: mock.Mock,
         mock_rom: mock.Mock,
-        mapper: mappers.Mapper0
-):
+        mapper: mappers.Mapper0):
     """Tests addresses are mapped into addresses $8000-$FFFF if there are
     2 program banks on the ROM.
 
@@ -56,8 +53,7 @@ def test_cpu_read_with_multiple_prg_banks_does_not_mirror_address(
 def test_cpu_read_with_a_single_prg_bank_mirrors_address(
         mock_header: mock.Mock,
         mock_rom: mock.Mock,
-        mapper: mappers.Mapper0
-):
+        mapper: mappers.Mapper0):
     """Tests addresses are mirrored for addresses $C000-$FFFF if there is
     1 program bank on the ROM.
 
@@ -74,8 +70,7 @@ def test_cpu_read_with_a_single_prg_bank_mirrors_address(
 
 def test_ppu_read_does_not_map_address(
         mock_rom: mock.Mock,
-        mapper: mappers.Mapper0
-):
+        mapper: mappers.Mapper0):
     """Tests that the ppu_read method does not provide any mapping
     functionality.
 
