@@ -1,13 +1,17 @@
-from unittest.mock import Mock
+from unittest import mock
 
-from pytest_mock import MockFixture
+import pytest_mock
 
-from purenes.cpu import CPU
+import purenes.cpu
 
 
 class TestCPU(object):
 
-    def test_reset(self, cpu: CPU, mock_cpu_bus: Mock, mocker: MockFixture):
+    def test_reset(
+            self,
+            cpu: purenes.cpu.CPU,
+            mock_cpu_bus: mock.Mock,
+            mocker: pytest_mock.MockFixture):
         """Test CPU reset cycle.
 
         Verifies the program counter is updated with the values stored at

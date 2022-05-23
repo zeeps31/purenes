@@ -1,7 +1,7 @@
-from enum import Enum
+import enum
 
 
-class Mirroring(Enum):
+class Mirroring(enum.Enum):
     HORIZONTAL = 0
     VERTICAL = 1
 

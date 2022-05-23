@@ -1,7 +1,7 @@
-import pytest
+from unittest import mock
 
-from pytest_mock import MockFixture
-from unittest.mock import Mock
+import pytest
+import pytest_mock
 
 
 @pytest.fixture()
@@ -12,15 +12,15 @@ def rom_data() -> bytes:
 
 
 @pytest.fixture()
-def mock_header(mocker: MockFixture):
+def mock_header(mocker: pytest_mock.MockFixture):
     """A Mock to represent a Header."""
     yield mocker.Mock()
 
 
 @pytest.fixture()
-def mock_rom(mocker: MockFixture, mock_header: Mock):
+def mock_rom(mocker: pytest_mock.MockFixture, mock_header: mock.Mock):
     """A Mock to represent a Rom with a mocked Header."""
-    rom: Mock = mocker.Mock()
+    rom: mock.Mock = mocker.Mock()
     rom.header = mock_header
 
     yield rom

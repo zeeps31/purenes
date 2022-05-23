@@ -1,17 +1,20 @@
-from unittest.mock import Mock
+from unittest import mock
 
 import pytest
 
-from purenes.mappers import Mapper0
+from purenes import mappers
 
 
 class TestMapper0(object):
 
     @pytest.fixture()
-    def mapper(self, mock_rom: Mock):
-        yield Mapper0(mock_rom)
+    def mapper(self, mock_rom: mock.Mock):
+        yield mappers.Mapper0(mock_rom)
 
-    def test_cpu_write_is_unsupported(self, mock_rom: Mock, mapper: Mapper0):
+    def test_cpu_write_is_unsupported(
+            self,
+            mock_rom: mock.Mock,
+            mapper: mappers.Mapper0):
         """Tests that writes from the CPU are not supported and throw an
         exception.
         """
@@ -19,7 +22,10 @@ class TestMapper0(object):
         with pytest.raises(RuntimeError):
             mapper.cpu_write(0x00, 0x00)
 
-    def test_ppu_write_is_unsupported(self, mock_rom: Mock, mapper: Mapper0):
+    def test_ppu_write_is_unsupported(
+            self,
+            mock_rom: mock.Mock,
+            mapper: mappers.Mapper0):
         """Tests that writes from the PPU are not supported and throw an
         exception.
         """
@@ -29,9 +35,9 @@ class TestMapper0(object):
 
     def test_cpu_read_with_multiple_prg_banks_does_not_mirror_address(
             self,
-            mock_header: Mock,
-            mock_rom: Mock,
-            mapper: Mapper0
+            mock_header: mock.Mock,
+            mock_rom: mock.Mock,
+            mapper: mappers.Mapper0
     ):
         """Tests addresses are mapped into addresses $8000-$FFFF if there are
         2 program banks on the ROM.
@@ -48,9 +54,9 @@ class TestMapper0(object):
 
     def test_cpu_read_with_a_single_prg_bank_mirrors_address(
             self,
-            mock_header: Mock,
-            mock_rom: Mock,
-            mapper: Mapper0
+            mock_header: mock.Mock,
+            mock_rom: mock.Mock,
+            mapper: mappers.Mapper0
     ):
         """Tests addresses are mirrored for addresses $C000-$FFFF if there is
         1 program bank on the ROM.
@@ -67,8 +73,8 @@ class TestMapper0(object):
 
     def test_ppu_read_does_not_map_address(
             self,
-            mock_rom: Mock,
-            mapper: Mapper0
+            mock_rom: mock.Mock,
+            mapper: mappers.Mapper0
     ):
         """Tests that the ppu_read method does not provide any mapping
         functionality.

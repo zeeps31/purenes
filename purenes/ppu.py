@@ -9,7 +9,7 @@ import ctypes
 from typing import List
 from typing import Tuple
 
-from purenes.palette import PPU_PALETTE
+from purenes import palette
 
 
 class _Control(ctypes.Union):
@@ -703,7 +703,7 @@ class PPU(object):
         self._at_shift_lo <<= 1
 
     def _generate_pixel(self) -> None:
-        palette: int = 0x00
+        _palette: int = 0x00
 
         if 0 <= self._scanline <= 240 and self._cycle <= 256:
 
@@ -714,13 +714,13 @@ class PPU(object):
 
                 # Create index into palette memory
                 # https://www.nesdev.org/wiki/PPU_palettes
-                palette = ((self._pt_shift_hi & background_mux) << 1 |
+                _palette = ((self._pt_shift_hi & background_mux) << 1 |
                            self._pt_shift_lo & background_mux)
-                palette |= ((self._at_shift_hi & background_mux) << 1 |
+                _palette |= ((self._at_shift_hi & background_mux) << 1 |
                             self._at_shift_lo & background_mux) << 2
 
-            color: Tuple[int, int, int] = PPU_PALETTE[
-                self._read(0x3F00 | palette)
+            color: Tuple[int, int, int] = palette.PPU_PALETTE[
+                self._read(0x3F00 | _palette)
             ]
 
             self._pixel_values[(256 * self._scanline) + self._cycle-1] = color

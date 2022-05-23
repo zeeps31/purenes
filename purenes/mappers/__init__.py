@@ -1,6 +1,6 @@
 import abc
 
-from purenes.rom import Rom
+import purenes.rom
 
 
 class Mapper(abc.ABC):
@@ -15,8 +15,8 @@ class Mapper(abc.ABC):
     """
     name: str
 
-    def __init__(self, rom: Rom):
-        self.rom: Rom = rom
+    def __init__(self, rom: purenes.rom.Rom):
+        self.rom: purenes.rom.Rom = rom
 
     @abc.abstractmethod
     def cpu_read(self, address: int) -> int:

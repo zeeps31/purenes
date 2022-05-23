@@ -1,9 +1,9 @@
-from unittest.mock import Mock
+from unittest import mock
 
 import pytest
-from pytest_mock import MockFixture
+import pytest_mock
 
-from purenes.ppu import PPU
+import purenes.ppu
 
 
 class TestPPU(object):
@@ -16,7 +16,7 @@ class TestPPU(object):
 
     TOTAL_VISIBLE_SCANLINE_CYCLES: int = 257
 
-    def test_ppu_reset(self, ppu: PPU):
+    def test_ppu_reset(self, ppu: purenes.ppu.PPU):
         ppu.reset()
 
         values = ppu.read_only_values
@@ -29,9 +29,9 @@ class TestPPU(object):
 
     def test_nametable_reads_during_a_scanline_cycle(
             self,
-            ppu: PPU,
-            mock_ppu_bus: Mock,
-            mocker: MockFixture
+            ppu: purenes.ppu.PPU,
+            mock_ppu_bus: mock.Mock,
+            mocker: pytest_mock.MockFixture
     ):
         """Tests reads to retrieve nametable data during scanline cycles.
 
@@ -63,9 +63,9 @@ class TestPPU(object):
 
     def test_attribute_table_reads_during_a_scanline_cycle(
             self,
-            ppu: PPU,
-            mock_ppu_bus: Mock,
-            mocker: MockFixture
+            ppu: purenes.ppu.PPU,
+            mock_ppu_bus: mock.Mock,
+            mocker: pytest_mock.MockFixture
     ):
         """Tests reads to retrieve attribute table data during scanline cycles.
 
@@ -101,9 +101,9 @@ class TestPPU(object):
 
     def test_pattern_table_reads_during_a_scanline_cycle(
             self,
-            ppu: PPU,
-            mock_ppu_bus: Mock,
-            mocker: MockFixture
+            ppu: purenes.ppu.PPU,
+            mock_ppu_bus: mock.Mock,
+            mocker: pytest_mock.MockFixture
     ):
         """Tests reads to retrieve low and high pattern table tiles during a
         scanline cycle.
@@ -154,7 +154,7 @@ class TestPPU(object):
             any_order=True
         )
 
-    def test_coarse_scroll_horizontal_increment(self, ppu: PPU):
+    def test_coarse_scroll_horizontal_increment(self, ppu: purenes.ppu.PPU):
         """Tests coarse_x increment without scrolling offsets
 
         Verifies that coarse_x is 31 (the last tile of the nametable) and that
@@ -172,7 +172,7 @@ class TestPPU(object):
 
     def test_coarse_scroll_horizontal_increment_wraps_around_at_maximum(
             self,
-            ppu: PPU
+            ppu: purenes.ppu.PPU
     ):
         """Tests coarse_x increment with scrolling offsets
 
@@ -192,7 +192,7 @@ class TestPPU(object):
 
     def test_horizontal_coarse_scroll_resets_after_rendering_a_scanline(
             self,
-            ppu: PPU
+            ppu: purenes.ppu.PPU
     ):
         """Tests coarse_x resets at cycle 257 in a scanline during rendering.
         """
@@ -201,7 +201,7 @@ class TestPPU(object):
 
         assert ppu.read_only_values["vram"].flags.coarse_x == 0
 
-    def test_vertical_scrolling(self, ppu: PPU):
+    def test_vertical_scrolling(self, ppu: purenes.ppu.PPU):
         """Tests vertical scrolling without any vertical scrolling offsets.
 
         Verifies that fine_y is incremented by 1 without overflowing into
@@ -220,7 +220,7 @@ class TestPPU(object):
 
     def test_vertical_scrolling_overflows_at_maximum(
             self,
-            ppu: PPU
+            ppu: purenes.ppu.PPU
     ):
         """Tests vertical scrolling with a fine_y offset of 1 overflows into
         coarse_y after one row of tiles is rendered.
@@ -242,7 +242,7 @@ class TestPPU(object):
 
     def test_vertical_scrolling_wraps_around_nametable_at_maximum(
             self,
-            ppu: PPU
+            ppu: purenes.ppu.PPU
     ):
         """Tests vertical scrolling with a fine_y offset of 1 wraps around the
         nametable after one frame is rendered.
@@ -263,7 +263,7 @@ class TestPPU(object):
         assert vram.flags.coarse_y == 0
         assert vram.flags.nt_select_y == 1
 
-    def test_cycle_resets_at_maximum(self, ppu: PPU):
+    def test_cycle_resets_at_maximum(self, ppu: purenes.ppu.PPU):
         """Tests incrementing of cycles within a scanline resets at the maximum
         and that the scanline is incremented by 1.
 
@@ -276,7 +276,7 @@ class TestPPU(object):
         assert ppu.read_only_values["cycle"] == 0
         assert ppu.read_only_values["scanline"] == 0
 
-    def test_scanline_resets_at_maximum(self, ppu: PPU):
+    def test_scanline_resets_at_maximum(self, ppu: purenes.ppu.PPU):
         """Tests scanline is reset to the pre-render scanline when the maximum
         scanline and scanline cycles have been reached.
         """
@@ -297,11 +297,11 @@ class TestPPU(object):
     )
     def test_shift_registers_while_rendering(
             self,
-            ppu: PPU,
-            mock_ppu_bus: Mock,
-            cycle_count,
-            shift_hi,
-            shift_lo,
+            ppu: purenes.ppu.PPU,
+            mock_ppu_bus: mock.Mock,
+            cycle_count: int,
+            shift_hi: int,
+            shift_lo: int,
     ):
         """Tests shift registers are loaded and shifted correctly during
         rendering cycles.
@@ -321,7 +321,10 @@ class TestPPU(object):
         assert ppu.read_only_values["pt_shift_hi"] == shift_hi
         assert ppu.read_only_values["pt_shift_lo"] == shift_lo
 
-    def test_background_pixel_output(self, ppu: PPU, mock_ppu_bus: Mock):
+    def test_background_pixel_output(
+            self,
+            ppu: purenes.ppu.PPU,
+            mock_ppu_bus: mock.Mock):
         """Tests palette selection and pixel output for one frame.
 
         Returns the same value for all reads to palette memory and verifies

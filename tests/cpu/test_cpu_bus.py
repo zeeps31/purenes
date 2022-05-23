@@ -1,6 +1,6 @@
 import pytest
 
-from purenes.cpu import CPUBus
+import purenes.cpu
 
 
 class TestCpuBus(object):
@@ -9,7 +9,7 @@ class TestCpuBus(object):
                                          "0x10000. Address should "
                                          "be between 0x0000 - 0xFFFF")
 
-    def test_read_from_ram(self, cpu_bus: CPUBus):
+    def test_read_from_ram(self, cpu_bus: purenes.cpu.CPUBus):
         """Test that reads from CPU RAM for addresses 0x0000-0x2000 return
         the correct values.
         """
@@ -20,7 +20,7 @@ class TestCpuBus(object):
 
             assert data == 0x00
 
-    def test_write_to_ram(self, cpu_bus: CPUBus):
+    def test_write_to_ram(self, cpu_bus: purenes.cpu.CPUBus):
         """Test that writes to CPU RAM for addresses 0x0000-0x2000 return
         the correct values.
         """
@@ -34,7 +34,7 @@ class TestCpuBus(object):
 
     def test_read_from_an_incorrect_address_is_invalid(
             self,
-            cpu_bus: CPUBus
+            cpu_bus: purenes.cpu.CPUBus
     ):
         """Test that a read from an address not in the addressable range of the
         CPU throws an exception.
@@ -48,7 +48,7 @@ class TestCpuBus(object):
 
     def test_write_to_an_incorrect_address_is_invalid(
             self,
-            cpu_bus: CPUBus
+            cpu_bus: purenes.cpu.CPUBus
     ):
         """Test that a write to an address not in the addressable range of the
         CPU throws an exception.

@@ -1,26 +1,25 @@
-from unittest.mock import Mock
+from unittest import mock
 
 import pytest
-from pytest_mock import MockFixture
+import pytest_mock
 
-from purenes.cpu import CPU
-from purenes.cpu import CPUBus
+import purenes.cpu
 
 
 @pytest.fixture()
 def cpu_bus():
     """A CPUBus instance."""
-    cpu_bus: CPUBus = CPUBus()
+    cpu_bus: purenes.cpu.CPUBus = purenes.cpu.CPUBus()
     yield cpu_bus
 
 
 @pytest.fixture()
-def mock_cpu_bus(mocker: MockFixture):
+def mock_cpu_bus(mocker: pytest_mock.MockFixture):
     """A Mock to represent the CPUBus."""
     yield mocker.Mock()
 
 
 @pytest.fixture()
-def cpu(mock_cpu_bus: Mock):
+def cpu(mock_cpu_bus: mock.Mock):
     """A CPU instance with a mocked CPUBus."""
-    yield CPU(mock_cpu_bus)
+    yield purenes.cpu.CPU(mock_cpu_bus)
