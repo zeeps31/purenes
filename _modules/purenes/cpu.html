@@ -202,6 +202,9 @@
     <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">TypedDict</span>  <span class="c1"># pragma: no cover</span>
 <span class="kn">import</span> <span class="nn">ctypes</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
 
 
 <div class="viewcode-block" id="CPUStatus"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPUStatus">[docs]</a><span class="k">class</span> <span class="nc">CPUStatus</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">Union</span><span class="p">):</span>
@@ -216,7 +219,8 @@
 <span class="sd">    * zero              (Z) - Zero flag.</span>
 <span class="sd">    * interrupt_disable (I) - Interrupt disable flag.</span>
 <span class="sd">    * decimal           (D) - Decimal flag. On the NES, has no effect.</span>
-<span class="sd">    * _                 (ss) - Unused</span>
+<span class="sd">    * brk               (B) - Break flag.</span>
+<span class="sd">    * na                (s) - Unused</span>
 <span class="sd">    * overflow          (V) - Overflow flag.</span>
 <span class="sd">    * negative          (N) - Negative flag.</span>
 <span class="sd">    """</span>
@@ -229,7 +233,8 @@
                 <span class="p">(</span><span class="s2">"zero"</span><span class="p">,</span>              <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
                 <span class="p">(</span><span class="s2">"interrupt_disable"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
                 <span class="p">(</span><span class="s2">"decimal"</span><span class="p">,</span>           <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">"na"</span><span class="p">,</span>                <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"brk"</span><span class="p">,</span>               <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"na"</span><span class="p">,</span>                <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
                 <span class="p">(</span><span class="s2">"overflow"</span><span class="p">,</span>          <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
                 <span class="p">(</span><span class="s2">"negative"</span><span class="p">,</span>          <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
             <span class="p">]}</span>
@@ -352,8 +357,9 @@
     <span class="c1"># The internal bus for the CPU</span>
     <span class="n">_cpu_bus</span><span class="p">:</span> <span class="n">CPUBus</span>
 
-    <span class="c1"># The low byte of the reset vector.</span>
-    <span class="n">_RES</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mh">0xFFFC</span>
+    <span class="c1"># Reset vector low bytes</span>
+    <span class="n">_RES</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xFFFC</span>
+    <span class="n">_IRQ</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xFFFE</span>
 
     <span class="c1"># CPU Internal registers</span>
     <span class="n">_A</span><span class="p">:</span> <span class="nb">int</span>
@@ -366,8 +372,11 @@
     <span class="c1"># Tracks the total number of cycles that have been performed. This value</span>
     <span class="c1"># is used to synchronize the CPU and PPU</span>
     <span class="n">_cycle_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
     <span class="c1"># Used to track the current opcode that the CPU is executing.</span>
-    <span class="n">_active_operation</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">_active_operation</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># Map of opcodes to operations</span>
+    <span class="n">_operations</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpu_bus</span><span class="p">:</span> <span class="n">CPUBus</span><span class="p">):</span>
         <span class="sd">"""Connect the :class:`~purenes.cpu.CPUBus` to the CPU.</span>
@@ -380,6 +389,7 @@
 <span class="sd">            cpu_bus (CPUBus): An instance of a :class:`~purenes.cpu.CPUBus`</span>
 <span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cpu_bus</span> <span class="o">=</span> <span class="n">cpu_bus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_map_operations</span><span class="p">()</span>
 
 <div class="viewcode-block" id="CPU.clock"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPU.clock">[docs]</a>    <span class="k">def</span> <span class="nf">clock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">"""Perform one CPU "tick". The clock method is the main entry-point</span>
@@ -452,7 +462,53 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_cpu_bus</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_execute_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">pass</span></div>
+        <span class="n">operation</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_operations</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_active_operation</span><span class="p">]</span>
+
+        <span class="n">addressing_mode</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">operation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">operation</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">addressing_mode</span><span class="p">()</span>
+        <span class="n">operation</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_imp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Implied addressing mode. In this mode the operand is implied by the</span>
+        <span class="c1"># operation.</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">_BRK</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># BRK initiates a software interrupt similar to a hardware interrupt</span>
+        <span class="c1"># (IRQ).</span>
+
+        <span class="c1"># The return address pushed to the stack is PC+2, providing an extra</span>
+        <span class="c1"># byte of spacing for a break mark (reason for the break).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_PC</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">interrupt</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">brk</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_PC</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_PC</span> <span class="o">&amp;</span> <span class="mh">0x00FF</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">reg</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_PC</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_IRQ</span><span class="p">)</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_IRQ</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cycle_count</span> <span class="o">+=</span> <span class="mi">7</span>
+
+    <span class="k">def</span> <span class="nf">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Push a value to the stack. The stack is implemented at addresses</span>
+        <span class="c1"># $0100 - $01FF and is a LIFO stack. A push to the stack decrements the</span>
+        <span class="c1"># stack pointer by 1.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="mh">0x0100</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">_S</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_S</span> <span class="o">-=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">_map_operations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Map operations and addressing modes to opcodes.</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_operations</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="mh">0x00</span><span class="p">:</span>  <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_imp</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_BRK</span><span class="p">)</span>
+        <span class="p">}</span></div>
 </pre></div>
         </article>
       </div>
