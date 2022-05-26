@@ -94,7 +94,8 @@ def test_BRK_with_implied_addressing_mode(
     # The program counter is set to the value at the IRQ vector
     assert cpu.read_only_values["pc"] == 0x0101
 
-    # 3 values are pushed to the stack during this operation
+    # 3 values are pushed to the stack during this operation. The stack pointer
+    # should be decremented by 3 (0xFD-3)
     assert cpu.read_only_values["s"] == 0xFA
 
     assert cpu.status.flags.brk == 1

@@ -25,7 +25,7 @@ class CPUStatus(ctypes.Union):
     * interrupt_disable (I) - Interrupt disable flag.
     * decimal           (D) - Decimal flag. On the NES, has no effect.
     * brk               (B) - Break flag.
-    * _                 (s) - Unused
+    * na                (s) - Unused
     * overflow          (V) - Overflow flag.
     * negative          (N) - Negative flag.
     """
@@ -277,7 +277,7 @@ class CPU(object):
         operation()
 
     def _imp(self):
-        # Implied addressing mode. In this mode The operand is implied by the
+        # Implied addressing mode. In this mode the operand is implied by the
         # operation.
         return
 
