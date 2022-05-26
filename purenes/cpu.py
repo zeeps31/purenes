@@ -7,6 +7,9 @@ except ImportError:  # pragma: no cover
     from typing_extensions import TypedDict  # pragma: no cover
 import ctypes
 from typing import List
+from typing import Tuple
+from typing import Callable
+from typing import Dict
 
 
 class CPUStatus(ctypes.Union):
@@ -21,7 +24,8 @@ class CPUStatus(ctypes.Union):
     * zero              (Z) - Zero flag.
     * interrupt_disable (I) - Interrupt disable flag.
     * decimal           (D) - Decimal flag. On the NES, has no effect.
-    * _                 (ss) - Unused
+    * brk               (B) - Break flag.
+    * na                (s) - Unused
     * overflow          (V) - Overflow flag.
     * negative          (N) - Negative flag.
     """
@@ -34,7 +38,8 @@ class CPUStatus(ctypes.Union):
                 ("zero",              ctypes.c_uint8, 1),
                 ("interrupt_disable", ctypes.c_uint8, 1),
                 ("decimal",           ctypes.c_uint8, 1),
-                ("na",                ctypes.c_uint8, 2),
+                ("brk",               ctypes.c_uint8, 1),
+                ("na",                ctypes.c_uint8, 1),
                 ("overflow",          ctypes.c_uint8, 1),
                 ("negative",          ctypes.c_uint8, 1),
             ]}
@@ -157,8 +162,9 @@ class CPU(object):
     # The internal bus for the CPU
     _cpu_bus: CPUBus
 
-    # The low byte of the reset vector.
-    _RES: int = 0xFFFC
+    # Reset vector low bytes
+    _RES: Final[int] = 0xFFFC
+    _IRQ: Final[int] = 0xFFFE
 
     # CPU Internal registers
     _A: int
@@ -171,8 +177,11 @@ class CPU(object):
     # Tracks the total number of cycles that have been performed. This value
     # is used to synchronize the CPU and PPU
     _cycle_count: int = 0
+
     # Used to track the current opcode that the CPU is executing.
-    _active_operation: int
+    _active_operation: int = None
+    # Map of opcodes to operations
+    _operations: Dict[int, Tuple[Callable, Callable]]
 
     def __init__(self, cpu_bus: CPUBus):
         """Connect the :class:`~purenes.cpu.CPUBus` to the CPU.
@@ -185,6 +194,7 @@ class CPU(object):
             cpu_bus (CPUBus): An instance of a :class:`~purenes.cpu.CPUBus`
         """
         self._cpu_bus = cpu_bus
+        self._map_operations()
 
     def clock(self) -> None:
         """Perform one CPU "tick". The clock method is the main entry-point
@@ -257,4 +267,50 @@ class CPU(object):
         self._cpu_bus.write(address, data)
 
     def _execute_operation(self) -> None:
-        pass
+        operation: Tuple[Callable, Callable] = self._operations[
+            self._active_operation]
+
+        addressing_mode: Callable = operation[0]
+        operation: Callable = operation[1]
+
+        addressing_mode()
+        operation()
+
+    def _imp(self):
+        # Implied addressing mode. In this mode the operand is implied by the
+        # operation.
+        return
+
+    def _BRK(self):
+        # BRK initiates a software interrupt similar to a hardware interrupt
+        # (IRQ).
+
+        # The return address pushed to the stack is PC+2, providing an extra
+        # byte of spacing for a break mark (reason for the break).
+        self._PC += 1
+
+        self.status.flags.interrupt = 1
+        self.status.flags.brk = 1
+
+        self._push_to_stack(self._PC >> 8)
+        self._push_to_stack(self._PC & 0x00FF)
+
+        self._push_to_stack(self.status.reg)
+
+        self._PC = self._read(self._IRQ) | self._read(self._IRQ + 1) << 8
+
+        self._cycle_count += 7
+
+    def _push_to_stack(self, data: int) -> None:
+        # Push a value to the stack. The stack is implemented at addresses
+        # $0100 - $01FF and is a LIFO stack. A push to the stack decrements the
+        # stack pointer by 1.
+        self._write(0x0100 | self._S, data)
+        self._S -= 1
+
+    def _map_operations(self) -> None:
+        # Map operations and addressing modes to opcodes.
+        op = self
+        self._operations = {
+            0x00:  (op._imp, op._BRK)
+        }
