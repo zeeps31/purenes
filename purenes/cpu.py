@@ -162,17 +162,16 @@ class CPU(object):
     # The internal bus for the CPU
     _cpu_bus: CPUBus
 
-    # Reset vector low bytes
-    _RES: Final[int] = 0xFFFC
-    _IRQ: Final[int] = 0xFFFE
+    _RES: Final[int] = 0xFFFC  # Reset vector low bytes
+    _IRQ: Final[int] = 0xFFFE  # Interrupt vector low bytes
 
     # CPU Internal registers
-    _A: int
-    _X: int
-    _Y: int
-    _PC: int
-    _S: int
-    status: CPUStatus = CPUStatus()
+    _a:  int  # Accumulator register
+    _x:  int  # X index register
+    _y:  int  # Y index register
+    _pc: int  # 16-bit program counter
+    _s:  int  # Stack pointer
+    status: CPUStatus = CPUStatus()  # Status register (P)
 
     # Tracks the total number of cycles that have been performed. This value
     # is used to synchronize the CPU and PPU
@@ -211,8 +210,8 @@ class CPU(object):
         Returns:
             None
         """
-        self._active_operation = self._read(self._PC)
-        self._PC += 1
+        self._active_operation = self._read(self._pc)
+        self._pc += 1
         self._execute_operation()
 
     def reset(self) -> None:
@@ -233,16 +232,16 @@ class CPU(object):
             None
         """
         # Perform reset actions.
-        self._A = 0x00
-        self._X = 0x00
-        self._Y = 0x00
-        self._S = 0xFD
+        self._a = 0x00
+        self._x = 0x00
+        self._y = 0x00
+        self._s = 0xFD
         self.status.reg |= 0x04
 
         pc_lo: int = self._read(self._RES)
         pc_hi: int = self._read(self._RES + 1)
 
-        self._PC = pc_hi << 8 | pc_lo
+        self._pc = pc_hi << 8 | pc_lo
 
         # As the reset line goes high the processor performs a start sequence
         # of 7 cycles
@@ -251,11 +250,11 @@ class CPU(object):
     @property
     def read_only_values(self) -> CPUReadOnlyValues:
         return {
-            "a":  self._A,
-            "x":  self._X,
-            "y":  self._Y,
-            "s":  self._S,
-            "pc": self._PC,
+            "a":  self._a,
+            "x":  self._x,
+            "y":  self._y,
+            "s":  self._s,
+            "pc": self._pc,
             "cycle_count": self._cycle_count,
             "active_operation": self._active_operation,
         }
@@ -287,17 +286,17 @@ class CPU(object):
 
         # The return address pushed to the stack is PC+2, providing an extra
         # byte of spacing for a break mark (reason for the break).
-        self._PC += 1
+        self._pc += 1
 
         self.status.flags.interrupt = 1
         self.status.flags.brk = 1
 
-        self._push_to_stack(self._PC >> 8)
-        self._push_to_stack(self._PC & 0x00FF)
+        self._push_to_stack(self._pc >> 8)
+        self._push_to_stack(self._pc & 0x00FF)
 
         self._push_to_stack(self.status.reg)
 
-        self._PC = self._read(self._IRQ) | self._read(self._IRQ + 1) << 8
+        self._pc = self._read(self._IRQ) | self._read(self._IRQ + 1) << 8
 
         self._cycle_count += 7
 
@@ -305,8 +304,8 @@ class CPU(object):
         # Push a value to the stack. The stack is implemented at addresses
         # $0100 - $01FF and is a LIFO stack. A push to the stack decrements the
         # stack pointer by 1.
-        self._write(0x0100 | self._S, data)
-        self._S -= 1
+        self._write(0x0100 | self._s, data)
+        self._s -= 1
 
     def _map_operations(self) -> None:
         # Map operations and addressing modes to opcodes.
