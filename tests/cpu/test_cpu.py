@@ -118,13 +118,13 @@ def test_ORA_with_x_indexed_indirect_addressing_mode(
     3. The zero and negative status flags are updated as expected.
     """
     mock_cpu_bus.read.side_effect = [
-        0x00,  # data at low byte of the reset vector
-        0x00,  # data at high byte of the reset vector (init PC to 0x0000)
-        0x01,  # operation at program counter address
-        0x02,  # indirect zero-page address
-        0x04,  # operand address low byte
-        0x00,  # operand address high byte
-        0x05   # operand
+        0x00,  # Data at low byte of the reset vector
+        0x00,  # Data at high byte of the reset vector (init PC to 0x0000)
+        0x01,  # Operation at program counter address
+        0x02,  # Indirect zero-page address
+        0x04,  # Operand address low byte
+        0x00,  # Operand address high byte
+        0x05   # Operand
     ]
 
     cpu.reset()
@@ -134,11 +134,11 @@ def test_ORA_with_x_indexed_indirect_addressing_mode(
     calls = [
         mocker.call.read(0xFFFC),
         mocker.call.read(0xFFFD),
-        mocker.call.read(0x0000),  # first PC read
+        mocker.call.read(0x0000),  # First PC read
         mocker.call.read(0x0001),  # PC + 1 read
-        mocker.call.read(0x0002),  # izx address lo
-        mocker.call.read(0x0003),  # izx address hi
-        mocker.call.read(0x0004)   # operand
+        mocker.call.read(0x0002),  # izx address low
+        mocker.call.read(0x0003),  # izx address high
+        mocker.call.read(0x0004)   # Operand
     ]
 
     mock_cpu_bus.assert_has_calls(calls)
