@@ -177,9 +177,8 @@ class CPU(object):
     # is used to synchronize the CPU and PPU
     _cycle_count: int = 0
 
-    # Used to track the current opcode that the CPU is executing.
-    _active_operation: int = None
-    # Map of opcodes to operations
+    _active_operation: int = None  # Current opcode that the CPU is executing.
+    _operand: int = None           # The operand retrieved from addressing mode
     _operations: Dict[int, Tuple[Callable, Callable]]
 
     def __init__(self, cpu_bus: CPUBus):
@@ -280,6 +279,21 @@ class CPU(object):
         # operation.
         return
 
+    def _izx(self):
+        # X-indexed indirect addressing mode.
+
+        # The value retrieved by reading from the location at the program
+        # counter is a zero-page address. This value is added with the x
+        # register to form the effective address. This addressing mode wraps
+        # around for values larger than $FF.
+        indirect_zpg_address: int = self._read(self._pc)
+        self._pc += 1
+
+        lo: int = self._read((indirect_zpg_address + self._x) & 0x00FF)
+        hi: int = self._read((indirect_zpg_address + self._x + 1) & 0x00FF)
+
+        self._operand = self._read(hi << 8 | lo)
+
     def _BRK(self):
         # BRK initiates a software interrupt similar to a hardware interrupt
         # (IRQ).
@@ -300,6 +314,14 @@ class CPU(object):
 
         self._cycle_count += 7
 
+    def _ORA(self):
+        # OR with the accumulator.
+        self._a |= self._operand
+
+        # Sets the negative flag if the two's complement MSB is 1.
+        self.status.flags.negative = self._a & 0x80
+        self.status.flags.zero = self._a == 0x00
+
     def _push_to_stack(self, data: int) -> None:
         # Push a value to the stack. The stack is implemented at addresses
         # $0100 - $01FF and is a LIFO stack. A push to the stack decrements the
@@ -311,5 +333,5 @@ class CPU(object):
         # Map operations and addressing modes to opcodes.
         op = self
         self._operations = {
-            0x00:  (op._imp, op._BRK)
+            0x00:  (op._imp, op._BRK), 0x01: (op._izx, op._ORA),
         }
