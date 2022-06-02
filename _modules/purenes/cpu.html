@@ -372,9 +372,8 @@
     <span class="c1"># is used to synchronize the CPU and PPU</span>
     <span class="n">_cycle_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="c1"># Used to track the current opcode that the CPU is executing.</span>
-    <span class="n">_active_operation</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="c1"># Map of opcodes to operations</span>
+    <span class="n">_active_operation</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Current opcode that the CPU is executing.</span>
+    <span class="n">_operand</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>           <span class="c1"># The operand retrieved from addressing mode</span>
     <span class="n">_operations</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpu_bus</span><span class="p">:</span> <span class="n">CPUBus</span><span class="p">):</span>
@@ -475,6 +474,21 @@
         <span class="c1"># operation.</span>
         <span class="k">return</span>
 
+    <span class="k">def</span> <span class="nf">_izx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># X-indexed indirect addressing mode.</span>
+
+        <span class="c1"># The value retrieved by reading from the location at the program</span>
+        <span class="c1"># counter is a zero-page address. This value is added with the x</span>
+        <span class="c1"># register to form the effective address. This addressing mode wraps</span>
+        <span class="c1"># around for values larger than $FF.</span>
+        <span class="n">indirect_zpg_address</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pc</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">lo</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">((</span><span class="n">indirect_zpg_address</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x00FF</span><span class="p">)</span>
+        <span class="n">hi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">((</span><span class="n">indirect_zpg_address</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x00FF</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_operand</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="n">hi</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span> <span class="o">|</span> <span class="n">lo</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">_BRK</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># BRK initiates a software interrupt similar to a hardware interrupt</span>
         <span class="c1"># (IRQ).</span>
@@ -495,6 +509,14 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_cycle_count</span> <span class="o">+=</span> <span class="mi">7</span>
 
+    <span class="k">def</span> <span class="nf">_ORA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># OR with the accumulator.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_a</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_operand</span>
+
+        <span class="c1"># Sets the negative flag if the two's complement MSB is 1.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">negative</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a</span> <span class="o">&amp;</span> <span class="mh">0x80</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">zero</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a</span> <span class="o">==</span> <span class="mh">0x00</span>
+
     <span class="k">def</span> <span class="nf">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Push a value to the stack. The stack is implemented at addresses</span>
         <span class="c1"># $0100 - $01FF and is a LIFO stack. A push to the stack decrements the</span>
@@ -506,7 +528,7 @@
         <span class="c1"># Map operations and addressing modes to opcodes.</span>
         <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_operations</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="mh">0x00</span><span class="p">:</span>  <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_imp</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_BRK</span><span class="p">)</span>
+            <span class="mh">0x00</span><span class="p">:</span>  <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_imp</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_BRK</span><span class="p">),</span> <span class="mh">0x01</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_izx</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ORA</span><span class="p">),</span>
         <span class="p">}</span></div>
 </pre></div>
         </article>
