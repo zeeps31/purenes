@@ -101,3 +101,49 @@ def test_BRK_with_implied_addressing_mode(
     assert cpu.status.flags.brk == 1
     assert cpu.status.flags.interrupt_disable == 1
     assert cpu.status.reg == 0x14
+
+
+def test_ORA_with_x_indexed_indirect_addressing_mode(
+        cpu: purenes.cpu.CPU,
+        mock_cpu_bus: mock.Mock,
+        mocker: pytest_mock.MockFixture):
+    """Test ORA with x indexed indirect addressing (opcode 0x01).
+
+    Clocks the CPU and verifies the following actions are performed.
+
+    1. The effective address is correctly formed from a zero-page x-indexed
+       address.
+    2. The operand returned from the read at the affective address is ORed with
+       the accumulator correctly.
+    3. The zero and negative status flags are updated as expected.
+    """
+    mock_cpu_bus.read.side_effect = [
+        0x00,  # Data at low byte of the reset vector
+        0x00,  # Data at high byte of the reset vector (init PC to 0x0000)
+        0x01,  # Operation at program counter address
+        0x02,  # Indirect zero-page address
+        0x04,  # Operand address low byte
+        0x00,  # Operand address high byte
+        0x05   # Operand
+    ]
+
+    cpu.reset()
+
+    cpu.clock()
+
+    calls = [
+        mocker.call.read(0xFFFC),
+        mocker.call.read(0xFFFD),
+        mocker.call.read(0x0000),  # First PC read
+        mocker.call.read(0x0001),  # PC + 1 read
+        mocker.call.read(0x0002),  # izx address low
+        mocker.call.read(0x0003),  # izx address high
+        mocker.call.read(0x0004)   # Operand
+    ]
+
+    mock_cpu_bus.assert_has_calls(calls)
+
+    assert cpu.read_only_values["a"] == 0x05
+    assert cpu.read_only_values["pc"] == 2
+    assert cpu.status.flags.negative == 0
+    assert cpu.status.flags.zero == 0
