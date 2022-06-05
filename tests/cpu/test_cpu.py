@@ -30,10 +30,10 @@ def test_reset(
     ]
     mock_cpu_bus.assert_has_calls(calls)
 
-    assert cpu.read_only_values["a"] == 0
-    assert cpu.read_only_values["x"] == 0
-    assert cpu.read_only_values["y"] == 0
-    assert cpu.read_only_values["s"] == 0xFD
+    assert cpu.a == 0
+    assert cpu.x == 0
+    assert cpu.y == 0
+    assert cpu.s == 0xFD
 
     assert cpu.status.reg == 0x04
     assert cpu.status.flags.interrupt_disable == 1
@@ -84,19 +84,18 @@ def test_BRK_with_implied_addressing_mode(
 
     mock_cpu_bus.assert_has_calls(calls)
 
-    assert cpu.read_only_values["active_operation"] == 0x00
+    assert cpu.opcode == 0x00
 
-    assert cpu.read_only_values["a"] == 0
-    assert cpu.read_only_values["x"] == 0
-    assert cpu.read_only_values["y"] == 0
+    assert cpu.a == 0
+    assert cpu.x == 0
+    assert cpu.y == 0
 
-    assert cpu.read_only_values["cycle_count"] == 14
     # The program counter is set to the value at the IRQ vector
-    assert cpu.read_only_values["pc"] == 0x0101
+    assert cpu.pc == 0x0101
 
     # 3 values are pushed to the stack during this operation. The stack pointer
     # should be decremented by 3 (0xFD-3)
-    assert cpu.read_only_values["s"] == 0xFA
+    assert cpu.s == 0xFA
 
     assert cpu.status.flags.brk == 1
     assert cpu.status.flags.interrupt_disable == 1
@@ -143,7 +142,7 @@ def test_ORA_with_x_indexed_indirect_addressing_mode(
 
     mock_cpu_bus.assert_has_calls(calls)
 
-    assert cpu.read_only_values["a"] == 0x05
-    assert cpu.read_only_values["pc"] == 2
+    assert cpu.a == 0x05
+    assert cpu.pc == 2
     assert cpu.status.flags.negative == 0
     assert cpu.status.flags.zero == 0
