@@ -242,24 +242,6 @@
         <span class="p">(</span><span class="s2">"reg"</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">)]</span></div>
 
 
-<div class="viewcode-block" id="CPUReadOnlyValues"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPUReadOnlyValues">[docs]</a><span class="k">class</span> <span class="nc">CPUReadOnlyValues</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
-    <span class="sd">"""Read-only container of CPU internal values.</span>
-
-<span class="sd">    This class should only be used for testing and debugging purposes.</span>
-<span class="sd">    """</span>
-    <span class="c1"># Internal registers</span>
-    <span class="n">a</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">x</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">y</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">s</span><span class="p">:</span> <span class="nb">int</span>
-
-    <span class="c1"># Counters</span>
-    <span class="n">pc</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">cycle_count</span><span class="p">:</span> <span class="nb">int</span>
-
-    <span class="n">active_operation</span><span class="p">:</span> <span class="nb">int</span></div>
-
-
 <div class="viewcode-block" id="CPUBus"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPUBus">[docs]</a><span class="k">class</span> <span class="nc">CPUBus</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">"""</span>
 <span class="sd">    A class to represent the NES CPU bus.</span>
@@ -353,28 +335,49 @@
 
 <span class="sd">    The NES CPU is based on the MOS6502 processor and runs at approximately</span>
 <span class="sd">    1.79 MHz.</span>
-<span class="sd">    """</span>
-    <span class="c1"># The internal bus for the CPU</span>
-    <span class="n">_cpu_bus</span><span class="p">:</span> <span class="n">CPUBus</span>
 
+<span class="sd">    Note:</span>
+<span class="sd">        The attributes listed below are exposed publicly to allow testing and</span>
+<span class="sd">        debugging processes to explicitly set and interrogate these values.</span>
+<span class="sd">        These values should not be accessed directly under normal</span>
+<span class="sd">        circumstances.</span>
+
+<span class="sd">        Internal Registers, Stack Pointer and Program Counter:</span>
+<span class="sd">            :attr:`~purenes.cpu.CPU.a`</span>
+<span class="sd">            :attr:`~purenes.cpu.CPU.x`</span>
+<span class="sd">            :attr:`~purenes.cpu.CPU.y`</span>
+<span class="sd">            :attr:`~purenes.cpu.CPU.pc`</span>
+<span class="sd">            :attr:`~purenes.cpu.CPU.s`</span>
+
+<span class="sd">        Active Opcode and Operand:</span>
+<span class="sd">            :attr:`~purenes.cpu.CPU.opcode`</span>
+<span class="sd">            :attr:`~purenes.cpu.CPU.operand`</span>
+<span class="sd">    """</span>
     <span class="n">_RES</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xFFFC</span>  <span class="c1"># Reset vector low bytes</span>
     <span class="n">_IRQ</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xFFFE</span>  <span class="c1"># Interrupt vector low bytes</span>
 
-    <span class="c1"># CPU Internal registers</span>
-    <span class="n">_a</span><span class="p">:</span>  <span class="nb">int</span>  <span class="c1"># Accumulator register</span>
-    <span class="n">_x</span><span class="p">:</span>  <span class="nb">int</span>  <span class="c1"># X index register</span>
-    <span class="n">_y</span><span class="p">:</span>  <span class="nb">int</span>  <span class="c1"># Y index register</span>
-    <span class="n">_pc</span><span class="p">:</span> <span class="nb">int</span>  <span class="c1"># 16-bit program counter</span>
-    <span class="n">_s</span><span class="p">:</span>  <span class="nb">int</span>  <span class="c1"># Stack pointer</span>
-    <span class="n">status</span><span class="p">:</span> <span class="n">CPUStatus</span> <span class="o">=</span> <span class="n">CPUStatus</span><span class="p">()</span>  <span class="c1"># Status register (P)</span>
+    <span class="c1"># CPU Internal registers made public for testing and debugging purposes</span>
+    <span class="c1"># only.</span>
+    <span class="n">a</span><span class="p">:</span>  <span class="nb">int</span>  <span class="c1">#: Accumulator register.</span>
+    <span class="n">x</span><span class="p">:</span>  <span class="nb">int</span>  <span class="c1">#: X index register.</span>
+    <span class="n">y</span><span class="p">:</span>  <span class="nb">int</span>  <span class="c1">#: Y index register.</span>
+    <span class="n">pc</span><span class="p">:</span> <span class="nb">int</span>  <span class="c1">#: The 16-bit program counter for the CPU.</span>
+    <span class="n">s</span><span class="p">:</span>  <span class="nb">int</span>  <span class="c1">#: Stack pointer.</span>
+    <span class="n">status</span><span class="p">:</span> <span class="n">CPUStatus</span> <span class="o">=</span> <span class="n">CPUStatus</span><span class="p">()</span>  <span class="c1">#: Status register (P).</span>
+
+    <span class="n">opcode</span><span class="p">:</span>  <span class="nb">int</span>  <span class="c1">#: The opcode that the CPU is currently executing.</span>
+    <span class="n">operand</span><span class="p">:</span> <span class="nb">int</span>  <span class="c1">#: The operand retrieved using the operation addressing mode.</span>
+
+    <span class="c1"># The internal bus for the CPU</span>
+    <span class="n">_cpu_bus</span><span class="p">:</span> <span class="n">CPUBus</span>
 
     <span class="c1"># Tracks the total number of cycles that have been performed. This value</span>
     <span class="c1"># is used to synchronize the CPU and PPU</span>
     <span class="n">_cycle_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="n">_active_operation</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Current opcode that the CPU is executing.</span>
-    <span class="n">_operand</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>           <span class="c1"># The operand retrieved from addressing mode</span>
-    <span class="n">_operations</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span>
+    <span class="n">_operations</span><span class="p">:</span>      <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span>
+    <span class="n">_operation</span><span class="p">:</span>       <span class="n">Callable</span>  <span class="c1"># The current operation</span>
+    <span class="n">_addressing_mode</span><span class="p">:</span> <span class="n">Callable</span>  <span class="c1"># The addressing mode for the current operation</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpu_bus</span><span class="p">:</span> <span class="n">CPUBus</span><span class="p">):</span>
         <span class="sd">"""Connect the :class:`~purenes.cpu.CPUBus` to the CPU.</span>
@@ -404,8 +407,12 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        """</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_active_operation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pc</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_pc</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opcode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_operation</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_retrieve_operand</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_execute_operation</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="CPU.reset"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPU.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -426,32 +433,20 @@
 <span class="sd">            None</span>
 <span class="sd">        """</span>
         <span class="c1"># Perform reset actions.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_a</span> <span class="o">=</span> <span class="mh">0x00</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="mh">0x00</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="mh">0x00</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span> <span class="o">=</span> <span class="mh">0xFD</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="mh">0x00</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mh">0x00</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="mh">0x00</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="mh">0xFD</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">reg</span> <span class="o">|=</span> <span class="mh">0x04</span>
 
         <span class="n">pc_lo</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_RES</span><span class="p">)</span>
         <span class="n">pc_hi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_RES</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_pc</span> <span class="o">=</span> <span class="n">pc_hi</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span> <span class="o">|</span> <span class="n">pc_lo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">=</span> <span class="n">pc_hi</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span> <span class="o">|</span> <span class="n">pc_lo</span>
 
         <span class="c1"># As the reset line goes high the processor performs a start sequence</span>
         <span class="c1"># of 7 cycles</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cycle_count</span> <span class="o">+=</span> <span class="mi">7</span></div>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">read_only_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CPUReadOnlyValues</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">"a"</span><span class="p">:</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_a</span><span class="p">,</span>
-            <span class="s2">"x"</span><span class="p">:</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span>
-            <span class="s2">"y"</span><span class="p">:</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">,</span>
-            <span class="s2">"s"</span><span class="p">:</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">,</span>
-            <span class="s2">"pc"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pc</span><span class="p">,</span>
-            <span class="s2">"cycle_count"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cycle_count</span><span class="p">,</span>
-            <span class="s2">"active_operation"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active_operation</span><span class="p">,</span>
-        <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cpu_bus</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
@@ -459,15 +454,20 @@
     <span class="k">def</span> <span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cpu_bus</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_execute_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">operation</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_operations</span><span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_active_operation</span><span class="p">]</span>
+    <span class="k">def</span> <span class="nf">_load_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">operation</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_operations</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">opcode</span><span class="p">]</span>
 
-        <span class="n">addressing_mode</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">operation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">operation</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_addressing_mode</span> <span class="o">=</span> <span class="n">operation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_operation</span> <span class="o">=</span> <span class="n">operation</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-        <span class="n">addressing_mode</span><span class="p">()</span>
-        <span class="n">operation</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_retrieve_operand</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Execute the addressing mode required by the current operation to</span>
+        <span class="c1"># retrieve the operand.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_addressing_mode</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_execute_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Perform the current operation.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_operation</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_imp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Implied addressing mode. In this mode the operand is implied by the</span>
@@ -481,13 +481,13 @@
         <span class="c1"># counter is a zero-page address. This value is added with the x</span>
         <span class="c1"># register to form the effective address. This addressing mode wraps</span>
         <span class="c1"># around for values larger than $FF.</span>
-        <span class="n">indirect_zpg_address</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pc</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_pc</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">indirect_zpg_address</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="n">lo</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">((</span><span class="n">indirect_zpg_address</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x00FF</span><span class="p">)</span>
-        <span class="n">hi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">((</span><span class="n">indirect_zpg_address</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x00FF</span><span class="p">)</span>
+        <span class="n">lo</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">((</span><span class="n">indirect_zpg_address</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x00FF</span><span class="p">)</span>
+        <span class="n">hi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">((</span><span class="n">indirect_zpg_address</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x00FF</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_operand</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="n">hi</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span> <span class="o">|</span> <span class="n">lo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operand</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="n">hi</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span> <span class="o">|</span> <span class="n">lo</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_BRK</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># BRK initiates a software interrupt similar to a hardware interrupt</span>
@@ -495,34 +495,34 @@
 
         <span class="c1"># The return address pushed to the stack is PC+2, providing an extra</span>
         <span class="c1"># byte of spacing for a break mark (reason for the break).</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_pc</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">interrupt</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">brk</span> <span class="o">=</span> <span class="mi">1</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pc</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pc</span> <span class="o">&amp;</span> <span class="mh">0x00FF</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">&amp;</span> <span class="mh">0x00FF</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">reg</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_pc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_IRQ</span><span class="p">)</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_IRQ</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_IRQ</span><span class="p">)</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_IRQ</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_cycle_count</span> <span class="o">+=</span> <span class="mi">7</span>
 
     <span class="k">def</span> <span class="nf">_ORA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># OR with the accumulator.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_a</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_operand</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operand</span>
 
         <span class="c1"># Sets the negative flag if the two's complement MSB is 1.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">negative</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a</span> <span class="o">&amp;</span> <span class="mh">0x80</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">zero</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a</span> <span class="o">==</span> <span class="mh">0x00</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">negative</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">&amp;</span> <span class="mh">0x80</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">zero</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">==</span> <span class="mh">0x00</span>
 
     <span class="k">def</span> <span class="nf">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Push a value to the stack. The stack is implemented at addresses</span>
         <span class="c1"># $0100 - $01FF and is a LIFO stack. A push to the stack decrements the</span>
         <span class="c1"># stack pointer by 1.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="mh">0x0100</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="mh">0x0100</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">-=</span> <span class="mi">1</span>
 
     <span class="k">def</span> <span class="nf">_map_operations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Map operations and addressing modes to opcodes.</span>
