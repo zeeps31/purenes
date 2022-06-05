@@ -158,19 +158,8 @@ class CPU(object):
             :attr:`~purenes.cpu.CPU.opcode`
             :attr:`~purenes.cpu.CPU.operand`
     """
-    # The internal bus for the CPU
-    _cpu_bus: CPUBus
-
     _RES: Final[int] = 0xFFFC  # Reset vector low bytes
     _IRQ: Final[int] = 0xFFFE  # Interrupt vector low bytes
-
-    # Tracks the total number of cycles that have been performed. This value
-    # is used to synchronize the CPU and PPU
-    _cycle_count: int = 0
-
-    _operations: Dict[int, Tuple[Callable, Callable]]
-    _operation:       Callable  # The current operation
-    _addressing_mode: Callable  # The addressing mode for the current operation
 
     # CPU Internal registers made public for testing and debugging purposes
     # only.
@@ -183,6 +172,17 @@ class CPU(object):
 
     opcode:  int  #: The opcode that the CPU is currently executing.
     operand: int  #: The operand retrieved using the operation addressing mode.
+
+    # The internal bus for the CPU
+    _cpu_bus: CPUBus
+
+    # Tracks the total number of cycles that have been performed. This value
+    # is used to synchronize the CPU and PPU
+    _cycle_count: int = 0
+
+    _operations:      Dict[int, Tuple[Callable, Callable]]
+    _operation:       Callable  # The current operation
+    _addressing_mode: Callable  # The addressing mode for the current operation
 
     def __init__(self, cpu_bus: CPUBus):
         """Connect the :class:`~purenes.cpu.CPUBus` to the CPU.
