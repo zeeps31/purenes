@@ -47,24 +47,6 @@ class CPUStatus(ctypes.Union):
         ("reg", ctypes.c_uint8)]
 
 
-class CPUReadOnlyValues(TypedDict):
-    """Read-only container of CPU internal values.
-
-    This class should only be used for testing and debugging purposes.
-    """
-    # Internal registers
-    a: int
-    x: int
-    y: int
-    s: int
-
-    # Counters
-    pc: int
-    cycle_count: int
-
-    active_operation: int
-
-
 class CPUBus(object):
     """
     A class to represent the NES CPU bus.
@@ -158,6 +140,23 @@ class CPU(object):
 
     The NES CPU is based on the MOS6502 processor and runs at approximately
     1.79 MHz.
+
+    Note:
+        The attributes listed below are exposed publicly to allow testing and
+        debugging processes to explicitly set and interrogate these values.
+        These values should not be accessed directly under normal
+        circumstances.
+
+        Internal Registers, Stack Pointer and Program Counter:
+            :attr:`~purenes.cpu.CPU.a`
+            :attr:`~purenes.cpu.CPU.x`
+            :attr:`~purenes.cpu.CPU.y`
+            :attr:`~purenes.cpu.CPU.pc`
+            :attr:`~purenes.cpu.CPU.s`
+
+        Active Opcode and Operand:
+            :attr:`~purenes.cpu.CPU.opcode`
+            :attr:`~purenes.cpu.CPU.operand`
     """
     # The internal bus for the CPU
     _cpu_bus: CPUBus
@@ -165,21 +164,25 @@ class CPU(object):
     _RES: Final[int] = 0xFFFC  # Reset vector low bytes
     _IRQ: Final[int] = 0xFFFE  # Interrupt vector low bytes
 
-    # CPU Internal registers
-    _a:  int  # Accumulator register
-    _x:  int  # X index register
-    _y:  int  # Y index register
-    _pc: int  # 16-bit program counter
-    _s:  int  # Stack pointer
-    status: CPUStatus = CPUStatus()  # Status register (P)
-
     # Tracks the total number of cycles that have been performed. This value
     # is used to synchronize the CPU and PPU
     _cycle_count: int = 0
 
-    _active_operation: int = None  # Current opcode that the CPU is executing.
-    _operand: int = None           # The operand retrieved from addressing mode
     _operations: Dict[int, Tuple[Callable, Callable]]
+    _operation:       Callable  # The current operation
+    _addressing_mode: Callable  # The addressing mode for the current operation
+
+    # CPU Internal registers made public for testing and debugging purposes
+    # only.
+    a:  int  #: Accumulator register.
+    x:  int  #: X index register.
+    y:  int  #: Y index register.
+    pc: int  #: The 16-bit program counter for the CPU.
+    s:  int  #: Stack pointer.
+    status: CPUStatus = CPUStatus()  #: Status register (P).
+
+    opcode:  int  #: The opcode that the CPU is currently executing.
+    operand: int  #: The operand retrieved using the operation addressing mode.
 
     def __init__(self, cpu_bus: CPUBus):
         """Connect the :class:`~purenes.cpu.CPUBus` to the CPU.
@@ -209,8 +212,12 @@ class CPU(object):
         Returns:
             None
         """
-        self._active_operation = self._read(self._pc)
-        self._pc += 1
+        self.opcode = self._read(self.pc)
+        self.pc += 1
+
+        self._load_operation()
+
+        self._retrieve_operand()
         self._execute_operation()
 
     def reset(self) -> None:
@@ -231,32 +238,20 @@ class CPU(object):
             None
         """
         # Perform reset actions.
-        self._a = 0x00
-        self._x = 0x00
-        self._y = 0x00
-        self._s = 0xFD
+        self.a = 0x00
+        self.x = 0x00
+        self.y = 0x00
+        self.s = 0xFD
         self.status.reg |= 0x04
 
         pc_lo: int = self._read(self._RES)
         pc_hi: int = self._read(self._RES + 1)
 
-        self._pc = pc_hi << 8 | pc_lo
+        self.pc = pc_hi << 8 | pc_lo
 
         # As the reset line goes high the processor performs a start sequence
         # of 7 cycles
         self._cycle_count += 7
-
-    @property
-    def read_only_values(self) -> CPUReadOnlyValues:
-        return {
-            "a":  self._a,
-            "x":  self._x,
-            "y":  self._y,
-            "s":  self._s,
-            "pc": self._pc,
-            "cycle_count": self._cycle_count,
-            "active_operation": self._active_operation,
-        }
 
     def _read(self, address: int) -> int:
         return self._cpu_bus.read(address)
@@ -264,15 +259,20 @@ class CPU(object):
     def _write(self, address: int, data: int) -> None:
         self._cpu_bus.write(address, data)
 
-    def _execute_operation(self) -> None:
-        operation: Tuple[Callable, Callable] = self._operations[
-            self._active_operation]
+    def _load_operation(self) -> None:
+        operation: Tuple[Callable, Callable] = self._operations[self.opcode]
 
-        addressing_mode: Callable = operation[0]
-        operation: Callable = operation[1]
+        self._addressing_mode = operation[0]
+        self._operation = operation[1]
 
-        addressing_mode()
-        operation()
+    def _retrieve_operand(self):
+        # Execute the addressing mode required by the current operation to
+        # retrieve the operand.
+        self._addressing_mode()
+
+    def _execute_operation(self):
+        # Perform the current operation.
+        self._operation()
 
     def _imp(self):
         # Implied addressing mode. In this mode the operand is implied by the
@@ -286,13 +286,13 @@ class CPU(object):
         # counter is a zero-page address. This value is added with the x
         # register to form the effective address. This addressing mode wraps
         # around for values larger than $FF.
-        indirect_zpg_address: int = self._read(self._pc)
-        self._pc += 1
+        indirect_zpg_address: int = self._read(self.pc)
+        self.pc += 1
 
-        lo: int = self._read((indirect_zpg_address + self._x) & 0x00FF)
-        hi: int = self._read((indirect_zpg_address + self._x + 1) & 0x00FF)
+        lo: int = self._read((indirect_zpg_address + self.x) & 0x00FF)
+        hi: int = self._read((indirect_zpg_address + self.x + 1) & 0x00FF)
 
-        self._operand = self._read(hi << 8 | lo)
+        self.operand = self._read(hi << 8 | lo)
 
     def _BRK(self):
         # BRK initiates a software interrupt similar to a hardware interrupt
@@ -300,34 +300,34 @@ class CPU(object):
 
         # The return address pushed to the stack is PC+2, providing an extra
         # byte of spacing for a break mark (reason for the break).
-        self._pc += 1
+        self.pc += 1
 
         self.status.flags.interrupt = 1
         self.status.flags.brk = 1
 
-        self._push_to_stack(self._pc >> 8)
-        self._push_to_stack(self._pc & 0x00FF)
+        self._push_to_stack(self.pc >> 8)
+        self._push_to_stack(self.pc & 0x00FF)
 
         self._push_to_stack(self.status.reg)
 
-        self._pc = self._read(self._IRQ) | self._read(self._IRQ + 1) << 8
+        self.pc = self._read(self._IRQ) | self._read(self._IRQ + 1) << 8
 
         self._cycle_count += 7
 
     def _ORA(self):
         # OR with the accumulator.
-        self._a |= self._operand
+        self.a |= self.operand
 
         # Sets the negative flag if the two's complement MSB is 1.
-        self.status.flags.negative = self._a & 0x80
-        self.status.flags.zero = self._a == 0x00
+        self.status.flags.negative = self.a & 0x80
+        self.status.flags.zero = self.a == 0x00
 
     def _push_to_stack(self, data: int) -> None:
         # Push a value to the stack. The stack is implemented at addresses
         # $0100 - $01FF and is a LIFO stack. A push to the stack decrements the
         # stack pointer by 1.
-        self._write(0x0100 | self._s, data)
-        self._s -= 1
+        self._write(0x0100 | self.s, data)
+        self.s -= 1
 
     def _map_operations(self) -> None:
         # Map operations and addressing modes to opcodes.
