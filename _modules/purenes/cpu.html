@@ -497,7 +497,7 @@
         <span class="c1"># byte of spacing for a break mark (reason for the break).</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">interrupt</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">interrupt_disable</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">brk</span> <span class="o">=</span> <span class="mi">1</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="p">)</span>
@@ -514,7 +514,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operand</span>
 
         <span class="c1"># Sets the negative flag if the two's complement MSB is 1.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">negative</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">&amp;</span> <span class="mh">0x80</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">negative</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">&amp;</span> <span class="mh">0x80</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">zero</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">==</span> <span class="mh">0x00</span>
 
     <span class="k">def</span> <span class="nf">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
