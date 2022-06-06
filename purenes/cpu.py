@@ -302,7 +302,7 @@ class CPU(object):
         # byte of spacing for a break mark (reason for the break).
         self.pc += 1
 
-        self.status.flags.interrupt = 1
+        self.status.flags.interrupt_disable = 1
         self.status.flags.brk = 1
 
         self._push_to_stack(self.pc >> 8)
@@ -319,7 +319,7 @@ class CPU(object):
         self.a |= self.operand
 
         # Sets the negative flag if the two's complement MSB is 1.
-        self.status.flags.negative = self.a & 0x80
+        self.status.flags.negative = (self.a & 0x80) != 0
         self.status.flags.zero = self.a == 0x00
 
     def _push_to_stack(self, data: int) -> None:
