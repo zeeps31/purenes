@@ -279,6 +279,8 @@ class CPU(object):
         # operation.
         return
 
+    # Addressing Modes
+
     def _izx(self):
         # X-indexed indirect addressing mode.
 
@@ -293,6 +295,14 @@ class CPU(object):
         hi: int = self._read((indirect_zpg_address + self.x + 1) & 0x00FF)
 
         self.operand = self._read(hi << 8 | lo)
+
+    def _zpg(self):
+        # Zero page addressing mode. Address = $00LL.
+        operand: int = self._read(self.pc)
+        self.operand = self._read(operand)
+        self.pc += 1
+
+    # Operations
 
     def _BRK(self):
         # BRK initiates a software interrupt similar to a hardware interrupt
@@ -334,4 +344,5 @@ class CPU(object):
         op = self
         self._operations = {
             0x00:  (op._imp, op._BRK), 0x01: (op._izx, op._ORA),
+            0x05:  (op._zpg, op._ORA),
         }

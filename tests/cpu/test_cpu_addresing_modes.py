@@ -65,3 +65,50 @@ def test_x_indexed_indirect_addressing_mode(
     mock_cpu_bus.assert_has_calls(calls)
 
     assert cpu.operand == operand
+
+
+@pytest.mark.parametrize(
+    "operand",
+    [
+        0xFF
+    ],
+    ids=[
+        "retrieves_the_operand_correctly",
+    ]
+)
+def test_zero_page_addressing_mode(
+        cpu: purenes.cpu.CPU,
+        mock_cpu_bus: mock.Mock,
+        mocker: pytest_mock.MockFixture,
+        operand: int
+):
+    """Tests zero-page addressing mode using opcode 0x05.
+
+    Clocks the CPU and verifies the following actions are performed while
+    retrieving the operand:
+
+    1. The address used to retrieve the operation value is $00 + operand
+    2. The program counter is incremented correctly.
+    """
+    mocker.patch.object(cpu, "_execute_operation")
+
+    cpu.pc = 0x0000
+    operand: int = operand
+
+    mock_cpu_bus.read.side_effect = [
+        0x05,     # Opcode
+        operand,  # Zero-page address
+        0x01      # Dummy operation value
+    ]
+
+    cpu.clock()
+
+    calls = [
+        mocker.call.read(0x0000),  # First PC read, retrieve opcode
+        mocker.call.read(0x0001),  # Call to retrieve operand
+        mocker.call.read(0x00 | operand),
+    ]
+
+    mock_cpu_bus.assert_has_calls(calls)
+
+    assert cpu.pc == 0x0002
