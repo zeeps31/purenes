@@ -60,7 +60,7 @@ def test_BRK(
 
 
 @pytest.mark.parametrize(
-    "accumulator_value, operand_value, negative_flag, zero_flag",
+    "accumulator_value, operation_value, negative_flag, zero_flag",
     [
         (0x00, 0x01, 0, 0),
         (0x00, 0x00, 0, 1),
@@ -77,7 +77,7 @@ def test_ORA(
         mock_cpu_bus: mock.Mock,
         mocker: pytest_mock.MockFixture,
         accumulator_value: int,
-        operand_value: int,
+        operation_value: int,
         negative_flag: int,
         zero_flag: int
 ):
@@ -86,20 +86,19 @@ def test_ORA(
     Clocks the CPU and verifies that the following actions are performed during
     the ORA operation.
 
-    1. The accumulator register is correctly ORed with the value or the
-       operand.
+    1. The accumulator register is correctly ORed with the operation value.
     2. The negative (N) flag is set under the correct conditions.
     3. The zero (Z) flag is set under the correct conditions.
     """
     cpu.pc = 0x0000
     cpu.a = accumulator_value
-    cpu.operand = operand_value
+    cpu.operation_value = operation_value
 
     mock_cpu_bus.read.return_value = 0x01  # Opcode
-    mocker.patch.object(cpu, "_retrieve_operand")
+    mocker.patch.object(cpu, "_retrieve_operation_value")
 
     cpu.clock()
 
-    assert cpu.a == accumulator_value | operand_value
+    assert cpu.a == accumulator_value | operation_value
     assert cpu.status.flags.negative == negative_flag
     assert cpu.status.flags.zero == zero_flag
