@@ -68,7 +68,7 @@ def test_x_indexed_indirect_addressing_mode(
 
 
 @pytest.mark.parametrize(
-    "operation_value",
+    "operand",
     [
         0xFF
     ],
@@ -80,7 +80,7 @@ def test_zero_page_addressing_mode(
         cpu: purenes.cpu.CPU,
         mock_cpu_bus: mock.Mock,
         mocker: pytest_mock.MockFixture,
-        operation_value: int
+        operand: int
 ):
     """Tests zero-page addressing mode using opcode 0x05.
 
@@ -93,7 +93,7 @@ def test_zero_page_addressing_mode(
     mocker.patch.object(cpu, "_execute_operation")
 
     cpu.pc = 0x0000
-    operand: int = operation_value
+    operand: int = operand
 
     mock_cpu_bus.read.side_effect = [
         0x05,     # Opcode
