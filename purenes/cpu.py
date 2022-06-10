@@ -154,24 +154,27 @@ class CPU(object):
             :attr:`~purenes.cpu.CPU.pc`
             :attr:`~purenes.cpu.CPU.s`
 
-        Active Opcode and Operand:
+        Active Opcode and Operation Value:
             :attr:`~purenes.cpu.CPU.opcode`
-            :attr:`~purenes.cpu.CPU.operand`
+            :attr:`~purenes.cpu.CPU.operation_value`
     """
     _RES: Final[int] = 0xFFFC  # Reset vector low bytes
     _IRQ: Final[int] = 0xFFFE  # Interrupt vector low bytes
 
-    # CPU Internal registers made public for testing and debugging purposes
-    # only.
-    a:  int  #: Accumulator register.
-    x:  int  #: X index register.
-    y:  int  #: Y index register.
-    pc: int  #: The 16-bit program counter for the CPU.
-    s:  int  #: Stack pointer.
+    a:  int                          #: Accumulator register.
+    x:  int                          #: X index register.
+    y:  int                          #: Y index register.
+    pc: int                          #: The 16-bit program counter for the CPU.
+    s:  int                          #: Stack pointer.
     status: CPUStatus = CPUStatus()  #: Status register (P).
 
     opcode:  int  #: The opcode that the CPU is currently executing.
-    operand: int  #: The operand retrieved using the operation addressing mode.
+    operation_value: int  #: The value retrieved using the addressing mode.
+
+    # The "effective address" is the address that contains the value needed
+    # by the operation. The effective address is either formed from the
+    # operand, or is the operand itself (E.g. absolute addressing).
+    _effective_address: int
 
     # The internal bus for the CPU
     _cpu_bus: CPUBus
@@ -217,7 +220,7 @@ class CPU(object):
 
         self._load_operation()
 
-        self._retrieve_operand()
+        self._retrieve_operation_value()
         self._execute_operation()
 
     def reset(self) -> None:
@@ -265,7 +268,7 @@ class CPU(object):
         self._addressing_mode = operation[0]
         self._operation = operation[1]
 
-    def _retrieve_operand(self):
+    def _retrieve_operation_value(self):
         # Execute the addressing mode required by the current operation to
         # retrieve the operand.
         self._addressing_mode()
@@ -284,22 +287,23 @@ class CPU(object):
     def _izx(self):
         # X-indexed indirect addressing mode.
 
-        # The value retrieved by reading from the location at the program
-        # counter is a zero-page address. This value is added with the x
+        # The operand is a zero-page address. This value is added with the x
         # register to form the effective address. This addressing mode wraps
         # around for values larger than $FF.
-        indirect_zpg_address: int = self._read(self.pc)
+        operand: int = self._read(self.pc)
         self.pc += 1
 
-        lo: int = self._read((indirect_zpg_address + self.x) & 0x00FF)
-        hi: int = self._read((indirect_zpg_address + self.x + 1) & 0x00FF)
+        lo: int = self._read((operand + self.x) & 0x00FF)
+        hi: int = self._read((operand + self.x + 1) & 0x00FF)
 
-        self.operand = self._read(hi << 8 | lo)
+        self._effective_address = hi << 8 | lo
+        self.operation_value = self._read(self._effective_address)
 
     def _zpg(self):
         # Zero page addressing mode. Address = $00LL.
         operand: int = self._read(self.pc)
-        self.operand = self._read(operand)
+        self._effective_address = operand
+        self.operation_value = self._read(self._effective_address)
         self.pc += 1
 
     # Operations
@@ -326,7 +330,7 @@ class CPU(object):
 
     def _ORA(self):
         # OR with the accumulator.
-        self.a |= self.operand
+        self.a |= self.operation_value
 
         # Sets the negative flag if the two's complement MSB is 1.
         self.status.flags.negative = (self.a & 0x80) != 0
