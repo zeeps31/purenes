@@ -104,6 +104,38 @@ def test_ORA(
     assert cpu.status.flags.zero == zero_flag
 
 
+def test_PHP(
+        cpu: purenes.cpu.CPU,
+        mock_cpu_bus: mock.Mock,
+        mocker: pytest_mock.MockFixture):
+    """Tests PHP (Push Processor Status on Stack) operation using opcode 0x08.
+
+    Clocks the CPU and verifies that the following actions are performed during
+    the PHP operation.
+
+    1. The value of the status register (P) is pushed to the stack with the brk
+       flag set.
+    2. The stack pointer is decremented by one.
+    3. The brk flag is reset to 0 after it is pushed.
+    """
+    cpu.pc = 0x0000
+    cpu.s = 0xFD
+    cpu.status.reg = 0x00
+
+    mock_cpu_bus.read.return_value = 0x08  # Opcode
+
+    cpu.clock()
+
+    calls = [
+        mocker.call.write(0x01FD, 0x10)
+    ]
+
+    mock_cpu_bus.assert_has_calls(calls)
+
+    assert cpu.status.reg == 0x00
+    assert cpu.s == 0xFC
+
+
 @pytest.mark.parametrize(
     "operation_value, effective_address, carry_flag, negative_flag, zero_flag",
     [

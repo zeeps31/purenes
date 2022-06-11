@@ -349,6 +349,12 @@ class CPU(object):
         self.status.flags.negative = (self.a & 0x80) != 0
         self.status.flags.zero = self.a == 0x00
 
+    def _PHP(self):
+        # Push Processor Status on Stack.
+        self.status.flags.brk = 1
+        self._push_to_stack(self.status.reg)
+        self.status.flags.brk = 0
+
     def _push_to_stack(self, data: int) -> None:
         # Push a value to the stack. The stack is implemented at addresses
         # $0100 - $01FF and is a LIFO stack. A push to the stack decrements the
@@ -360,6 +366,7 @@ class CPU(object):
         # Map operations and addressing modes to opcodes.
         op = self
         self._operations = {
-            0x00:  (op._imp, op._BRK), 0x01: (op._izx, op._ORA),
-            0x05:  (op._zpg, op._ORA), 0x06: (op._zpg, op._ASL),
+            0x00: (op._imp, op._BRK), 0x01: (op._izx, op._ORA),
+            0x05: (op._zpg, op._ORA), 0x06: (op._zpg, op._ASL),
+            0x08: (op._imp, op._PHP),
         }
