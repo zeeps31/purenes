@@ -357,8 +357,9 @@ circumstances.</p>
 <a class="reference internal" href="#purenes.cpu.CPU.pc" title="purenes.cpu.CPU.pc"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pc</span></code></a>
 <a class="reference internal" href="#purenes.cpu.CPU.s" title="purenes.cpu.CPU.s"><code class="xref py py-attr docutils literal notranslate"><span class="pre">s</span></code></a></p>
 </dd>
-<dt>Active Opcode and Operation Value:</dt><dd><p><a class="reference internal" href="#purenes.cpu.CPU.opcode" title="purenes.cpu.CPU.opcode"><code class="xref py py-attr docutils literal notranslate"><span class="pre">opcode</span></code></a>
-<a class="reference internal" href="#purenes.cpu.CPU.operation_value" title="purenes.cpu.CPU.operation_value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">operation_value</span></code></a></p>
+<dt>Active Opcode, Operation Value and Effective Address:</dt><dd><p><a class="reference internal" href="#purenes.cpu.CPU.opcode" title="purenes.cpu.CPU.opcode"><code class="xref py py-attr docutils literal notranslate"><span class="pre">opcode</span></code></a>
+<a class="reference internal" href="#purenes.cpu.CPU.operation_value" title="purenes.cpu.CPU.operation_value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">operation_value</span></code></a>
+<a class="reference internal" href="#purenes.cpu.CPU.effective_address" title="purenes.cpu.CPU.effective_address"><code class="xref py py-attr docutils literal notranslate"><span class="pre">effective_address</span></code></a></p>
 </dd>
 </dl>
 </div>
@@ -404,6 +405,13 @@ provided by the reset vector at $FFFC.)</p>
 <dt class="sig sig-object py" id="purenes.cpu.CPU.a">
 <span class="sig-name descname"><span class="pre">a</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.cpu.CPU.a" title="Permalink to this definition">#</a></dt>
 <dd><p>Accumulator register.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.cpu.CPU.effective_address">
+<span class="sig-name descname"><span class="pre">effective_address</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.cpu.CPU.effective_address" title="Permalink to this definition">#</a></dt>
+<dd><p>The “effective address” is the address that contains the value needed
+by the operation. The effective address is either formed from the
+operand, or is the operand itself (E.g. absolute addressing).</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="purenes.cpu.CPU.opcode">

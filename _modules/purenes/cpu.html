@@ -349,9 +349,10 @@
 <span class="sd">            :attr:`~purenes.cpu.CPU.pc`</span>
 <span class="sd">            :attr:`~purenes.cpu.CPU.s`</span>
 
-<span class="sd">        Active Opcode and Operation Value:</span>
+<span class="sd">        Active Opcode, Operation Value and Effective Address:</span>
 <span class="sd">            :attr:`~purenes.cpu.CPU.opcode`</span>
 <span class="sd">            :attr:`~purenes.cpu.CPU.operation_value`</span>
+<span class="sd">            :attr:`~purenes.cpu.CPU.effective_address`</span>
 <span class="sd">    """</span>
     <span class="n">_RES</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xFFFC</span>  <span class="c1"># Reset vector low bytes</span>
     <span class="n">_IRQ</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xFFFE</span>  <span class="c1"># Interrupt vector low bytes</span>
@@ -366,10 +367,10 @@
     <span class="n">opcode</span><span class="p">:</span>  <span class="nb">int</span>  <span class="c1">#: The opcode that the CPU is currently executing.</span>
     <span class="n">operation_value</span><span class="p">:</span> <span class="nb">int</span>  <span class="c1">#: The value retrieved using the addressing mode.</span>
 
-    <span class="c1"># The "effective address" is the address that contains the value needed</span>
-    <span class="c1"># by the operation. The effective address is either formed from the</span>
-    <span class="c1"># operand, or is the operand itself (E.g. absolute addressing).</span>
-    <span class="n">_effective_address</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="c1">#: The "effective address" is the address that contains the value needed</span>
+    <span class="c1">#: by the operation. The effective address is either formed from the</span>
+    <span class="c1">#: operand, or is the operand itself (E.g. absolute addressing).</span>
+    <span class="n">effective_address</span><span class="p">:</span> <span class="nb">int</span>
 
     <span class="c1"># The internal bus for the CPU</span>
     <span class="n">_cpu_bus</span><span class="p">:</span> <span class="n">CPUBus</span>
@@ -472,12 +473,12 @@
         <span class="c1"># Perform the current operation.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_operation</span><span class="p">()</span>
 
+    <span class="c1"># Addressing Modes</span>
+
     <span class="k">def</span> <span class="nf">_imp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Implied addressing mode. In this mode the operand is implied by the</span>
         <span class="c1"># operation.</span>
         <span class="k">return</span>
-
-    <span class="c1"># Addressing Modes</span>
 
     <span class="k">def</span> <span class="nf">_izx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># X-indexed indirect addressing mode.</span>
@@ -491,17 +492,29 @@
         <span class="n">lo</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">((</span><span class="n">operand</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x00FF</span><span class="p">)</span>
         <span class="n">hi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">((</span><span class="n">operand</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x00FF</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_effective_address</span> <span class="o">=</span> <span class="n">hi</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span> <span class="o">|</span> <span class="n">lo</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_effective_address</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">effective_address</span> <span class="o">=</span> <span class="n">hi</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span> <span class="o">|</span> <span class="n">lo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effective_address</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_zpg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Zero page addressing mode. Address = $00LL.</span>
         <span class="n">operand</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pc</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_effective_address</span> <span class="o">=</span> <span class="n">operand</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_effective_address</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">effective_address</span> <span class="o">=</span> <span class="n">operand</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effective_address</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="c1"># Operations</span>
+
+    <span class="k">def</span> <span class="nf">_ASL</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Arithmetic shift left. Shifts in a zero bit on the right.</span>
+
+        <span class="c1"># The 7th bit of the operation value is preserved in the carry flag.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">carry</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">&amp;</span> <span class="mh">0x80</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x00FF</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effective_address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">negative</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">&amp;</span> <span class="mh">0x80</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">zero</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">==</span> <span class="mh">0x00</span>
 
     <span class="k">def</span> <span class="nf">_BRK</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># BRK initiates a software interrupt similar to a hardware interrupt</span>
@@ -543,7 +556,7 @@
         <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_operations</span> <span class="o">=</span> <span class="p">{</span>
             <span class="mh">0x00</span><span class="p">:</span>  <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_imp</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_BRK</span><span class="p">),</span> <span class="mh">0x01</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_izx</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ORA</span><span class="p">),</span>
-            <span class="mh">0x05</span><span class="p">:</span>  <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_zpg</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ORA</span><span class="p">),</span>
+            <span class="mh">0x05</span><span class="p">:</span>  <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_zpg</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ORA</span><span class="p">),</span> <span class="mh">0x06</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_zpg</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ASL</span><span class="p">),</span>
         <span class="p">}</span></div>
 </pre></div>
         </article>
