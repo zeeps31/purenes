@@ -102,3 +102,61 @@ def test_ORA(
     assert cpu.a == accumulator_value | operation_value
     assert cpu.status.flags.negative == negative_flag
     assert cpu.status.flags.zero == zero_flag
+
+
+@pytest.mark.parametrize(
+    "operation_value, effective_address, carry_flag, negative_flag, zero_flag",
+    [
+        (0x10, 0x0000, 0, 0, 0),
+        (0x81, 0x0000, 1, 0, 0),
+        (0xFF, 0x0000, 1, 1, 0),
+        (0x00, 0x0000, 0, 0, 1),
+    ],
+    ids=[
+        "does_not_update_status_flags_when_the_conditions_are_not_met",
+        "sets_the_carry_flag_under_the_correct_conditions",
+        "sets_the_negative_flag_under_the_correct_conditions",
+        "sets_the_zero_flag_under_the_correct_conditions"
+    ]
+)
+def test_ASL(
+        cpu: purenes.cpu.CPU,
+        mock_cpu_bus: mock.Mock,
+        mocker: pytest_mock.MockFixture,
+        operation_value: int,
+        effective_address: int,
+        carry_flag: int,
+        negative_flag: int,
+        zero_flag: int
+):
+    """Tests the ASL (Arithmetic Shift Left) operation using opcode 0x06.
+
+    Clocks the CPU and verifies that the following actions are performed during
+    the ASL operation.
+
+    1. All bits in the operation value are shifted left by one bit and written
+       back to the effective address.
+    2. For operation values where bit 7 is 1, verifies that the value of bit
+       7 is shifted into the carry flag.
+    3. For results where bit 7 is 1 after the operation is performed, verifies
+       that the negative flag is set.
+    4. For results that are zero, verifies the zero flag is set.
+    """
+    cpu.pc = 0x0000
+    cpu.operation_value = operation_value
+    cpu.effective_address = effective_address
+
+    mock_cpu_bus.read.return_value = 0x06  # Opcode
+    mocker.patch.object(cpu, "_retrieve_operation_value")
+
+    cpu.clock()
+
+    calls = [
+        mocker.call.write(0x0000, (operation_value << 1) & 0x00FF)
+    ]
+
+    mock_cpu_bus.assert_has_calls(calls)
+
+    assert cpu.status.flags.carry == carry_flag
+    assert cpu.status.flags.negative == negative_flag
+    assert cpu.status.flags.zero == zero_flag
