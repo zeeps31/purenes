@@ -154,9 +154,10 @@ class CPU(object):
             :attr:`~purenes.cpu.CPU.pc`
             :attr:`~purenes.cpu.CPU.s`
 
-        Active Opcode and Operation Value:
+        Active Opcode, Operation Value and Effective Address:
             :attr:`~purenes.cpu.CPU.opcode`
             :attr:`~purenes.cpu.CPU.operation_value`
+            :attr:`~purenes.cpu.CPU.effective_address`
     """
     _RES: Final[int] = 0xFFFC  # Reset vector low bytes
     _IRQ: Final[int] = 0xFFFE  # Interrupt vector low bytes
@@ -171,10 +172,10 @@ class CPU(object):
     opcode:  int  #: The opcode that the CPU is currently executing.
     operation_value: int  #: The value retrieved using the addressing mode.
 
-    # The "effective address" is the address that contains the value needed
-    # by the operation. The effective address is either formed from the
-    # operand, or is the operand itself (E.g. absolute addressing).
-    _effective_address: int
+    #: The "effective address" is the address that contains the value needed
+    #: by the operation. The effective address is either formed from the
+    #: operand, or is the operand itself (E.g. absolute addressing).
+    effective_address: int
 
     # The internal bus for the CPU
     _cpu_bus: CPUBus
@@ -277,12 +278,12 @@ class CPU(object):
         # Perform the current operation.
         self._operation()
 
+    # Addressing Modes
+
     def _imp(self):
         # Implied addressing mode. In this mode the operand is implied by the
         # operation.
         return
-
-    # Addressing Modes
 
     def _izx(self):
         # X-indexed indirect addressing mode.
@@ -296,17 +297,29 @@ class CPU(object):
         lo: int = self._read((operand + self.x) & 0x00FF)
         hi: int = self._read((operand + self.x + 1) & 0x00FF)
 
-        self._effective_address = hi << 8 | lo
-        self.operation_value = self._read(self._effective_address)
+        self.effective_address = hi << 8 | lo
+        self.operation_value = self._read(self.effective_address)
 
     def _zpg(self):
         # Zero page addressing mode. Address = $00LL.
         operand: int = self._read(self.pc)
-        self._effective_address = operand
-        self.operation_value = self._read(self._effective_address)
+        self.effective_address = operand
+        self.operation_value = self._read(self.effective_address)
         self.pc += 1
 
     # Operations
+
+    def _ASL(self):
+        # Arithmetic shift left. Shifts in a zero bit on the right.
+
+        # The 7th bit of the operation value is preserved in the carry flag.
+        self.status.flags.carry = (self.operation_value & 0x80) != 0
+
+        self.operation_value = (self.operation_value << 1) & 0x00FF
+        self._write(self.effective_address, self.operation_value)
+
+        self.status.flags.negative = (self.operation_value & 0x80) != 0
+        self.status.flags.zero = self.operation_value == 0x00
 
     def _BRK(self):
         # BRK initiates a software interrupt similar to a hardware interrupt
@@ -348,5 +361,5 @@ class CPU(object):
         op = self
         self._operations = {
             0x00:  (op._imp, op._BRK), 0x01: (op._izx, op._ORA),
-            0x05:  (op._zpg, op._ORA),
+            0x05:  (op._zpg, op._ORA), 0x06: (op._zpg, op._ASL),
         }
