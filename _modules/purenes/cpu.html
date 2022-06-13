@@ -200,11 +200,12 @@
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Final</span>  <span class="c1"># pragma: no cover</span>
     <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">TypedDict</span>  <span class="c1"># pragma: no cover</span>
+
 <span class="kn">import</span> <span class="nn">ctypes</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
 
 
 <div class="viewcode-block" id="CPUStatus"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPUStatus">[docs]</a><span class="k">class</span> <span class="nc">CPUStatus</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">Union</span><span class="p">):</span>
@@ -486,6 +487,12 @@
 
     <span class="c1"># Addressing Modes</span>
 
+    <span class="k">def</span> <span class="nf">_imm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Immediate addressing mode. Operand and operation value is byte BB</span>
+        <span class="c1"># (#$BB).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">+=</span> <span class="mi">1</span>
+
     <span class="k">def</span> <span class="nf">_imp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Implied addressing mode. In this mode the operand is implied by the</span>
         <span class="c1"># operation.</span>
@@ -572,7 +579,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_operations</span> <span class="o">=</span> <span class="p">{</span>
             <span class="mh">0x00</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_imp</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_BRK</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="mh">0x01</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_izx</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ORA</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
             <span class="mh">0x05</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_zpg</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ORA</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="mh">0x06</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_zpg</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ASL</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
-            <span class="mh">0x08</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_imp</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_PHP</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+            <span class="mh">0x08</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_imp</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_PHP</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="mh">0x09</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_imm</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ORA</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
         <span class="p">}</span></div>
 </pre></div>
         </article>
