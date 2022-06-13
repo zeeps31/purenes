@@ -331,10 +331,12 @@
 
 
 <div class="viewcode-block" id="CPU"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPU">[docs]</a><span class="k">class</span> <span class="nc">CPU</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">"""A class to represent the NES CPU core.</span>
+    <span class="sd">"""A non-cycle-accurate implementation of the MOS6502 processor.</span>
 
-<span class="sd">    The NES CPU is based on the MOS6502 processor and runs at approximately</span>
-<span class="sd">    1.79 MHz.</span>
+<span class="sd">    Each time the CPU is clocked, the addressing mode and operation are</span>
+<span class="sd">    performed on the first clock cycle. A counter is used to track the</span>
+<span class="sd">    remaining clock cycles for the operation. For each subsequent clock no</span>
+<span class="sd">    action is performed until the counter reaches 0.</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        The attributes listed below are exposed publicly to allow testing and</span>
@@ -349,10 +351,11 @@
 <span class="sd">            :attr:`~purenes.cpu.CPU.pc`</span>
 <span class="sd">            :attr:`~purenes.cpu.CPU.s`</span>
 
-<span class="sd">        Active Opcode, Operation Value and Effective Address:</span>
+<span class="sd">        Active Opcode, Operation Value, Effective Address and Remaining Cycles:</span>
 <span class="sd">            :attr:`~purenes.cpu.CPU.opcode`</span>
 <span class="sd">            :attr:`~purenes.cpu.CPU.operation_value`</span>
 <span class="sd">            :attr:`~purenes.cpu.CPU.effective_address`</span>
+<span class="sd">            :attr:`~purenes.cpu.CPU.remaining_cycles`</span>
 <span class="sd">    """</span>
     <span class="n">_RES</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xFFFC</span>  <span class="c1"># Reset vector low bytes</span>
     <span class="n">_IRQ</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xFFFE</span>  <span class="c1"># Interrupt vector low bytes</span>
@@ -375,11 +378,10 @@
     <span class="c1"># The internal bus for the CPU</span>
     <span class="n">_cpu_bus</span><span class="p">:</span> <span class="n">CPUBus</span>
 
-    <span class="c1"># Tracks the total number of cycles that have been performed. This value</span>
-    <span class="c1"># is used to synchronize the CPU and PPU</span>
-    <span class="n">_cycle_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1">#: Tracks the total number of cycles that have been performed.</span>
+    <span class="n">remaining_cycles</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="n">_operations</span><span class="p">:</span>      <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span>
+    <span class="n">_operations</span><span class="p">:</span>      <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
     <span class="n">_operation</span><span class="p">:</span>       <span class="n">Callable</span>  <span class="c1"># The current operation</span>
     <span class="n">_addressing_mode</span><span class="p">:</span> <span class="n">Callable</span>  <span class="c1"># The addressing mode for the current operation</span>
 
@@ -400,7 +402,8 @@
         <span class="sd">"""Perform one CPU "tick". The clock method is the main entry-point</span>
 <span class="sd">        into the CPU.</span>
 
-<span class="sd">        Each time the CPU is clocked the following events occur:</span>
+<span class="sd">        Each time the CPU is clocked and the remaining cycle counter is 0, the</span>
+<span class="sd">        following events occur:</span>
 
 <span class="sd">        1. The CPU reads from :class:`~purenes.cpu.CPUBus` at the address</span>
 <span class="sd">           stored in the program counter.</span>
@@ -408,16 +411,22 @@
 <span class="sd">        3. The operation retrieved from the address at the program counter is</span>
 <span class="sd">           executed.</span>
 
+<span class="sd">        If there are still remaining cycles for the operation, the remaining</span>
+<span class="sd">        cycle counter is decremented and no action is performed.</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        """</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">opcode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pc</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remaining_cycles</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">opcode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pc</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_load_operation</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_load_operation</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_retrieve_operation_value</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_execute_operation</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_retrieve_operation_value</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_execute_operation</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">remaining_cycles</span> <span class="o">-=</span> <span class="mi">1</span></div>
 
 <div class="viewcode-block" id="CPU.reset"><a class="viewcode-back" href="../../purenes.html#purenes.cpu.CPU.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">"""Perform power-up and reset procedures for the CPU.</span>
@@ -450,7 +459,7 @@
 
         <span class="c1"># As the reset line goes high the processor performs a start sequence</span>
         <span class="c1"># of 7 cycles</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cycle_count</span> <span class="o">+=</span> <span class="mi">7</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remaining_cycles</span> <span class="o">+=</span> <span class="mi">7</span></div>
 
     <span class="k">def</span> <span class="nf">_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cpu_bus</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
@@ -459,10 +468,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_cpu_bus</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_load_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">operation</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_operations</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">opcode</span><span class="p">]</span>
+        <span class="n">operation</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_operations</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">opcode</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_addressing_mode</span> <span class="o">=</span> <span class="n">operation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_operation</span> <span class="o">=</span> <span class="n">operation</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remaining_cycles</span> <span class="o">+=</span> <span class="n">operation</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_retrieve_operation_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Execute the addressing mode required by the current operation to</span>
@@ -534,8 +545,6 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_IRQ</span><span class="p">)</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_IRQ</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cycle_count</span> <span class="o">+=</span> <span class="mi">7</span>
-
     <span class="k">def</span> <span class="nf">_ORA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># OR with the accumulator.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span>
@@ -561,9 +570,9 @@
         <span class="c1"># Map operations and addressing modes to opcodes.</span>
         <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_operations</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="mh">0x00</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_imp</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_BRK</span><span class="p">),</span> <span class="mh">0x01</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_izx</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ORA</span><span class="p">),</span>
-            <span class="mh">0x05</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_zpg</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ORA</span><span class="p">),</span> <span class="mh">0x06</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_zpg</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ASL</span><span class="p">),</span>
-            <span class="mh">0x08</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_imp</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_PHP</span><span class="p">),</span>
+            <span class="mh">0x00</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_imp</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_BRK</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="mh">0x01</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_izx</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ORA</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+            <span class="mh">0x05</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_zpg</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ORA</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="mh">0x06</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_zpg</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ASL</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+            <span class="mh">0x08</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_imp</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_PHP</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
         <span class="p">}</span></div>
 </pre></div>
         </article>

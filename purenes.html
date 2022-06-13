@@ -341,9 +341,11 @@ Mapper.</p>
 <dt class="sig sig-object py" id="purenes.cpu.CPU">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">purenes.cpu.</span></span><span class="sig-name descname"><span class="pre">CPU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cpu_bus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#purenes.cpu.CPUBus" title="purenes.cpu.CPUBus"><span class="pre">purenes.cpu.CPUBus</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/purenes/cpu.html#CPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.cpu.CPU" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A class to represent the NES CPU core.</p>
-<p>The NES CPU is based on the MOS6502 processor and runs at approximately
-1.79 MHz.</p>
+<p>A non-cycle-accurate implementation of the MOS6502 processor.</p>
+<p>Each time the CPU is clocked, the addressing mode and operation are
+performed on the first clock cycle. A counter is used to track the
+remaining clock cycles for the operation. For each subsequent clock no
+action is performed until the counter reaches 0.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The attributes listed below are exposed publicly to allow testing and
@@ -357,9 +359,10 @@ circumstances.</p>
 <a class="reference internal" href="#purenes.cpu.CPU.pc" title="purenes.cpu.CPU.pc"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pc</span></code></a>
 <a class="reference internal" href="#purenes.cpu.CPU.s" title="purenes.cpu.CPU.s"><code class="xref py py-attr docutils literal notranslate"><span class="pre">s</span></code></a></p>
 </dd>
-<dt>Active Opcode, Operation Value and Effective Address:</dt><dd><p><a class="reference internal" href="#purenes.cpu.CPU.opcode" title="purenes.cpu.CPU.opcode"><code class="xref py py-attr docutils literal notranslate"><span class="pre">opcode</span></code></a>
+<dt>Active Opcode, Operation Value, Effective Address and Remaining Cycles:</dt><dd><p><a class="reference internal" href="#purenes.cpu.CPU.opcode" title="purenes.cpu.CPU.opcode"><code class="xref py py-attr docutils literal notranslate"><span class="pre">opcode</span></code></a>
 <a class="reference internal" href="#purenes.cpu.CPU.operation_value" title="purenes.cpu.CPU.operation_value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">operation_value</span></code></a>
-<a class="reference internal" href="#purenes.cpu.CPU.effective_address" title="purenes.cpu.CPU.effective_address"><code class="xref py py-attr docutils literal notranslate"><span class="pre">effective_address</span></code></a></p>
+<a class="reference internal" href="#purenes.cpu.CPU.effective_address" title="purenes.cpu.CPU.effective_address"><code class="xref py py-attr docutils literal notranslate"><span class="pre">effective_address</span></code></a>
+<a class="reference internal" href="#purenes.cpu.CPU.remaining_cycles" title="purenes.cpu.CPU.remaining_cycles"><code class="xref py py-attr docutils literal notranslate"><span class="pre">remaining_cycles</span></code></a></p>
 </dd>
 </dl>
 </div>
@@ -368,7 +371,8 @@ circumstances.</p>
 <span class="sig-name descname"><span class="pre">clock</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/purenes/cpu.html#CPU.clock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#purenes.cpu.CPU.clock" title="Permalink to this definition">#</a></dt>
 <dd><p>Perform one CPU “tick”. The clock method is the main entry-point
 into the CPU.</p>
-<p>Each time the CPU is clocked the following events occur:</p>
+<p>Each time the CPU is clocked and the remaining cycle counter is 0, the
+following events occur:</p>
 <ol class="arabic simple">
 <li><p>The CPU reads from <a class="reference internal" href="#purenes.cpu.CPUBus" title="purenes.cpu.CPUBus"><code class="xref py py-class docutils literal notranslate"><span class="pre">CPUBus</span></code></a> at the address
 stored in the program counter.</p></li>
@@ -376,6 +380,8 @@ stored in the program counter.</p></li>
 <li><p>The operation retrieved from the address at the program counter is
 executed.</p></li>
 </ol>
+<p>If there are still remaining cycles for the operation, the remaining
+cycle counter is decremented and no action is performed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>None</p>
@@ -427,6 +433,11 @@ operand, or is the operand itself (E.g. absolute addressing).</p>
 <dt class="sig sig-object py" id="purenes.cpu.CPU.pc">
 <span class="sig-name descname"><span class="pre">pc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#purenes.cpu.CPU.pc" title="Permalink to this definition">#</a></dt>
 <dd><p>The 16-bit program counter for the CPU.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="purenes.cpu.CPU.remaining_cycles">
+<span class="sig-name descname"><span class="pre">remaining_cycles</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#purenes.cpu.CPU.remaining_cycles" title="Permalink to this definition">#</a></dt>
+<dd><p>Tracks the total number of cycles that have been performed.</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="purenes.cpu.CPU.s">
