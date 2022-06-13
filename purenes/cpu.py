@@ -136,10 +136,12 @@ class CPUBus(object):
 
 
 class CPU(object):
-    """A class to represent the NES CPU core.
+    """A non-cycle-accurate implementation of the MOS6502 processor.
 
-    The NES CPU is based on the MOS6502 processor and runs at approximately
-    1.79 MHz.
+    Each time the CPU is clocked, the addressing mode and operation are
+    performed on the first clock cycle. A counter is used to track the
+    remaining clock cycles for the operation. For each subsequent clock no
+    action is performed until the counter reaches 0.
 
     Note:
         The attributes listed below are exposed publicly to allow testing and
@@ -154,10 +156,11 @@ class CPU(object):
             :attr:`~purenes.cpu.CPU.pc`
             :attr:`~purenes.cpu.CPU.s`
 
-        Active Opcode, Operation Value and Effective Address:
+        Active Opcode, Operation Value, Effective Address and Remaining Cycles:
             :attr:`~purenes.cpu.CPU.opcode`
             :attr:`~purenes.cpu.CPU.operation_value`
             :attr:`~purenes.cpu.CPU.effective_address`
+            :attr:`~purenes.cpu.CPU.remaining_cycles`
     """
     _RES: Final[int] = 0xFFFC  # Reset vector low bytes
     _IRQ: Final[int] = 0xFFFE  # Interrupt vector low bytes
@@ -180,11 +183,10 @@ class CPU(object):
     # The internal bus for the CPU
     _cpu_bus: CPUBus
 
-    # Tracks the total number of cycles that have been performed. This value
-    # is used to synchronize the CPU and PPU
-    _cycle_count: int = 0
+    #: Tracks the total number of cycles that have been performed.
+    remaining_cycles: int = 0
 
-    _operations:      Dict[int, Tuple[Callable, Callable]]
+    _operations:      Dict[int, Tuple[Callable, Callable, int]]
     _operation:       Callable  # The current operation
     _addressing_mode: Callable  # The addressing mode for the current operation
 
@@ -205,7 +207,8 @@ class CPU(object):
         """Perform one CPU "tick". The clock method is the main entry-point
         into the CPU.
 
-        Each time the CPU is clocked the following events occur:
+        Each time the CPU is clocked and the remaining cycle counter is 0, the
+        following events occur:
 
         1. The CPU reads from :class:`~purenes.cpu.CPUBus` at the address
            stored in the program counter.
@@ -213,16 +216,22 @@ class CPU(object):
         3. The operation retrieved from the address at the program counter is
            executed.
 
+        If there are still remaining cycles for the operation, the remaining
+        cycle counter is decremented and no action is performed.
+
         Returns:
             None
         """
-        self.opcode = self._read(self.pc)
-        self.pc += 1
+        if self.remaining_cycles == 0:
+            self.opcode = self._read(self.pc)
+            self.pc += 1
 
-        self._load_operation()
+            self._load_operation()
 
-        self._retrieve_operation_value()
-        self._execute_operation()
+            self._retrieve_operation_value()
+            self._execute_operation()
+
+        self.remaining_cycles -= 1
 
     def reset(self) -> None:
         """Perform power-up and reset procedures for the CPU.
@@ -255,7 +264,7 @@ class CPU(object):
 
         # As the reset line goes high the processor performs a start sequence
         # of 7 cycles
-        self._cycle_count += 7
+        self.remaining_cycles += 7
 
     def _read(self, address: int) -> int:
         return self._cpu_bus.read(address)
@@ -264,10 +273,12 @@ class CPU(object):
         self._cpu_bus.write(address, data)
 
     def _load_operation(self) -> None:
-        operation: Tuple[Callable, Callable] = self._operations[self.opcode]
+        operation: Tuple[Callable, Callable, int] = self._operations[
+            self.opcode]
 
         self._addressing_mode = operation[0]
         self._operation = operation[1]
+        self.remaining_cycles += operation[2]
 
     def _retrieve_operation_value(self):
         # Execute the addressing mode required by the current operation to
@@ -339,8 +350,6 @@ class CPU(object):
 
         self.pc = self._read(self._IRQ) | self._read(self._IRQ + 1) << 8
 
-        self._cycle_count += 7
-
     def _ORA(self):
         # OR with the accumulator.
         self.a |= self.operation_value
@@ -366,7 +375,7 @@ class CPU(object):
         # Map operations and addressing modes to opcodes.
         op = self
         self._operations = {
-            0x00: (op._imp, op._BRK), 0x01: (op._izx, op._ORA),
-            0x05: (op._zpg, op._ORA), 0x06: (op._zpg, op._ASL),
-            0x08: (op._imp, op._PHP),
+            0x00: (op._imp, op._BRK, 7), 0x01: (op._izx, op._ORA, 6),
+            0x05: (op._zpg, op._ORA, 3), 0x06: (op._zpg, op._ASL, 5),
+            0x08: (op._imp, op._PHP, 3),
         }
