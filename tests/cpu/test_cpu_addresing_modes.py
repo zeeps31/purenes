@@ -7,6 +7,49 @@ import purenes.cpu
 
 
 @pytest.mark.parametrize(
+    "operand",
+    [
+        0xFF,
+    ],
+    ids=[
+        "sets_the_operation_value_correctly",
+    ]
+)
+def test_immediate_addressing_mode(
+        cpu: purenes.cpu.CPU,
+        mock_cpu_bus: mock.Mock,
+        mocker: pytest_mock.MockFixture,
+        operand: int):
+    """Tests immediate addressing mode using opcode 0x09.
+
+    Verifies the following:
+    1. The operand is set as the operation value.
+    2. The program counter is incremented
+    """
+    # Patch out the execution of the operation
+    mocker.patch.object(cpu, "_execute_operation")
+
+    cpu.pc = 0x0000
+
+    mock_cpu_bus.read.side_effect = [
+        0x09,  # opcode
+        operand
+    ]
+
+    cpu.clock()
+
+    calls = [
+        mocker.call.read(0x0000),  # First PC read, retrieve opcode
+        mocker.call.read(0x0001),  # PC + 1, get operand
+    ]
+
+    mock_cpu_bus.assert_has_calls(calls)
+
+    assert cpu.operation_value == operand
+    assert cpu.pc == 2
+
+
+@pytest.mark.parametrize(
     "x_value, indirect_zp_address, value_address_lo, value_address_hi",
     [
         (0x00, 0x02, 0x04, 0x00),
