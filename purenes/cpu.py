@@ -5,11 +5,12 @@ try:
 except ImportError:  # pragma: no cover
     from typing_extensions import Final  # pragma: no cover
     from typing_extensions import TypedDict  # pragma: no cover
+
 import ctypes
-from typing import List
-from typing import Tuple
 from typing import Callable
 from typing import Dict
+from typing import List
+from typing import Tuple
 
 
 class CPUStatus(ctypes.Union):
@@ -291,6 +292,12 @@ class CPU(object):
 
     # Addressing Modes
 
+    def _imm(self):
+        # Immediate addressing mode. Operand and operation value is byte BB
+        # (#$BB).
+        self.operation_value = self._read(self.pc)
+        self.pc += 1
+
     def _imp(self):
         # Implied addressing mode. In this mode the operand is implied by the
         # operation.
@@ -377,5 +384,5 @@ class CPU(object):
         self._operations = {
             0x00: (op._imp, op._BRK, 7), 0x01: (op._izx, op._ORA, 6),
             0x05: (op._zpg, op._ORA, 3), 0x06: (op._zpg, op._ASL, 5),
-            0x08: (op._imp, op._PHP, 3),
+            0x08: (op._imp, op._PHP, 3), 0x09: (op._imm, op._ORA, 2),
         }
