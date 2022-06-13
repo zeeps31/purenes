@@ -200,3 +200,35 @@ def test_ASL(
     assert cpu.status.flags.negative == negative_flag
     assert cpu.status.flags.zero == zero_flag
     assert cpu.remaining_cycles == 0
+
+
+def test_ASL_with_accumulator_addressing(
+        cpu: purenes.cpu.CPU,
+        mock_cpu_bus: mock.Mock,
+        mocker: pytest_mock.MockFixture
+):
+    """Tests the ASL (Arithmetic Shift Left) operation using accumulator
+    addressing.
+
+    Placed in a separate test as the verification steps required warrant a
+    separate test.
+
+    Verifies the following:
+
+    1. The accumulator is set to the operation value with a zero bit shifted in
+       on the right.
+    2. The operation takes two clock cycles to complete.
+    """
+    cpu.pc = 0x0000
+    cpu.a = 0x00
+    cpu.operation_value = 0x10
+
+    mock_cpu_bus.read.return_value = 0x0A  # Opcode
+    mocker.patch.object(cpu, "_retrieve_operation_value")
+
+    for _ in range(0, 2):
+        cpu.clock()
+
+    assert cpu.a == 0x20
+    assert cpu.operation_value == 0x20
+    assert cpu.remaining_cycles == 0

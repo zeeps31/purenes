@@ -292,6 +292,11 @@ class CPU(object):
 
     # Addressing Modes
 
+    def _acc(self):
+        # Accumulator addressing mode. The operand and operation value are the
+        # value currently stored in the accumulator.
+        self.operation_value = self.a
+
     def _imm(self):
         # Immediate addressing mode. Operand and operation value is byte BB
         # (#$BB).
@@ -334,7 +339,13 @@ class CPU(object):
         self.status.flags.carry = (self.operation_value & 0x80) != 0
 
         self.operation_value = (self.operation_value << 1) & 0x00FF
-        self._write(self.effective_address, self.operation_value)
+
+        # If this is accumulator addressing mode write the value back to the
+        # accumulator, otherwise, write to the effective address.
+        if self._addressing_mode == self._acc:
+            self.a = self.operation_value
+        else:
+            self._write(self.effective_address, self.operation_value)
 
         self.status.flags.negative = (self.operation_value & 0x80) != 0
         self.status.flags.zero = self.operation_value == 0x00
@@ -385,4 +396,5 @@ class CPU(object):
             0x00: (op._imp, op._BRK, 7), 0x01: (op._izx, op._ORA, 6),
             0x05: (op._zpg, op._ORA, 3), 0x06: (op._zpg, op._ASL, 5),
             0x08: (op._imp, op._PHP, 3), 0x09: (op._imm, op._ORA, 2),
+            0x0A: (op._acc, op._ASL, 2)
         }

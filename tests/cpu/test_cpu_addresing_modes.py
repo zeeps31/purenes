@@ -6,6 +6,30 @@ import pytest_mock
 import purenes.cpu
 
 
+def test_accumulator_addressing_mode(
+        cpu: purenes.cpu.CPU,
+        mock_cpu_bus: mock.Mock,
+        mocker: pytest_mock.MockFixture):
+    """Tests immediate addressing mode using opcode 0x0A.
+
+    Verifies the following:
+    1. The accumulator is set as the operation value.
+    """
+    # Patch out the execution of the operation
+    mocker.patch.object(cpu, "_execute_operation")
+
+    cpu.pc = 0x0000
+    cpu.a = 0xFF
+
+    mock_cpu_bus.read.side_effect = [
+        0x0A,  # opcode
+    ]
+
+    cpu.clock()
+
+    assert cpu.operation_value == cpu.a
+
+
 @pytest.mark.parametrize(
     "operand",
     [
