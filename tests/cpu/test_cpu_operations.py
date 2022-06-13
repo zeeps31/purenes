@@ -32,7 +32,8 @@ def test_BRK(
         0x01,  # dummy data at high address of the interrupt vector
     ]
 
-    cpu.clock()
+    for _ in range(0, 7):
+        cpu.clock()
 
     calls = [
         mocker.call.read(0x0000),         # PC address
@@ -57,6 +58,7 @@ def test_BRK(
     assert cpu.status.flags.brk == 1
     assert cpu.status.flags.interrupt_disable == 1
     assert cpu.status.reg == 0x14
+    assert cpu.remaining_cycles == 0
 
 
 @pytest.mark.parametrize(
@@ -97,11 +99,13 @@ def test_ORA(
     mock_cpu_bus.read.return_value = 0x01  # Opcode
     mocker.patch.object(cpu, "_retrieve_operation_value")
 
-    cpu.clock()
+    for _ in range(0, 6):
+        cpu.clock()
 
     assert cpu.a == accumulator_value | operation_value
     assert cpu.status.flags.negative == negative_flag
     assert cpu.status.flags.zero == zero_flag
+    assert cpu.remaining_cycles == 0
 
 
 def test_PHP(
@@ -124,7 +128,8 @@ def test_PHP(
 
     mock_cpu_bus.read.return_value = 0x08  # Opcode
 
-    cpu.clock()
+    for _ in range(0, 3):
+        cpu.clock()
 
     calls = [
         mocker.call.write(0x01FD, 0x10)
@@ -134,6 +139,7 @@ def test_PHP(
 
     assert cpu.status.reg == 0x00
     assert cpu.s == 0xFC
+    assert cpu.remaining_cycles == 0
 
 
 @pytest.mark.parametrize(
@@ -181,7 +187,8 @@ def test_ASL(
     mock_cpu_bus.read.return_value = 0x06  # Opcode
     mocker.patch.object(cpu, "_retrieve_operation_value")
 
-    cpu.clock()
+    for _ in range(0, 5):
+        cpu.clock()
 
     calls = [
         mocker.call.write(0x0000, (operation_value << 1) & 0x00FF)

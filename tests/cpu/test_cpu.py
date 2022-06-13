@@ -37,3 +37,5 @@ def test_reset(
 
     assert cpu.status.reg == 0x04
     assert cpu.status.flags.interrupt_disable == 1
+
+    assert cpu.remaining_cycles == 7
