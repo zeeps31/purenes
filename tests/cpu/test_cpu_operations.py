@@ -199,3 +199,4 @@ def test_ASL(
     assert cpu.status.flags.carry == carry_flag
     assert cpu.status.flags.negative == negative_flag
     assert cpu.status.flags.zero == zero_flag
+    assert cpu.remaining_cycles == 0
