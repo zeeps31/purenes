@@ -297,6 +297,17 @@ class CPU(object):
         # value currently stored in the accumulator.
         self.operation_value = self.a
 
+    def _abs(self):
+        # Absolute addressing mode. Operand is address $HHLL.
+        lo: int = self._read(self.pc)
+        self.pc += 1
+
+        hi: int = self._read(self.pc)
+        self.pc += 1
+
+        self.effective_address = hi << 8 | lo
+        self.operation_value = self._read(self.effective_address)
+
     def _imm(self):
         # Immediate addressing mode. Operand and operation value is byte BB
         # (#$BB).
@@ -396,5 +407,6 @@ class CPU(object):
             0x00: (op._imp, op._BRK, 7), 0x01: (op._izx, op._ORA, 6),
             0x05: (op._zpg, op._ORA, 3), 0x06: (op._zpg, op._ASL, 5),
             0x08: (op._imp, op._PHP, 3), 0x09: (op._imm, op._ORA, 2),
-            0x0A: (op._acc, op._ASL, 2)
+            0x0A: (op._acc, op._ASL, 2), 0x0D: (op._abs, op._ORA, 4),
+            0x0E: (op._abs, op._ASL, 6)
         }

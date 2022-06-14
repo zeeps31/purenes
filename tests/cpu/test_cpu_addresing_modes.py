@@ -30,6 +30,63 @@ def test_accumulator_addressing_mode(
 
 
 @pytest.mark.parametrize(
+    "opcode, operand_lo, operand_hi",
+    [
+        (0x0D, 0x00, 0x01),
+        (0x0E, 0x00, 0x01),
+    ],
+    ids=[
+        "sets_the_operation_value_correctly_and_maps_to_opcode_0x0D",
+        "sets_the_operation_value_correctly_and_maps_to_opcode_0x0E"
+    ]
+)
+def test_absolute_addressing_mode(
+        cpu: purenes.cpu.CPU,
+        mock_cpu_bus: mock.Mock,
+        mocker: pytest_mock.MockFixture,
+        opcode: int,
+        operand_lo: int,
+        operand_hi: int):
+    """Tests accumulator addressing mode.
+
+    Verifies the following:
+
+    1. The addressing mode is mapped to the correct opcode.
+    2. The low and high bytes of the absolute effective address are read in
+       order of low to high.
+    3. The operation value is read at the location of the effective address.
+    4. The program counter is incremented correctly.
+    """
+    # Patch out the execution of the operation
+    mocker.patch.object(cpu, "_execute_operation")
+
+    cpu.pc = 0x0000
+    operation_value: int = 0x01
+    effective_address: int = operand_hi << 8 | operand_lo
+
+    mock_cpu_bus.read.side_effect = [
+        opcode,
+        operand_lo,
+        operand_hi,
+        operation_value
+    ]
+
+    cpu.clock()
+
+    calls = [
+        mocker.call.read(0x0000),  # First PC read, retrieve opcode
+        mocker.call.read(0x0001),  # PC + 1, get operand low byte
+        mocker.call.read(0x0002),  # PC + 2, get operand high byte
+        mocker.call.read(effective_address)  # Retrieve operation value
+    ]
+
+    mock_cpu_bus.assert_has_calls(calls)
+
+    assert cpu.operation_value == operation_value
+    assert cpu.pc == 3
+
+
+@pytest.mark.parametrize(
     "operand",
     [
         0xFF,
