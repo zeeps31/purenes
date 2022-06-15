@@ -6,23 +6,35 @@ import pytest_mock
 import purenes.cpu
 
 
+@pytest.mark.parametrize(
+    "opcode, accumulator_value",
+    [
+        (0x0A, 0xFF),
+    ],
+    ids=[
+        "executes_successfully_using_opcode_0x0A",
+    ]
+)
 def test_accumulator_addressing_mode(
         cpu: purenes.cpu.CPU,
         mock_cpu_bus: mock.Mock,
-        mocker: pytest_mock.MockFixture):
+        mocker: pytest_mock.MockFixture,
+        opcode: int,
+        accumulator_value: int):
     """Tests accumulator addressing mode using opcode 0x0A.
 
     Verifies the following:
 
-    1. The accumulator is set as the operation value.
+    1. The addressing mode is mapped to the correct opcode.
+    2. The accumulator is set as the operation value.
     """
     # Patch out the execution of the operation
     mocker.patch.object(cpu, "_execute_operation")
 
     cpu.pc = 0x0000
-    cpu.a = 0xFF
+    cpu.a = accumulator_value
 
-    mock_cpu_bus.read.return_value = 0x0A  # Opcode
+    mock_cpu_bus.read.return_value = opcode
 
     cpu.clock()
 
@@ -36,8 +48,8 @@ def test_accumulator_addressing_mode(
         (0x0E, 0x00, 0x01),
     ],
     ids=[
-        "sets_the_operation_value_correctly_and_maps_to_opcode_0x0D",
-        "sets_the_operation_value_correctly_and_maps_to_opcode_0x0E"
+        "executes_successfully_using_opcode_0x0D",
+        "executes_successfully_using_opcode_0x0E"
     ]
 )
 def test_absolute_addressing_mode(
@@ -87,24 +99,27 @@ def test_absolute_addressing_mode(
 
 
 @pytest.mark.parametrize(
-    "operand",
+    "opcode, operand",
     [
-        0xFF,
+        (0x09, 0xFF),
     ],
     ids=[
-        "sets_the_operation_value_correctly",
+        "executes_successfully_using_opcode_0x09",
     ]
 )
 def test_immediate_addressing_mode(
         cpu: purenes.cpu.CPU,
         mock_cpu_bus: mock.Mock,
         mocker: pytest_mock.MockFixture,
+        opcode: int,
         operand: int):
-    """Tests immediate addressing mode using opcode 0x09.
+    """Tests immediate addressing mode.
 
     Verifies the following:
-    1. The operand is set as the operation value.
-    2. The program counter is incremented
+
+    1. The addressing mode is mapped to the correct opcode.
+    2. The operand is set as the operation value.
+    3. The program counter is incremented
     """
     # Patch out the execution of the operation
     mocker.patch.object(cpu, "_execute_operation")
@@ -112,7 +127,7 @@ def test_immediate_addressing_mode(
     cpu.pc = 0x0000
 
     mock_cpu_bus.read.side_effect = [
-        0x09,  # opcode
+        opcode,
         operand
     ]
 
@@ -130,13 +145,13 @@ def test_immediate_addressing_mode(
 
 
 @pytest.mark.parametrize(
-    "x_value, indirect_zp_address, value_address_lo, value_address_hi",
+    "opcode, operand, x_value, value_address_lo, value_address_hi",
     [
-        (0x00, 0x02, 0x04, 0x00),
-        (0xFF, 0x01, 0x04, 0x00),
+        (0x01, 0x00, 0x02, 0x04, 0x00),
+        (0x01, 0xFF, 0x01, 0x04, 0x00),
     ],
     ids=[
-        "retrieves_the_operation_value_correctly",
+        "executes_successfully_using_opcode_0x01",
         "wraps_around_when_the_maximum_value_is_reached"
     ]
 )
@@ -144,19 +159,21 @@ def test_x_indexed_indirect_addressing_mode(
         cpu: purenes.cpu.CPU,
         mock_cpu_bus: mock.Mock,
         mocker: pytest_mock.MockFixture,
+        opcode: int,
+        operand: int,
         x_value: int,
-        indirect_zp_address: int,
         value_address_lo: int,
         value_address_hi: int):
-    """Tests X indexed indirect addressing mode using opcode 0x01.
+    """Tests X indexed indirect addressing mode.
 
     Clocks the CPU and verifies the following actions are performed while
     retrieving the operand:
 
-    1. The indirect zero-page address is correctly added to the value of x
+    1. The addressing mode is mapped to the correct opcode.
+    2. The indirect zero-page address is correctly added to the value of x
        and x + 1 to retrieve the high and low bytes of the value address.
-    2. The address is wrapped around when necessary.
-    3. The low and high bytes of the value address are correctly combined to
+    3. The address is wrapped around when necessary.
+    4. The low and high bytes of the value address are correctly combined to
        form the effective address.
     """
     # Patch out the execution of the operation
@@ -168,8 +185,8 @@ def test_x_indexed_indirect_addressing_mode(
     operation_value: int = 0x00
 
     mock_cpu_bus.read.side_effect = [
-        0x01,  # opcode
-        indirect_zp_address,
+        opcode,
+        operand,
         value_address_lo,
         value_address_hi,
         operation_value
@@ -180,8 +197,8 @@ def test_x_indexed_indirect_addressing_mode(
     calls = [
         mocker.call.read(0x0000),  # First PC read, retrieve opcode
         mocker.call.read(0x0001),  # PC + 1, get indirect zero-page address
-        mocker.call.read((indirect_zp_address + cpu.x) & 0x00FF),
-        mocker.call.read((indirect_zp_address + 1 + cpu.x) & 0x00FF),
+        mocker.call.read((operand + cpu.x) & 0x00FF),
+        mocker.call.read((operand + 1 + cpu.x) & 0x00FF),
         mocker.call.read(value_address_hi << 8 | value_address_lo)
     ]
 
@@ -191,21 +208,24 @@ def test_x_indexed_indirect_addressing_mode(
 
 
 @pytest.mark.parametrize(
-    "operand",
+    "opcode, operand",
     [
-        0xFF
+        (0x05, 0xFF),
+        (0x06, 0xFF)
     ],
     ids=[
-        "retrieves_the_operation_value_correctly",
+        "executes_successfully_using_opcode_0x05",
+        "executes_successfully_using_opcode_0x06",
     ]
 )
 def test_zero_page_addressing_mode(
         cpu: purenes.cpu.CPU,
         mock_cpu_bus: mock.Mock,
         mocker: pytest_mock.MockFixture,
+        opcode: int,
         operand: int
 ):
-    """Tests zero-page addressing mode using opcode 0x05.
+    """Tests zero-page addressing mode.
 
     Clocks the CPU and verifies the following actions are performed while
     retrieving the operand:
@@ -219,7 +239,7 @@ def test_zero_page_addressing_mode(
     operand: int = operand
 
     mock_cpu_bus.read.side_effect = [
-        0x05,     # Opcode
+        opcode,
         operand,  # Zero-page address
         0x01      # Dummy operation value
     ]
