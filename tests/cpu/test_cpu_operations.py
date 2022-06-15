@@ -54,7 +54,7 @@ def test_ASL(
     cpu.operation_value = operation_value
     cpu.effective_address = effective_address
 
-    mock_cpu_bus.read.return_value = opcode # Opcode
+    mock_cpu_bus.read.return_value = opcode
     mocker.patch.object(cpu, "_retrieve_operation_value")
 
     for _ in range(0, cycle_count):
@@ -204,7 +204,7 @@ def test_ORA(
     cpu.a = accumulator_value
     cpu.operation_value = operation_value
 
-    mock_cpu_bus.read.return_value = opcode  # Opcode
+    mock_cpu_bus.read.return_value = opcode
     mocker.patch.object(cpu, "_retrieve_operation_value")
 
     for _ in range(0, cycle_count):
