@@ -208,6 +208,76 @@ def test_x_indexed_indirect_addressing_mode(
 
 
 @pytest.mark.parametrize(
+    "opcode, operand, y_value, value_address_lo, value_address_hi, "
+    "effective_address, cycle_count",
+    [
+        (0x11, 0x00, 0x02, 0x04, 0x00, 0x0006, 5),
+        (0x11, 0x00, 0x01, 0xFF, 0x00, 0x0100, 6),
+    ],
+    ids=[
+        "executes_successfully_using_opcode_0x11",
+        "adds_an_extra_cycle_if_a_page_boundary_is_crossed"
+    ]
+)
+def test_y_indexed_indirect_addressing_mode(
+        cpu: purenes.cpu.CPU,
+        mock_cpu_bus: mock.Mock,
+        mocker: pytest_mock.MockFixture,
+        opcode: int,
+        operand: int,
+        y_value: int,
+        value_address_lo: int,
+        value_address_hi: int,
+        effective_address: int,
+        cycle_count: int):
+    """Tests Y indexed indirect addressing mode.
+
+    Note:
+         Because this addressing mode has the ability to add an extra
+        clock cycle, this test includes cycle_count which is typically tested
+        in operation tests.
+
+    Verifies the following:
+
+    1. The addressing mode is mapped to the correct opcode.
+    2. The effective address is formed correctly using (opcode, opcode + 1) + y
+    3. An extra cycle is added if a page boundary is crossed.
+    """
+    # Patch out the execution of the operation
+    mocker.patch.object(cpu, "_execute_operation")
+
+    cpu.pc = 0x0000
+    cpu.y = y_value
+
+    operation_value: int = 0x00
+
+    mock_cpu_bus.read.side_effect = [
+        opcode,
+        operand,
+        value_address_lo,
+        value_address_hi,
+        operation_value
+    ]
+
+    for _ in range(0, cycle_count):
+        cpu.clock()
+
+    calls = [
+        mocker.call.read(0x0000),  # First PC read, retrieve opcode
+        mocker.call.read(0x0001),  # PC + 1, get indirect zero-page address
+        mocker.call.read(operand & 0x00FF),
+        mocker.call.read((operand + 1) & 0x00FF),
+        mocker.call.read((value_address_hi << 8 | value_address_lo) + y_value)
+    ]
+
+    mock_cpu_bus.assert_has_calls(calls)
+
+    assert cpu.effective_address == effective_address
+    assert cpu.operation_value == operation_value
+    assert cpu.remaining_cycles == 0
+
+
+@pytest.mark.parametrize(
     "opcode, operand, operation_value",
     [
         (0x10, 0x00, 0),

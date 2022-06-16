@@ -345,6 +345,27 @@ class CPU(object):
         self.effective_address = hi << 8 | lo
         self.operation_value = self._read(self.effective_address)
 
+    def _izy(self):
+        # Y-indexed indirect addressing mode.
+
+        # The operand is a zero-page address. The effective address is formed
+        # as follows (operand, operand + 1) + y.
+        operand: int = self._read(self.pc)
+        self.pc += 1
+
+        lo: int = self._read((operand & 0x00FF))
+        hi: int = self._read((operand + 1) & 0x00FF)
+
+        self.effective_address = (hi << 8 | lo) + self.y
+
+        # Check if page boundary was crossed (high bytes of effective address
+        # before y offset do not equal high bytes of effective address with y
+        # offset). Add an extra cycle if True.
+        if (self.effective_address & 0xFF00) != (hi << 8):
+            self.remaining_cycles += 1
+
+        self.operation_value = self._read(self.effective_address)
+
     def _rel(self):
         # Relative addressing mode. Only used with branching instructions.
 
@@ -474,8 +495,8 @@ class CPU(object):
             0x08: (op._imp, op._PHP, 3), 0x09: (op._imm, op._ORA, 2),
             0x0A: (op._acc, op._ASL, 2), 0x0D: (op._abs, op._ORA, 4),
             0x0E: (op._abs, op._ASL, 6), 0x10: (op._rel, op._BPL, 2),
-            0x30: (op._rel, op._BMI, 2), 0x50: (op._rel, op._BVC, 2),
-            0x70: (op._rel, op._BVS, 2), 0x90: (op._rel, op._BCC, 2),
-            0xB0: (op._rel, op._BCS, 2), 0xD0: (op._rel, op._BNE, 2),
-            0xF0: (op._rel, op._BEQ, 2)
+            0x11: (op._izy, op._ORA, 5), 0x30: (op._rel, op._BMI, 2),
+            0x50: (op._rel, op._BVC, 2), 0x70: (op._rel, op._BVS, 2),
+            0x90: (op._rel, op._BCC, 2), 0xB0: (op._rel, op._BCS, 2),
+            0xD0: (op._rel, op._BNE, 2), 0xF0: (op._rel, op._BEQ, 2)
         }
