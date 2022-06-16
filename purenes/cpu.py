@@ -349,7 +349,7 @@ class CPU(object):
         # Y-indexed indirect addressing mode.
 
         # The operand is a zero-page address. The effective address is formed
-        # as follows (operand, operand + 1) + y.
+        # as follows: (operand, operand + 1) + y.
         operand: int = self._read(self.pc)
         self.pc += 1
 
