@@ -208,6 +208,59 @@ def test_x_indexed_indirect_addressing_mode(
 
 
 @pytest.mark.parametrize(
+    "opcode, operand, operation_value",
+    [
+        (0x10, 0x00, 0),
+        (0x10, 0x80, -128),
+        (0x10, 0x7F, 127)
+    ],
+    ids=[
+        "executes_successfully_using_opcode_0x10",
+        "casts_signed_integers_to_negative_values",
+        "casts_signed_integers_to_positive_values"
+    ]
+)
+def test_relative_addressing_mode(
+        cpu: purenes.cpu.CPU,
+        mock_cpu_bus: mock.Mock,
+        mocker: pytest_mock.MockFixture,
+        opcode: int,
+        operand: int,
+        operation_value: int,
+):
+    """Tests relative addressing mode.
+
+    Verifies the following:
+
+    1. The addressing mode is mapped to the correct opcode.
+    2. The operand is correctly cast to a signed 8-bit value.
+    3. The operation value is set to the operand.
+    4. The program counter is incremented correctly.
+    """
+    # Patch out the execution of the operation
+    mocker.patch.object(cpu, "_execute_operation")
+
+    cpu.pc = 0x0000
+
+    mock_cpu_bus.read.side_effect = [
+        opcode,
+        operand
+    ]
+
+    cpu.clock()
+
+    calls = [
+        mocker.call.read(0x0000),  # First PC read, retrieve opcode
+        mocker.call.read(0x0001),  # PC + 1, get operand
+    ]
+
+    mock_cpu_bus.assert_has_calls(calls)
+
+    assert cpu.operation_value == operation_value
+    assert cpu.pc == 2
+
+
+@pytest.mark.parametrize(
     "opcode, operand",
     [
         (0x05, 0xFF),
