@@ -485,6 +485,17 @@
         <span class="c1"># Perform the current operation.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_operation</span><span class="p">()</span>
 
+    <span class="k">def</span> <span class="nf">_execute_branch_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Common function to execute branching instructions.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remaining_cycles</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">effective_address</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span>
+
+        <span class="c1"># Check if page boundary was crossed. Add an extra cycle if True.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effective_address</span> <span class="o">&amp;</span> <span class="mh">0xFF00</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">&amp;</span> <span class="mh">0xFF00</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remaining_cycles</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effective_address</span>
+
     <span class="c1"># Addressing Modes</span>
 
     <span class="k">def</span> <span class="nf">_acc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -529,6 +540,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">effective_address</span> <span class="o">=</span> <span class="n">hi</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span> <span class="o">|</span> <span class="n">lo</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effective_address</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">_rel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Relative addressing mode. Only used with branching instructions.</span>
+
+        <span class="c1"># The operand in this addressing mode is a signed 8-bit value</span>
+        <span class="c1"># -128 ... +127 and can increment or decrement the program counter in</span>
+        <span class="c1"># this range.</span>
+        <span class="n">operand</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Cast operand to a signed offset.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int8</span><span class="p">(</span><span class="n">operand</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+
     <span class="k">def</span> <span class="nf">_zpg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Zero page addressing mode. Address = $00LL.</span>
         <span class="n">operand</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pc</span><span class="p">)</span>
@@ -555,6 +578,48 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">negative</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">&amp;</span> <span class="mh">0x80</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">zero</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">==</span> <span class="mh">0x00</span>
+
+    <span class="c1"># Conditional Branch Instructions</span>
+
+    <span class="k">def</span> <span class="nf">_BCC</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Branch on carry clear (C = 0)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">carry</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_execute_branch_operation</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_BCS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Branch on carry set (C = 1)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">carry</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_execute_branch_operation</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_BNE</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Branch on not equal (Z = 0)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">zero</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_execute_branch_operation</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_BEQ</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Branch on equal (Z = 1)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">zero</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_execute_branch_operation</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_BPL</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Branch on result plus (N = 0).</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">negative</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_execute_branch_operation</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_BMI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Branch on result minus (N = 1).</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">negative</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_execute_branch_operation</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_BVC</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Branch on overflow clear (V = 0)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">overflow</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_execute_branch_operation</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_BVS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Branch on overflow set (V = 1)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">overflow</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_execute_branch_operation</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_BRK</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># BRK initiates a software interrupt similar to a hardware interrupt</span>
@@ -603,7 +668,11 @@
             <span class="mh">0x05</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_zpg</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ORA</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="mh">0x06</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_zpg</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ASL</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
             <span class="mh">0x08</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_imp</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_PHP</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="mh">0x09</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_imm</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ORA</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
             <span class="mh">0x0A</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_acc</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ASL</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="mh">0x0D</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_abs</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ORA</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-            <span class="mh">0x0E</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_abs</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ASL</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+            <span class="mh">0x0E</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_abs</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_ASL</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="mh">0x10</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_rel</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_BPL</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="mh">0x30</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_rel</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_BMI</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="mh">0x50</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_rel</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_BVC</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="mh">0x70</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_rel</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_BVS</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="mh">0x90</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_rel</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_BCC</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="mh">0xB0</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_rel</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_BCS</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="mh">0xD0</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_rel</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_BNE</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="mh">0xF0</span><span class="p">:</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_rel</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">_BEQ</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="p">}</span></div>
 </pre></div>
         </article>
