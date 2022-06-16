@@ -582,6 +582,26 @@
 
     <span class="c1"># Operations</span>
 
+    <span class="c1"># Stack Instructions</span>
+
+    <span class="k">def</span> <span class="nf">_PHP</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Push Processor Status on Stack.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">brk</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">reg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">brk</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Logical Operations</span>
+
+    <span class="k">def</span> <span class="nf">_ORA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># OR with the accumulator.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span>
+
+        <span class="c1"># Sets the negative flag if the two's complement MSB is 1.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">negative</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">&amp;</span> <span class="mh">0x80</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">zero</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">==</span> <span class="mh">0x00</span>
+
+    <span class="c1"># Shift and Rotate Instructions</span>
+
     <span class="k">def</span> <span class="nf">_ASL</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Arithmetic shift left. Shifts in a zero bit on the right.</span>
 
@@ -642,6 +662,8 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">overflow</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_execute_branch_operation</span><span class="p">()</span>
 
+    <span class="c1"># Interrupts</span>
+
     <span class="k">def</span> <span class="nf">_BRK</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># BRK initiates a software interrupt similar to a hardware interrupt</span>
         <span class="c1"># (IRQ).</span>
@@ -659,20 +681,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">reg</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_IRQ</span><span class="p">)</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_IRQ</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span>
-
-    <span class="k">def</span> <span class="nf">_ORA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># OR with the accumulator.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span>
-
-        <span class="c1"># Sets the negative flag if the two's complement MSB is 1.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">negative</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">&amp;</span> <span class="mh">0x80</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">zero</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">==</span> <span class="mh">0x00</span>
-
-    <span class="k">def</span> <span class="nf">_PHP</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># Push Processor Status on Stack.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">brk</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">reg</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">brk</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">def</span> <span class="nf">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Push a value to the stack. The stack is implemented at addresses</span>
