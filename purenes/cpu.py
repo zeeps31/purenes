@@ -290,6 +290,17 @@ class CPU(object):
         # Perform the current operation.
         self._operation()
 
+    def _execute_branch_operation(self):
+        # Common function to execute branching instructions.
+        self.remaining_cycles += 1
+        self.effective_address = self.pc + self.operation_value
+
+        # Check if page boundary was crossed. Add an extra cycle if True.
+        if (self.effective_address & 0xFF00) != (self.pc & 0xFF00):
+            self.remaining_cycles += 1
+
+        self.pc = self.effective_address
+
     # Addressing Modes
 
     def _acc(self):
@@ -334,6 +345,18 @@ class CPU(object):
         self.effective_address = hi << 8 | lo
         self.operation_value = self._read(self.effective_address)
 
+    def _rel(self):
+        # Relative addressing mode. Only used with branching instructions.
+
+        # The operand in this addressing mode is a signed 8-bit value
+        # -128 ... +127 and can increment or decrement the program counter in
+        # this range.
+        operand: int = self._read(self.pc)
+        self.pc += 1
+
+        # Cast operand to a signed offset.
+        self.operation_value = ctypes.c_int8(operand).value
+
     def _zpg(self):
         # Zero page addressing mode. Address = $00LL.
         operand: int = self._read(self.pc)
@@ -360,6 +383,48 @@ class CPU(object):
 
         self.status.flags.negative = (self.operation_value & 0x80) != 0
         self.status.flags.zero = self.operation_value == 0x00
+
+    # Conditional Branch Instructions
+
+    def _BCC(self):
+        # Branch on carry clear (C = 0)
+        if self.status.flags.carry == 0:
+            self._execute_branch_operation()
+
+    def _BCS(self):
+        # Branch on carry set (C = 1)
+        if self.status.flags.carry == 1:
+            self._execute_branch_operation()
+
+    def _BNE(self):
+        # Branch on not equal (Z = 0)
+        if self.status.flags.zero == 0:
+            self._execute_branch_operation()
+
+    def _BEQ(self):
+        # Branch on equal (Z = 1)
+        if self.status.flags.zero == 1:
+            self._execute_branch_operation()
+
+    def _BPL(self):
+        # Branch on result plus (N = 0).
+        if self.status.flags.negative == 0:
+            self._execute_branch_operation()
+
+    def _BMI(self):
+        # Branch on result minus (N = 1).
+        if self.status.flags.negative == 1:
+            self._execute_branch_operation()
+
+    def _BVC(self):
+        # Branch on overflow clear (V = 0)
+        if self.status.flags.overflow == 0:
+            self._execute_branch_operation()
+
+    def _BVS(self):
+        # Branch on overflow set (V = 1)
+        if self.status.flags.overflow == 1:
+            self._execute_branch_operation()
 
     def _BRK(self):
         # BRK initiates a software interrupt similar to a hardware interrupt
@@ -408,5 +473,9 @@ class CPU(object):
             0x05: (op._zpg, op._ORA, 3), 0x06: (op._zpg, op._ASL, 5),
             0x08: (op._imp, op._PHP, 3), 0x09: (op._imm, op._ORA, 2),
             0x0A: (op._acc, op._ASL, 2), 0x0D: (op._abs, op._ORA, 4),
-            0x0E: (op._abs, op._ASL, 6)
+            0x0E: (op._abs, op._ASL, 6), 0x10: (op._rel, op._BPL, 2),
+            0x30: (op._rel, op._BMI, 2), 0x50: (op._rel, op._BVC, 2),
+            0x70: (op._rel, op._BVS, 2), 0x90: (op._rel, op._BCC, 2),
+            0xB0: (op._rel, op._BCS, 2), 0xD0: (op._rel, op._BNE, 2),
+            0xF0: (op._rel, op._BEQ, 2)
         }
