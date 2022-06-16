@@ -295,7 +295,7 @@ class CPU(object):
         self.remaining_cycles += 1
         self.effective_address = self.pc + self.operation_value
 
-        # A page boundary was crossed and an extra cycle is added.
+        # Check if page boundary was crossed. Add an extra cycle if True.
         if (self.effective_address & 0xFF00) != (self.pc & 0xFF00):
             self.remaining_cycles += 1
 
@@ -397,12 +397,12 @@ class CPU(object):
             self._execute_branch_operation()
 
     def _BNE(self):
-        # Branch on result no zero (Z = 0)
+        # Branch on not equal (Z = 0)
         if self.status.flags.zero == 0:
             self._execute_branch_operation()
 
     def _BEQ(self):
-        # Branch on result zero (Z = 1)
+        # Branch on equal (Z = 1)
         if self.status.flags.zero == 1:
             self._execute_branch_operation()
 

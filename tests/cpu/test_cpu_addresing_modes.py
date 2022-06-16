@@ -211,11 +211,25 @@ def test_x_indexed_indirect_addressing_mode(
     "opcode, operand, operation_value",
     [
         (0x10, 0x00, 0),
+        (0x30, 0x00, 0),
+        (0x50, 0x00, 0),
+        (0x70, 0x00, 0),
+        (0x90, 0x00, 0),
+        (0xB0, 0x00, 0),
+        (0xD0, 0x00, 0),
+        (0xF0, 0x00, 0),
         (0x10, 0x80, -128),
         (0x10, 0x7F, 127)
     ],
     ids=[
         "executes_successfully_using_opcode_0x10",
+        "executes_successfully_using_opcode_0x30",
+        "executes_successfully_using_opcode_0x50",
+        "executes_successfully_using_opcode_0x70",
+        "executes_successfully_using_opcode_0x90",
+        "executes_successfully_using_opcode_0xB0",
+        "executes_successfully_using_opcode_0xD0",
+        "executes_successfully_using_opcode_0xF0",
         "casts_signed_integers_to_negative_values",
         "casts_signed_integers_to_positive_values"
     ]
