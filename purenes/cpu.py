@@ -387,6 +387,26 @@ class CPU(object):
 
     # Operations
 
+    # Stack Instructions
+
+    def _PHP(self):
+        # Push Processor Status on Stack.
+        self.status.flags.brk = 1
+        self._push_to_stack(self.status.reg)
+        self.status.flags.brk = 0
+
+    # Logical Operations
+
+    def _ORA(self):
+        # OR with the accumulator.
+        self.a |= self.operation_value
+
+        # Sets the negative flag if the two's complement MSB is 1.
+        self.status.flags.negative = (self.a & 0x80) != 0
+        self.status.flags.zero = self.a == 0x00
+
+    # Shift and Rotate Instructions
+
     def _ASL(self):
         # Arithmetic shift left. Shifts in a zero bit on the right.
 
@@ -447,6 +467,8 @@ class CPU(object):
         if self.status.flags.overflow == 1:
             self._execute_branch_operation()
 
+    # Interrupts
+
     def _BRK(self):
         # BRK initiates a software interrupt similar to a hardware interrupt
         # (IRQ).
@@ -464,20 +486,6 @@ class CPU(object):
         self._push_to_stack(self.status.reg)
 
         self.pc = self._read(self._IRQ) | self._read(self._IRQ + 1) << 8
-
-    def _ORA(self):
-        # OR with the accumulator.
-        self.a |= self.operation_value
-
-        # Sets the negative flag if the two's complement MSB is 1.
-        self.status.flags.negative = (self.a & 0x80) != 0
-        self.status.flags.zero = self.a == 0x00
-
-    def _PHP(self):
-        # Push Processor Status on Stack.
-        self.status.flags.brk = 1
-        self._push_to_stack(self.status.reg)
-        self.status.flags.brk = 0
 
     def _push_to_stack(self, data: int) -> None:
         # Push a value to the stack. The stack is implemented at addresses
