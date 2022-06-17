@@ -420,6 +420,9 @@ def test_zero_page_x_indexed_addressing_mode(
     Verifies the following:
 
     1. The addressing mode is mapped to the correct opcode.
+    2. The effective address is set to 0x00 + operand + x
+    3. The effective address does not cross pages if the the value of
+       operand + x exceeds the unsigned 8-bit maximum.
     """
     mocker.patch.object(cpu, "_execute_operation")
 
