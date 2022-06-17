@@ -385,6 +385,15 @@ class CPU(object):
         self.operation_value = self._read(self.effective_address)
         self.pc += 1
 
+    def _zpx(self):
+        # Zero page X indexed addressing mode. Address is operand + X without
+        # carry.
+        operand: int = self._read(self.pc)
+        self.pc += 1
+
+        self.effective_address = (operand + self.x) & 0x00FF
+        self.operation_value = self._read(self.effective_address)
+
     # Operations
 
     # Stack Instructions
@@ -503,7 +512,8 @@ class CPU(object):
             0x08: (op._imp, op._PHP, 3), 0x09: (op._imm, op._ORA, 2),
             0x0A: (op._acc, op._ASL, 2), 0x0D: (op._abs, op._ORA, 4),
             0x0E: (op._abs, op._ASL, 6), 0x10: (op._rel, op._BPL, 2),
-            0x11: (op._izy, op._ORA, 5), 0x30: (op._rel, op._BMI, 2),
+            0x11: (op._izy, op._ORA, 5), 0x15: (op._zpx, op._ORA, 4),
+            0x16: (op._zpx, op._ASL, 6), 0x30: (op._rel, op._BMI, 2),
             0x50: (op._rel, op._BVC, 2), 0x70: (op._rel, op._BVS, 2),
             0x90: (op._rel, op._BCC, 2), 0xB0: (op._rel, op._BCS, 2),
             0xD0: (op._rel, op._BNE, 2), 0xF0: (op._rel, op._BEQ, 2)
