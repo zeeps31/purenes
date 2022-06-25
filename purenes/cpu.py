@@ -319,6 +319,25 @@ class CPU(object):
         self.effective_address = hi << 8 | lo
         self.operation_value = self._read(self.effective_address)
 
+    def _aby(self):
+        # Absolute Y-indexed addressing mode. Effective address is operand
+        # incremented by Y with carry.
+        lo: int = self._read(self.pc)
+        self.pc += 1
+
+        hi: int = self._read(self.pc)
+        self.pc += 1
+
+        operand: int = hi << 8 | lo
+
+        self.effective_address = operand + self.y
+
+        # Check if page cross occurred. If so, add an extra cycle
+        if (self.effective_address & 0xFF00) != (operand & 0xFF00):
+            self.remaining_cycles += 1
+
+        self.operation_value = self._read(self.effective_address)
+
     def _imm(self):
         # Immediate addressing mode. Operand and operation value is byte BB
         # (#$BB).
@@ -544,11 +563,11 @@ class CPU(object):
             0x0E: (op._abs, op._ASL, 6), 0x10: (op._rel, op._BPL, 2),
             0x11: (op._izy, op._ORA, 5), 0x15: (op._zpx, op._ORA, 4),
             0x16: (op._zpx, op._ASL, 6), 0x18: (op._imp, op._CLC, 2),
-            0x30: (op._rel, op._BMI, 2), 0x38: (op._imp, op._SEC, 2),
-            0x50: (op._rel, op._BVC, 2), 0x58: (op._imp, op._CLI, 2),
-            0x70: (op._rel, op._BVS, 2), 0x78: (op._imp, op._SEI, 2),
-            0x90: (op._rel, op._BCC, 2), 0xB0: (op._rel, op._BCS, 2),
-            0xB8: (op._imp, op._CLV, 2), 0xD0: (op._rel, op._BNE, 2),
-            0xD8: (op._imp, op._CLD, 2), 0xF0: (op._rel, op._BEQ, 2),
-            0xF8: (op._imp, op._SED, 2),
+            0x19: (op._aby, op._ORA, 4), 0x30: (op._rel, op._BMI, 2),
+            0x38: (op._imp, op._SEC, 2), 0x50: (op._rel, op._BVC, 2),
+            0x58: (op._imp, op._CLI, 2), 0x70: (op._rel, op._BVS, 2),
+            0x78: (op._imp, op._SEI, 2), 0x90: (op._rel, op._BCC, 2),
+            0xB0: (op._rel, op._BCS, 2), 0xB8: (op._imp, op._CLV, 2),
+            0xD0: (op._rel, op._BNE, 2), 0xD8: (op._imp, op._CLD, 2),
+            0xF0: (op._rel, op._BEQ, 2), 0xF8: (op._imp, op._SED, 2),
         }

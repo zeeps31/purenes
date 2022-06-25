@@ -355,6 +355,7 @@ def test_BRK(
         (0x09, 0x00, 0x01, 0, 0, 2),
         (0x0D, 0x00, 0x01, 0, 0, 4),
         (0x15, 0x00, 0x01, 0, 0, 4),
+        (0x19, 0x00, 0x01, 0, 0, 4),
         (0x01, 0x00, 0x00, 0, 1, 6),
         (0x01, 0x00, 0x81, 1, 0, 6),
     ],
@@ -364,6 +365,7 @@ def test_BRK(
         "executes_successfully_using_opcode_0x09",
         "executes_successfully_using_opcode_0x0D",
         "executes_successfully_using_opcode_0x15",
+        "executes_successfully_using_opcode_0x19",
         "sets_the_zero_flag_when_the_result_is_zero",
         "sets_the_negative_flag_if_the_result_exceeds_the_signed_8_bit_maximum"
     ]
