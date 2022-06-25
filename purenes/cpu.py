@@ -312,6 +312,14 @@ class CPU(object):
 
         self.effective_address = hi << 8 | lo
 
+    def _increment_address_with_carry(self, address: int, increment: int):
+        # Common function to increment a 16-bit address with carry.
+        self.effective_address = address + increment
+
+        # Check if page cross occurred. If so, add an extra cycle
+        if (self.effective_address & 0xFF00) != (address & 0xFF00):
+            self.remaining_cycles += 1
+
     # Addressing Modes
 
     def _acc(self):
@@ -330,11 +338,7 @@ class CPU(object):
         self._read_absolute_address()
         operand: int = self.effective_address
 
-        self.effective_address = operand + self.x
-
-        # Check if page cross occurred. If so, add an extra cycle
-        if (self.effective_address & 0xFF00) != (operand & 0xFF00):
-            self.remaining_cycles += 1
+        self._increment_address_with_carry(operand, self.x)
 
         self.operation_value = self._read(self.effective_address)
 
@@ -344,11 +348,7 @@ class CPU(object):
         self._read_absolute_address()
         operand: int = self.effective_address
 
-        self.effective_address = operand + self.y
-
-        # Check if page cross occurred. If so, add an extra cycle
-        if (self.effective_address & 0xFF00) != (operand & 0xFF00):
-            self.remaining_cycles += 1
+        self._increment_address_with_carry(operand, self.y)
 
         self.operation_value = self._read(self.effective_address)
 
@@ -389,13 +389,7 @@ class CPU(object):
         lo: int = self._read((operand & 0x00FF))
         hi: int = self._read((operand + 1) & 0x00FF)
 
-        self.effective_address = (hi << 8 | lo) + self.y
-
-        # Check if page boundary was crossed (high bytes of effective address
-        # before y offset do not equal high bytes of effective address with y
-        # offset). Add an extra cycle if True.
-        if (self.effective_address & 0xFF00) != (hi << 8):
-            self.remaining_cycles += 1
+        self._increment_address_with_carry((hi << 8 | lo), self.y)
 
         self.operation_value = self._read(self.effective_address)
 
