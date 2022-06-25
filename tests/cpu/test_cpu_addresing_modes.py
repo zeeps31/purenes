@@ -105,14 +105,16 @@ def test_absolute_addressing_mode(
         (0x19, 0x00, 0x02, 0x04, 0x00, 0x0006, 4),
         (0x1D, 0x02, 0x00, 0x04, 0x00, 0x0006, 4),
         (0x19, 0x00, 0x01, 0xFF, 0x00, 0x0100, 5),
+        (0x1D, 0x01, 0x00, 0xFF, 0x00, 0x0100, 5),
     ],
     ids=[
         "executes_successfully_using_opcode_0x19",
         "executes_successfully_using_opcode_0x1D",
-        "adds_an_extra_cycle_if_a_page_boundary_is_crossed"
+        "adds_an_extra_cycle_if_a_page_boundary_is_crossed_y",
+        "adds_an_extra_cycle_if_a_page_boundary_is_crossed_x"
     ]
 )
-def test_indexed_absolute_addressing_mode(
+def test_indexed_absolute_addressing_modes(
         cpu: purenes.cpu.CPU,
         mock_cpu_bus: mock.Mock,
         mocker: pytest_mock.MockFixture,
