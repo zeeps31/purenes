@@ -130,8 +130,8 @@ def test_y_indexed_absolute_addressing_mode(
     Verifies the following:
 
     1. The addressing mode is mapped to the correct opcode.
-    2. The low and high bytes of the absolute effective address are read in
-       order of low to high.
+    2. The low and high bytes of the absolute address are read in order of low
+       to high.
     3. The effective address is formed correctly using operand + y
     4. An extra cycle is added if a page boundary is crossed.
     """
