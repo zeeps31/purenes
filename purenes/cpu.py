@@ -301,6 +301,17 @@ class CPU(object):
 
         self.pc = self.effective_address
 
+    def _read_absolute_address(self):
+        # Common function used by absolute addressing modes to read an absolute
+        # address. Sets the effective address to absolute address.
+        lo: int = self._read(self.pc)
+        self.pc += 1
+
+        hi: int = self._read(self.pc)
+        self.pc += 1
+
+        self.effective_address = hi << 8 | lo
+
     # Addressing Modes
 
     def _acc(self):
@@ -310,25 +321,14 @@ class CPU(object):
 
     def _abs(self):
         # Absolute addressing mode. Operand is address $HHLL.
-        lo: int = self._read(self.pc)
-        self.pc += 1
-
-        hi: int = self._read(self.pc)
-        self.pc += 1
-
-        self.effective_address = hi << 8 | lo
+        self._read_absolute_address()
         self.operation_value = self._read(self.effective_address)
 
     def _aby(self):
         # Absolute Y-indexed addressing mode. Effective address is operand
         # incremented by Y with carry.
-        lo: int = self._read(self.pc)
-        self.pc += 1
-
-        hi: int = self._read(self.pc)
-        self.pc += 1
-
-        operand: int = hi << 8 | lo
+        self._read_absolute_address()
+        operand: int = self.effective_address
 
         self.effective_address = operand + self.y
 
