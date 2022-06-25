@@ -496,6 +496,17 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effective_address</span>
 
+    <span class="k">def</span> <span class="nf">_read_absolute_address</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Common function used by absolute addressing modes to read an absolute</span>
+        <span class="c1"># address. Sets the effective address to absolute address.</span>
+        <span class="n">lo</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">hi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">effective_address</span> <span class="o">=</span> <span class="n">hi</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span> <span class="o">|</span> <span class="n">lo</span>
+
     <span class="c1"># Addressing Modes</span>
 
     <span class="k">def</span> <span class="nf">_acc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -505,25 +516,14 @@
 
     <span class="k">def</span> <span class="nf">_abs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Absolute addressing mode. Operand is address $HHLL.</span>
-        <span class="n">lo</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pc</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">+=</span> <span class="mi">1</span>
-
-        <span class="n">hi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pc</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">+=</span> <span class="mi">1</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">effective_address</span> <span class="o">=</span> <span class="n">hi</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span> <span class="o">|</span> <span class="n">lo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_read_absolute_address</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effective_address</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_aby</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Absolute Y-indexed addressing mode. Effective address is operand</span>
         <span class="c1"># incremented by Y with carry.</span>
-        <span class="n">lo</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pc</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">+=</span> <span class="mi">1</span>
-
-        <span class="n">hi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pc</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">+=</span> <span class="mi">1</span>
-
-        <span class="n">operand</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">hi</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span> <span class="o">|</span> <span class="n">lo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_read_absolute_address</span><span class="p">()</span>
+        <span class="n">operand</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effective_address</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">effective_address</span> <span class="o">=</span> <span class="n">operand</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
 
