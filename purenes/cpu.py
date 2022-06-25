@@ -452,6 +452,18 @@ class CPU(object):
         # Clear overflow flag
         self.status.flags.overflow = 0
 
+    def _SEC(self):
+        # Set carry flag
+        self.status.flags.carry = 1
+
+    def _SED(self):
+        # Set decimal flag
+        self.status.flags.decimal = 1
+
+    def _SEI(self):
+        # Set interrupt disable
+        self.status.flags.interrupt_disable = 1
+
     # Conditional Branch Instructions
 
     def _BCC(self):
@@ -532,9 +544,11 @@ class CPU(object):
             0x0E: (op._abs, op._ASL, 6), 0x10: (op._rel, op._BPL, 2),
             0x11: (op._izy, op._ORA, 5), 0x15: (op._zpx, op._ORA, 4),
             0x16: (op._zpx, op._ASL, 6), 0x18: (op._imp, op._CLC, 2),
-            0x30: (op._rel, op._BMI, 2), 0x50: (op._rel, op._BVC, 2),
-            0x58: (op._imp, op._CLI, 2), 0x70: (op._rel, op._BVS, 2),
+            0x30: (op._rel, op._BMI, 2), 0x38: (op._imp, op._SEC, 2),
+            0x50: (op._rel, op._BVC, 2), 0x58: (op._imp, op._CLI, 2),
+            0x70: (op._rel, op._BVS, 2), 0x78: (op._imp, op._SEI, 2),
             0x90: (op._rel, op._BCC, 2), 0xB0: (op._rel, op._BCS, 2),
             0xB8: (op._imp, op._CLV, 2), 0xD0: (op._rel, op._BNE, 2),
-            0xD8: (op._imp, op._CLD, 2), 0xF0: (op._rel, op._BEQ, 2)
+            0xD8: (op._imp, op._CLD, 2), 0xF0: (op._rel, op._BEQ, 2),
+            0xF8: (op._imp, op._SED, 2),
         }
