@@ -99,28 +99,33 @@ def test_absolute_addressing_mode(
 
 
 @pytest.mark.parametrize(
-    "opcode, y_value, value_address_lo, value_address_hi, effective_address, "
-    "cycle_count",
+    "opcode, x_value, y_value, value_address_lo, value_address_hi, "
+    "effective_address, cycle_count",
     [
-        (0x19, 0x02, 0x04, 0x00, 0x0006, 4),
-        (0x19, 0x01, 0xFF, 0x00, 0x0100, 5),
+        (0x19, 0x00, 0x02, 0x04, 0x00, 0x0006, 4),
+        (0x1D, 0x02, 0x00, 0x04, 0x00, 0x0006, 4),
+        (0x19, 0x00, 0x01, 0xFF, 0x00, 0x0100, 5),
+        (0x1D, 0x01, 0x00, 0xFF, 0x00, 0x0100, 5),
     ],
     ids=[
         "executes_successfully_using_opcode_0x19",
-        "adds_an_extra_cycle_if_a_page_boundary_is_crossed"
+        "executes_successfully_using_opcode_0x1D",
+        "adds_an_extra_cycle_if_a_page_boundary_is_crossed_y",
+        "adds_an_extra_cycle_if_a_page_boundary_is_crossed_x"
     ]
 )
-def test_y_indexed_absolute_addressing_mode(
+def test_indexed_absolute_addressing_modes(
         cpu: purenes.cpu.CPU,
         mock_cpu_bus: mock.Mock,
         mocker: pytest_mock.MockFixture,
         opcode: int,
+        x_value: int,
         y_value: int,
         value_address_lo: int,
         value_address_hi: int,
         effective_address: int,
         cycle_count: int):
-    """Tests Y-indexed absolute addressing mode.
+    """Tests X and Y indexed absolute addressing mode.
 
     Note:
         Because this addressing mode has the ability to add an extra
@@ -132,13 +137,14 @@ def test_y_indexed_absolute_addressing_mode(
     1. The addressing mode is mapped to the correct opcode.
     2. The low and high bytes of the absolute address are read in order of low
        to high.
-    3. The effective address is formed correctly using operand + y
+    3. The effective address is formed correctly using operand + y or x
     4. An extra cycle is added if a page boundary is crossed.
     """
     # Patch out the execution of the operation
     mocker.patch.object(cpu, "_execute_operation")
 
     cpu.pc = 0x0000
+    cpu.x = x_value
     cpu.y = y_value
 
     operation_value: int = 0x00

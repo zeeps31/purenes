@@ -13,6 +13,7 @@ import purenes.cpu
         (0x06, 0x10, 0x0000, 0, 0, 0, 5),
         (0x0E, 0x10, 0x0000, 0, 0, 0, 6),
         (0x16, 0x10, 0x0000, 0, 0, 0, 6),
+        (0x1E, 0x10, 0x0000, 0, 0, 0, 7),
         (0x06, 0x81, 0x0000, 1, 0, 0, 5),
         (0x06, 0xFF, 0x0000, 1, 1, 0, 5),
         (0x06, 0x00, 0x0000, 0, 0, 1, 5),
@@ -21,6 +22,7 @@ import purenes.cpu
         "executes_successfully_using_opcode_0x06",
         "executes_successfully_using_opcode_0x0E",
         "executes_successfully_using_opcode_0x16",
+        "executes_successfully_using_opcode_0x1E",
         "sets_the_carry_flag_under_the_correct_conditions",
         "sets_the_negative_flag_under_the_correct_conditions",
         "sets_the_zero_flag_under_the_correct_conditions",
@@ -356,6 +358,7 @@ def test_BRK(
         (0x0D, 0x00, 0x01, 0, 0, 4),
         (0x15, 0x00, 0x01, 0, 0, 4),
         (0x19, 0x00, 0x01, 0, 0, 4),
+        (0x1D, 0x00, 0x01, 0, 0, 4),
         (0x01, 0x00, 0x00, 0, 1, 6),
         (0x01, 0x00, 0x81, 1, 0, 6),
     ],
@@ -366,6 +369,7 @@ def test_BRK(
         "executes_successfully_using_opcode_0x0D",
         "executes_successfully_using_opcode_0x15",
         "executes_successfully_using_opcode_0x19",
+        "executes_successfully_using_opcode_0x1D",
         "sets_the_zero_flag_when_the_result_is_zero",
         "sets_the_negative_flag_if_the_result_exceeds_the_signed_8_bit_maximum"
     ]

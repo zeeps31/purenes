@@ -324,6 +324,20 @@ class CPU(object):
         self._read_absolute_address()
         self.operation_value = self._read(self.effective_address)
 
+    def _abx(self):
+        # Absolute X-indexed addressing mode. Effective address is operand
+        # incremented by X with carry.
+        self._read_absolute_address()
+        operand: int = self.effective_address
+
+        self.effective_address = operand + self.x
+
+        # Check if page cross occurred. If so, add an extra cycle
+        if (self.effective_address & 0xFF00) != (operand & 0xFF00):
+            self.remaining_cycles += 1
+
+        self.operation_value = self._read(self.effective_address)
+
     def _aby(self):
         # Absolute Y-indexed addressing mode. Effective address is operand
         # incremented by Y with carry.
@@ -563,7 +577,8 @@ class CPU(object):
             0x0E: (op._abs, op._ASL, 6), 0x10: (op._rel, op._BPL, 2),
             0x11: (op._izy, op._ORA, 5), 0x15: (op._zpx, op._ORA, 4),
             0x16: (op._zpx, op._ASL, 6), 0x18: (op._imp, op._CLC, 2),
-            0x19: (op._aby, op._ORA, 4), 0x30: (op._rel, op._BMI, 2),
+            0x19: (op._aby, op._ORA, 4), 0x1D: (op._abx, op._ORA, 4),
+            0x1E: (op._abx, op._ASL, 7), 0x30: (op._rel, op._BMI, 2),
             0x38: (op._imp, op._SEC, 2), 0x50: (op._rel, op._BVC, 2),
             0x58: (op._imp, op._CLI, 2), 0x70: (op._rel, op._BVS, 2),
             0x78: (op._imp, op._SEI, 2), 0x90: (op._rel, op._BCC, 2),
