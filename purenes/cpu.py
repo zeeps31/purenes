@@ -433,6 +433,13 @@ class CPU(object):
 
     # Logical Operations
 
+    def _AND(self):
+        # And with the accumulator
+        self.a &= self.operation_value
+
+        self.status.flags.negative = (self.a & 0x80) != 0
+        self.status.flags.zero = self.a == 0x00
+
     def _ORA(self):
         # OR with the accumulator.
         self.a |= self.operation_value
@@ -572,8 +579,12 @@ class CPU(object):
             0x11: (op._izy, op._ORA, 5), 0x15: (op._zpx, op._ORA, 4),
             0x16: (op._zpx, op._ASL, 6), 0x18: (op._imp, op._CLC, 2),
             0x19: (op._aby, op._ORA, 4), 0x1D: (op._abx, op._ORA, 4),
-            0x1E: (op._abx, op._ASL, 7), 0x30: (op._rel, op._BMI, 2),
-            0x38: (op._imp, op._SEC, 2), 0x50: (op._rel, op._BVC, 2),
+            0x1E: (op._abx, op._ASL, 7), 0x21: (op._izx, op._AND, 6),
+            0x25: (op._zpg, op._AND, 3), 0x29: (op._imm, op._AND, 2),
+            0x2D: (op._abs, op._AND, 4), 0x30: (op._rel, op._BMI, 2),
+            0x31: (op._izy, op._AND, 5), 0x35: (op._zpx, op._AND, 4),
+            0x38: (op._imp, op._SEC, 2), 0x39: (op._aby, op._AND, 4),
+            0x3D: (op._abx, op._AND, 4), 0x50: (op._rel, op._BVC, 2),
             0x58: (op._imp, op._CLI, 2), 0x70: (op._rel, op._BVS, 2),
             0x78: (op._imp, op._SEI, 2), 0x90: (op._rel, op._BCC, 2),
             0xB0: (op._rel, op._BCS, 2), 0xB8: (op._imp, op._CLV, 2),
