@@ -485,6 +485,15 @@
         <span class="c1"># Perform the current operation.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_operation</span><span class="p">()</span>
 
+    <span class="c1"># Private utility methods</span>
+
+    <span class="k">def</span> <span class="nf">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Push a value to the stack. The stack is implemented at addresses</span>
+        <span class="c1"># $0100 - $01FF and is a LIFO stack. A push to the stack decrements the</span>
+        <span class="c1"># stack pointer by 1.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="mh">0x0100</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">-=</span> <span class="mi">1</span>
+
     <span class="k">def</span> <span class="nf">_execute_branch_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Common function to execute branching instructions.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">remaining_cycles</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -514,6 +523,14 @@
         <span class="c1"># Check if page cross occurred. If so, add an extra cycle</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effective_address</span> <span class="o">&amp;</span> <span class="mh">0xFF00</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">address</span> <span class="o">&amp;</span> <span class="mh">0xFF00</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">remaining_cycles</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">_set_negative_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="c1"># Set the negative flag if the two's complement MSB is 1.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">negative</span> <span class="o">=</span> <span class="p">(</span><span class="n">value</span> <span class="o">&amp;</span> <span class="mh">0x80</span><span class="p">)</span> <span class="o">!=</span> <span class="mh">0x00</span>
+
+    <span class="k">def</span> <span class="nf">_set_zero_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="c1"># Sets the zero flag if the result of an operation is 0.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">zero</span> <span class="o">=</span> <span class="n">value</span> <span class="o">==</span> <span class="mh">0x00</span>
 
     <span class="c1"># Addressing Modes</span>
 
@@ -632,16 +649,15 @@
         <span class="c1"># And with the accumulator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">&amp;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">negative</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">&amp;</span> <span class="mh">0x80</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">zero</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">==</span> <span class="mh">0x00</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_negative_flag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_zero_flag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_ORA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># OR with the accumulator.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span>
 
-        <span class="c1"># Sets the negative flag if the two's complement MSB is 1.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">negative</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">&amp;</span> <span class="mh">0x80</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">zero</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">==</span> <span class="mh">0x00</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_negative_flag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_zero_flag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
 
     <span class="c1"># Shift and Rotate Instructions</span>
 
@@ -660,8 +676,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effective_address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">negative</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">&amp;</span> <span class="mh">0x80</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">zero</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">==</span> <span class="mh">0x00</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_negative_flag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_zero_flag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span><span class="p">)</span>
 
     <span class="c1"># Flag Instructions</span>
 
@@ -754,13 +770,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">reg</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_IRQ</span><span class="p">)</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_IRQ</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span>
-
-    <span class="k">def</span> <span class="nf">_push_to_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># Push a value to the stack. The stack is implemented at addresses</span>
-        <span class="c1"># $0100 - $01FF and is a LIFO stack. A push to the stack decrements the</span>
-        <span class="c1"># stack pointer by 1.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="mh">0x0100</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">-=</span> <span class="mi">1</span>
 
     <span class="k">def</span> <span class="nf">_map_operations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Map operations and addressing modes to opcodes.</span>
