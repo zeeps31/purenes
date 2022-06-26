@@ -330,7 +330,7 @@ class CPU(object):
             self.remaining_cycles += 1
 
     def _set_negative_flag(self, value: int):
-        # Set the negative flag if the  two's complement MSB is 1.
+        # Set the negative flag if the two's complement MSB is 1.
         self.status.flags.negative = (value & 0x80) != 0x00
 
     def _set_zero_flag(self, value: int):
