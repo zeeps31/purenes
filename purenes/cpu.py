@@ -290,6 +290,15 @@ class CPU(object):
         # Perform the current operation.
         self._operation()
 
+    # Private utility methods
+
+    def _push_to_stack(self, data: int) -> None:
+        # Push a value to the stack. The stack is implemented at addresses
+        # $0100 - $01FF and is a LIFO stack. A push to the stack decrements the
+        # stack pointer by 1.
+        self._write(0x0100 | self.s, data)
+        self.s -= 1
+
     def _execute_branch_operation(self):
         # Common function to execute branching instructions.
         self.remaining_cycles += 1
@@ -319,6 +328,14 @@ class CPU(object):
         # Check if page cross occurred. If so, add an extra cycle
         if (self.effective_address & 0xFF00) != (address & 0xFF00):
             self.remaining_cycles += 1
+
+    def _set_negative_flag(self, value: int):
+        # Set the negative flag if the two's complement MSB is 1.
+        self.status.flags.negative = (value & 0x80) != 0x00
+
+    def _set_zero_flag(self, value: int):
+        # Sets the zero flag if the result of an operation is 0.
+        self.status.flags.zero = value == 0x00
 
     # Addressing Modes
 
@@ -437,16 +454,15 @@ class CPU(object):
         # And with the accumulator
         self.a &= self.operation_value
 
-        self.status.flags.negative = (self.a & 0x80) != 0
-        self.status.flags.zero = self.a == 0x00
+        self._set_negative_flag(self.a)
+        self._set_zero_flag(self.a)
 
     def _ORA(self):
         # OR with the accumulator.
         self.a |= self.operation_value
 
-        # Sets the negative flag if the two's complement MSB is 1.
-        self.status.flags.negative = (self.a & 0x80) != 0
-        self.status.flags.zero = self.a == 0x00
+        self._set_negative_flag(self.a)
+        self._set_zero_flag(self.a)
 
     # Shift and Rotate Instructions
 
@@ -465,8 +481,8 @@ class CPU(object):
         else:
             self._write(self.effective_address, self.operation_value)
 
-        self.status.flags.negative = (self.operation_value & 0x80) != 0
-        self.status.flags.zero = self.operation_value == 0x00
+        self._set_negative_flag(self.operation_value)
+        self._set_zero_flag(self.operation_value)
 
     # Flag Instructions
 
@@ -559,13 +575,6 @@ class CPU(object):
         self._push_to_stack(self.status.reg)
 
         self.pc = self._read(self._IRQ) | self._read(self._IRQ + 1) << 8
-
-    def _push_to_stack(self, data: int) -> None:
-        # Push a value to the stack. The stack is implemented at addresses
-        # $0100 - $01FF and is a LIFO stack. A push to the stack decrements the
-        # stack pointer by 1.
-        self._write(0x0100 | self.s, data)
-        self.s -= 1
 
     def _map_operations(self) -> None:
         # Map operations and addressing modes to opcodes.
