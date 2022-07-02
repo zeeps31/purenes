@@ -372,10 +372,12 @@ def test_JSR(
 
     1. The JSR operation is mapped to opcode 0x20.
     2. The program counter pushed to the stack is decremented by one.
-    3. The program counter is pushed in order of high, to low bytes.
+    3. The program counter is pushed to the stack in order of high to low
+       bytes.
     4. The stack pointer is decremented by two.
     5. The program counter is equal to the effective address after the
        operation is performed.
+    6. The operation takes 6 clock cycles to complete.
     """
     cpu.pc = program_counter
     cpu.s = 0xFD
