@@ -551,41 +551,45 @@ def test_zero_page_addressing_mode(
 
 
 @pytest.mark.parametrize(
-    "opcode, x_value, operand, effective_address",
+    "opcode, x_value, y_value, operand, effective_address",
     [
-        (0x15, 0x01, 0x00, 0x0001),
-        (0x16, 0x01, 0x00, 0x0001),
-        (0x35, 0x01, 0x00, 0x0001),
-        (0x15, 0x02, 0xFF, 0x0001),
+        (0x15, 0x01, 0x00, 0x00, 0x0001),
+        (0x16, 0x01, 0x00, 0x00, 0x0001),
+        (0x35, 0x01, 0x00, 0x00, 0x0001),
+        (0x96, 0x00, 0x01, 0x00, 0x0001),
+        (0x15, 0x02, 0x00, 0xFF, 0x0001),
     ],
     ids=[
         "executes_successfully_using_opcode_0x15",
         "executes_successfully_using_opcode_0x16",
         "executes_successfully_using_opcode_0x35",
+        "executes_successfully_using_opcode_0x96",
         "wraps_around_when_the_maximum_value_is_reached"
     ]
 )
-def test_zero_page_x_indexed_addressing_mode(
+def test_zero_page_indexed_addressing_mode(
         cpu: purenes.cpu.CPU,
         mock_cpu_bus: mock.Mock,
         mocker: pytest_mock.MockFixture,
         opcode: int,
         x_value: int,
+        y_value: int,
         operand: int,
         effective_address: int):
-    """Tests zero-page x-indexed addressing mode.
+    """Tests zero-page indexed addressing modes (x and y).
 
     Verifies the following:
 
     1. The addressing mode is mapped to the correct opcode.
-    2. The effective address is set to 0x00 + operand + x
+    2. The effective address is set to 0x00 + operand + x or y register
     3. The effective address does not cross pages if the the value of
-       operand + x exceeds the unsigned 8-bit maximum.
+       operand + index exceeds the unsigned 8-bit maximum.
     """
     mocker.patch.object(cpu, "_execute_operation")
 
     cpu.pc = 0x0000
     cpu.x = x_value
+    cpu.y = y_value
     operand: int = operand
 
     mock_cpu_bus.read.side_effect = [

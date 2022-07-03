@@ -456,7 +456,22 @@ class CPU(object):
         self.effective_address = (operand + self.x) & 0x00FF
         self.operation_value = self._read(self.effective_address)
 
+    def _zpy(self):
+        # Zero page Y indexed addressing mode. Address is operand + Y without
+        # carry.
+        operand: int = self._read(self.pc)
+        self.pc += 1
+
+        self.effective_address = (operand + self.y) & 0x00FF
+        self.operation_value = self._read(self.effective_address)
+
     # Operations
+
+    # Transfer Instructions
+
+    def _STX(self):
+        # Store Index X in Memory
+        self._write(self.effective_address, self.x)
 
     # Stack Instructions
 
@@ -635,7 +650,8 @@ class CPU(object):
             0x50: (op._rel, op._BVC, 2), 0x58: (op._imp, op._CLI, 2),
             0x6C: (op._ind, op._JMP, 5), 0x70: (op._rel, op._BVS, 2),
             0x78: (op._imp, op._SEI, 2), 0x90: (op._rel, op._BCC, 2),
-            0xB0: (op._rel, op._BCS, 2), 0xB8: (op._imp, op._CLV, 2),
-            0xD0: (op._rel, op._BNE, 2), 0xD8: (op._imp, op._CLD, 2),
-            0xF0: (op._rel, op._BEQ, 2), 0xF8: (op._imp, op._SED, 2),
+            0x96: (op._zpy, op._STX, 4), 0xB0: (op._rel, op._BCS, 2),
+            0xB8: (op._imp, op._CLV, 2), 0xD0: (op._rel, op._BNE, 2),
+            0xD8: (op._imp, op._CLD, 2), 0xF0: (op._rel, op._BEQ, 2),
+            0xF8: (op._imp, op._SED, 2),
         }

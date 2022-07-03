@@ -294,6 +294,55 @@ def test_branching_operations(
 
 
 @pytest.mark.parametrize(
+    "opcode, effective_address, x_value, expected_value, cycle_count",
+    [
+        (0x96, 0x0000, 0x01, 0x01, 4),  # STX
+    ],
+    ids=[
+        "STX_executes_successfully_using_opcode_0x96",
+    ]
+)
+def test_store_operations(
+        cpu: purenes.cpu.CPU,
+        mock_cpu_bus: mock.Mock,
+        mocker: pytest_mock.MockFixture,
+        opcode: int,
+        effective_address: int,
+        x_value: int,
+        expected_value: int,
+        cycle_count: int):
+    """Test store instructions.
+
+    Common test for all store instructions. The individual values for registers
+    are provided as parameters and validated against the "expected_value"
+    parameter.
+
+    Verifies the following:
+
+    1. The operation is mapped to the correct opcode.
+    2. The operation writes the value being stored to the effective address.
+    3. The operation completes in the expected number of clock cycles.
+    """
+    cpu.effective_address = 0x0000
+    cpu.pc = 0x0000
+    cpu.x = x_value
+
+    mock_cpu_bus.read.return_value = opcode
+    mocker.patch.object(cpu, "_retrieve_operation_value")
+
+    for _ in range(0, cycle_count):
+        cpu.clock()
+
+    calls = [
+        mocker.call.write(effective_address, expected_value)
+    ]
+
+    mock_cpu_bus.assert_has_calls(calls)
+
+    assert cpu.remaining_cycles == 0
+
+
+@pytest.mark.parametrize(
     "opcode, effective_address, program_counter, cycle_count",
     [
         (0x6C, 0x0001, 0x0000, 5),
