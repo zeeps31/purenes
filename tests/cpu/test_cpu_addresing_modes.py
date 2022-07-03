@@ -46,11 +46,13 @@ def test_accumulator_addressing_mode(
     [
         (0x0D, 0x00, 0x01),
         (0x0E, 0x00, 0x01),
+        (0x2C, 0x00, 0x01),
         (0x2D, 0x00, 0x01),
     ],
     ids=[
         "executes_successfully_using_opcode_0x0D",
         "executes_successfully_using_opcode_0x0E",
+        "executes_successfully_using_opcode_0x2C",
         "executes_successfully_using_opcode_0x2D"
     ]
 )
