@@ -347,12 +347,14 @@ def test_store_operations(
     "expected_overflow_flag, expected_zero_flag, expected_cycle_count",
     [
         (0x24, 0xC0, 0x00, 1, 1, 1, 3),
+        (0x2C, 0xC0, 0x00, 1, 1, 1, 4),
         (0x24, 0x80, 0xFF, 1, 0, 0, 3),
         (0x24, 0x40, 0xFF, 0, 1, 0, 3),
         (0x24, 0x00, 0x00, 0, 0, 1, 3),
     ],
     ids=[
         "executes_successfully_using_opcode_0x24",
+        "executes_successfully_using_opcode_0x2C",
         "sets_the_negative_flag_correctly",
         "sets_the_overflow_flag_correctly",
         "sets_the_zero_flag_correctly"
