@@ -629,6 +629,14 @@ class CPU(object):
 
         self.pc = self._read(self._IRQ) | self._read(self._IRQ + 1) << 8
 
+    # Other
+
+    def _BIT(self):
+        # Test Bits in Memory with Accumulator
+        self.status.flags.negative = self.operation_value >> 7
+        self.status.flags.overflow = (self.operation_value >> 6) & 0x01
+        self.status.flags.zero = (self.operation_value & self.a) == 0
+
     def _map_operations(self) -> None:
         # Map operations and addressing modes to opcodes.
         op = self
@@ -642,16 +650,16 @@ class CPU(object):
             0x16: (op._zpx, op._ASL, 6), 0x18: (op._imp, op._CLC, 2),
             0x19: (op._aby, op._ORA, 4), 0x1D: (op._abx, op._ORA, 4),
             0x1E: (op._abx, op._ASL, 7), 0x20: (op._abs, op._JSR, 6),
-            0x21: (op._izx, op._AND, 6), 0x25: (op._zpg, op._AND, 3),
-            0x29: (op._imm, op._AND, 2), 0x2D: (op._abs, op._AND, 4),
-            0x30: (op._rel, op._BMI, 2), 0x31: (op._izy, op._AND, 5),
-            0x35: (op._zpx, op._AND, 4), 0x38: (op._imp, op._SEC, 2),
-            0x39: (op._aby, op._AND, 4), 0x3D: (op._abx, op._AND, 4),
-            0x50: (op._rel, op._BVC, 2), 0x58: (op._imp, op._CLI, 2),
-            0x6C: (op._ind, op._JMP, 5), 0x70: (op._rel, op._BVS, 2),
-            0x78: (op._imp, op._SEI, 2), 0x90: (op._rel, op._BCC, 2),
-            0x96: (op._zpy, op._STX, 4), 0xB0: (op._rel, op._BCS, 2),
-            0xB8: (op._imp, op._CLV, 2), 0xD0: (op._rel, op._BNE, 2),
-            0xD8: (op._imp, op._CLD, 2), 0xF0: (op._rel, op._BEQ, 2),
-            0xF8: (op._imp, op._SED, 2),
+            0x21: (op._izx, op._AND, 6), 0x24: (op._zpg, op._BIT, 3),
+            0x25: (op._zpg, op._AND, 3), 0x29: (op._imm, op._AND, 2),
+            0x2D: (op._abs, op._AND, 4), 0x30: (op._rel, op._BMI, 2),
+            0x31: (op._izy, op._AND, 5), 0x35: (op._zpx, op._AND, 4),
+            0x38: (op._imp, op._SEC, 2), 0x39: (op._aby, op._AND, 4),
+            0x3D: (op._abx, op._AND, 4), 0x50: (op._rel, op._BVC, 2),
+            0x58: (op._imp, op._CLI, 2), 0x6C: (op._ind, op._JMP, 5),
+            0x70: (op._rel, op._BVS, 2), 0x78: (op._imp, op._SEI, 2),
+            0x90: (op._rel, op._BCC, 2), 0x96: (op._zpy, op._STX, 4),
+            0xB0: (op._rel, op._BCS, 2), 0xB8: (op._imp, op._CLV, 2),
+            0xD0: (op._rel, op._BNE, 2), 0xD8: (op._imp, op._CLD, 2),
+            0xF0: (op._rel, op._BEQ, 2), 0xF8: (op._imp, op._SED, 2),
         }
