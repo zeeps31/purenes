@@ -228,6 +228,72 @@ def test_immediate_addressing_mode(
 
 
 @pytest.mark.parametrize(
+    "opcode, indirect_address_lo, indirect_address_hi, "
+    "expected_indirect_address_lo, expected_indirect_address_hi,"
+    "effective_address_lo, effective_address_hi",
+    [
+        (0x6C, 0x00, 0xFF, 0xFF00, 0xFF01, 0xFF, 0x00),
+        (0x6C, 0xFF, 0x00, 0x00FF, 0x0000, 0xFF, 0xFF),
+    ],
+    ids=[
+        "executes_successfully_using_opcode_0x6C",
+        "emulates_6502_page_boundary_hardware_bug"
+    ]
+)
+def test_indirect_addressing_mode(
+        cpu: purenes.cpu.CPU,
+        mock_cpu_bus: mock.Mock,
+        mocker: pytest_mock.MockFixture,
+        opcode: int,
+        indirect_address_lo: int,
+        indirect_address_hi: int,
+        expected_indirect_address_lo: int,
+        expected_indirect_address_hi: int,
+        effective_address_lo: int,
+        effective_address_hi: int):
+    """Tests indirect addressing mode.
+
+    Verifies the following
+
+    1. The addressing mode is mapped to the correct opcode.
+    2. The indirect absolute address is read in order of low to high bytes.
+    3. The effective address is retrieved in order of low to high using the
+       indirect address and the indirect_address + 1.
+    4. The (indirect_address + 1) does not cross page boundaries if the low
+       byte is 0xFF. This is a bug in the 6502 processor and recognized by
+       this emulator.
+    """
+    # Patch out the execution of the operation
+    mocker.patch.object(cpu, "_execute_operation")
+
+    cpu.pc = 0x0000
+    effective_address: int = effective_address_hi << 8 | effective_address_lo
+
+    mock_cpu_bus.read.side_effect = [
+        opcode,
+        indirect_address_lo,
+        indirect_address_hi,
+        effective_address_lo,
+        effective_address_hi,
+    ]
+
+    cpu.clock()
+
+    calls = [
+        mocker.call.read(0x0000),  # First PC read, retrieve opcode
+        mocker.call.read(0x0001),  # PC + 1, get ind address lo
+        mocker.call.read(0x0002),  # PC + 2, get ind address hi
+        # Get high and low bytes of effective address from indirect address
+        mocker.call.read(expected_indirect_address_lo),
+        mocker.call.read(expected_indirect_address_hi)
+    ]
+
+    mock_cpu_bus.assert_has_calls(calls)
+
+    assert cpu.effective_address == effective_address
+
+
+@pytest.mark.parametrize(
     "opcode, operand, x_value, value_address_lo, value_address_hi",
     [
         (0x01, 0x00, 0x02, 0x04, 0x00),

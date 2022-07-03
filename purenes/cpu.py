@@ -311,7 +311,7 @@ class CPU(object):
         self.pc = self.effective_address
 
     def _read_absolute_address(self):
-        # Common function used by absolute addressing modes to read an absolute
+        # Common function used by addressing modes to read a 16-bit absolute
         # address. Sets the effective address to absolute address.
         lo: int = self._read(self.pc)
         self.pc += 1
@@ -379,6 +379,24 @@ class CPU(object):
         # Implied addressing mode. In this mode the operand is implied by the
         # operation.
         return
+
+    def _ind(self):
+        # Indirect addressing mode. Operand is address; effective address is
+        # contents of word at address.
+        self._read_absolute_address()
+
+        # Denote this is a "pointer" to the effective address for readability.
+        address: int = self.effective_address
+
+        lo: int = self._read(address)
+        # Emulate hardware bug in 6502 processor that wraps the low byte of the
+        # address around upon a page boundary cross.
+        if ((address + 1) & 0xFF00) != address & 0xFF00:
+            hi: int = self._read(address & 0xFF00)
+        else:
+            hi: int = self._read(address + 1)
+
+        self.effective_address = hi << 8 | lo
 
     def _izx(self):
         # X-indexed indirect addressing mode.
@@ -558,6 +576,10 @@ class CPU(object):
 
     # Jumps & Subroutines
 
+    def _JMP(self):
+        # Jump to a new location.
+        self.pc = self.effective_address
+
     def _JSR(self):
         # Jump to New Location Saving Return Address.
 
@@ -611,9 +633,9 @@ class CPU(object):
             0x35: (op._zpx, op._AND, 4), 0x38: (op._imp, op._SEC, 2),
             0x39: (op._aby, op._AND, 4), 0x3D: (op._abx, op._AND, 4),
             0x50: (op._rel, op._BVC, 2), 0x58: (op._imp, op._CLI, 2),
-            0x70: (op._rel, op._BVS, 2), 0x78: (op._imp, op._SEI, 2),
-            0x90: (op._rel, op._BCC, 2), 0xB0: (op._rel, op._BCS, 2),
-            0xB8: (op._imp, op._CLV, 2), 0xD0: (op._rel, op._BNE, 2),
-            0xD8: (op._imp, op._CLD, 2), 0xF0: (op._rel, op._BEQ, 2),
-            0xF8: (op._imp, op._SED, 2),
+            0x6C: (op._ind, op._JMP, 5), 0x70: (op._rel, op._BVS, 2),
+            0x78: (op._imp, op._SEI, 2), 0x90: (op._rel, op._BCC, 2),
+            0xB0: (op._rel, op._BCS, 2), 0xB8: (op._imp, op._CLV, 2),
+            0xD0: (op._rel, op._BNE, 2), 0xD8: (op._imp, op._CLD, 2),
+            0xF0: (op._rel, op._BEQ, 2), 0xF8: (op._imp, op._SED, 2),
         }

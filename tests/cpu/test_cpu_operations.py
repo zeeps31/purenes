@@ -293,6 +293,46 @@ def test_branching_operations(
     assert cpu.pc == program_counter  # Expected program counter
 
 
+@pytest.mark.parametrize(
+    "opcode, effective_address, program_counter, cycle_count",
+    [
+        (0x6C, 0x0001, 0x0000, 5),
+    ],
+    ids=[
+        "executes_successfully_using_opcode_0x6C",
+    ]
+)
+def test_JMP(
+        cpu: purenes.cpu.CPU,
+        mock_cpu_bus: mock.Mock,
+        mocker: pytest_mock.MockFixture,
+        opcode: int,
+        effective_address: int,
+        program_counter: int,
+        cycle_count: int):
+    """Tests the JMP operation.
+
+    The JMP operation has only one opcode 0x6C.
+
+    Verifies the following:
+
+    1. The JMP operation is mapped to opcode 0x6C.
+    2. The program counter is set to the effective_address.
+    3. The operation completes in 5 clock cycles.
+    """
+    cpu.pc = program_counter
+    cpu.effective_address = effective_address
+
+    mock_cpu_bus.read.return_value = opcode
+    mocker.patch.object(cpu, "_retrieve_operation_value")
+
+    for _ in range(0, cycle_count):
+        cpu.clock()
+
+    assert cpu.remaining_cycles == 0
+    assert cpu.pc == effective_address
+
+
 def test_BRK(
         cpu: purenes.cpu.CPU,
         mock_cpu_bus: mock.Mock,
@@ -323,14 +363,14 @@ def test_BRK(
         cpu.clock()
 
     calls = [
-        mocker.call.read(0x0000),         # PC address
+        mocker.call.read(0x0000),  # PC address
         # Stack writes
         mocker.call.write(0x01FD, 0x00),  # PC high byte pushed to stack
         mocker.call.write(0x01FC, 0x02),  # PC low byte pushed to stack
         mocker.call.write(0x01FB, 0x14),  # Status reg pushed to stack
         # IRQ vector reads
-        mocker.call.read(0xFFFE),         # Interrupt vector low byte address
-        mocker.call.read(0xFFFF),         # Interrupt vector high byte address
+        mocker.call.read(0xFFFE),  # Interrupt vector low byte address
+        mocker.call.read(0xFFFF),  # Interrupt vector high byte address
     ]
 
     mock_cpu_bus.assert_has_calls(calls)
