@@ -363,14 +363,14 @@ def test_BRK(
         cpu.clock()
 
     calls = [
-        mocker.call.read(0x0000),  # PC address
+        mocker.call.read(0x0000),         # PC address
         # Stack writes
         mocker.call.write(0x01FD, 0x00),  # PC high byte pushed to stack
         mocker.call.write(0x01FC, 0x02),  # PC low byte pushed to stack
         mocker.call.write(0x01FB, 0x14),  # Status reg pushed to stack
         # IRQ vector reads
-        mocker.call.read(0xFFFE),  # Interrupt vector low byte address
-        mocker.call.read(0xFFFF),  # Interrupt vector high byte address
+        mocker.call.read(0xFFFE),         # Interrupt vector low byte address
+        mocker.call.read(0xFFFF),         # Interrupt vector high byte address
     ]
 
     mock_cpu_bus.assert_has_calls(calls)
