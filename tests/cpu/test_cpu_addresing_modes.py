@@ -503,11 +503,13 @@ def test_relative_addressing_mode(
     [
         (0x05, 0xFF),
         (0x06, 0xFF),
+        (0x24, 0xFF),
         (0x25, 0xFF)
     ],
     ids=[
         "executes_successfully_using_opcode_0x05",
         "executes_successfully_using_opcode_0x06",
+        "executes_successfully_using_opcode_0x24",
         "executes_successfully_using_opcode_0x25",
     ]
 )
