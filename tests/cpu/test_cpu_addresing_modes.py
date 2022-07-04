@@ -10,9 +10,11 @@ import purenes.cpu
     "opcode, accumulator_value",
     [
         (0x0A, 0xFF),
+        (0x2A, 0xFF),
     ],
     ids=[
         "executes_successfully_using_opcode_0x0A",
+        "executes_successfully_using_opcode_0x2A",
     ]
 )
 def test_accumulator_addressing_mode(
@@ -48,12 +50,14 @@ def test_accumulator_addressing_mode(
         (0x0E, 0x00, 0x01),
         (0x2C, 0x00, 0x01),
         (0x2D, 0x00, 0x01),
+        (0x2E, 0x00, 0x01),
     ],
     ids=[
         "executes_successfully_using_opcode_0x0D",
         "executes_successfully_using_opcode_0x0E",
         "executes_successfully_using_opcode_0x2C",
-        "executes_successfully_using_opcode_0x2D"
+        "executes_successfully_using_opcode_0x2D",
+        "executes_successfully_using_opcode_0x2E"
     ]
 )
 def test_absolute_addressing_mode(
@@ -110,6 +114,7 @@ def test_absolute_addressing_mode(
         (0x1D, 0x02, 0x00, 0x04, 0x00, 0x0006, 4),
         (0x39, 0x00, 0x02, 0x04, 0x00, 0x0006, 4),
         (0x3D, 0x02, 0x00, 0x04, 0x00, 0x0006, 4),
+        (0x3E, 0x02, 0x00, 0x04, 0x00, 0x0006, 7),
         (0x19, 0x00, 0x01, 0xFF, 0x00, 0x0100, 5),
         (0x1D, 0x01, 0x00, 0xFF, 0x00, 0x0100, 5),
     ],
@@ -118,6 +123,7 @@ def test_absolute_addressing_mode(
         "executes_successfully_using_opcode_0x1D",
         "executes_successfully_using_opcode_0x39",
         "executes_successfully_using_opcode_0x3D",
+        "executes_successfully_using_opcode_0x3E",
         "adds_an_extra_cycle_if_a_page_boundary_is_crossed_y",
         "adds_an_extra_cycle_if_a_page_boundary_is_crossed_x"
     ]
@@ -506,13 +512,15 @@ def test_relative_addressing_mode(
         (0x05, 0xFF),
         (0x06, 0xFF),
         (0x24, 0xFF),
-        (0x25, 0xFF)
+        (0x25, 0xFF),
+        (0x26, 0xFF)
     ],
     ids=[
         "executes_successfully_using_opcode_0x05",
         "executes_successfully_using_opcode_0x06",
         "executes_successfully_using_opcode_0x24",
         "executes_successfully_using_opcode_0x25",
+        "executes_successfully_using_opcode_0x26",
     ]
 )
 def test_zero_page_addressing_mode(
@@ -560,6 +568,7 @@ def test_zero_page_addressing_mode(
         (0x15, 0x01, 0x00, 0x00, 0x0001),
         (0x16, 0x01, 0x00, 0x00, 0x0001),
         (0x35, 0x01, 0x00, 0x00, 0x0001),
+        (0x36, 0x01, 0x00, 0x00, 0x0001),
         (0x96, 0x00, 0x01, 0x00, 0x0001),
         (0x15, 0x02, 0x00, 0xFF, 0x0001),
     ],
@@ -567,6 +576,7 @@ def test_zero_page_addressing_mode(
         "executes_successfully_using_opcode_0x15",
         "executes_successfully_using_opcode_0x16",
         "executes_successfully_using_opcode_0x35",
+        "executes_successfully_using_opcode_0x36",
         "executes_successfully_using_opcode_0x96",
         "wraps_around_when_the_maximum_value_is_reached"
     ]
