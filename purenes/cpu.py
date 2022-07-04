@@ -330,12 +330,14 @@ class CPU(object):
             self.remaining_cycles += 1
 
     def _write_operation_result(self, value: int):
-        # Common function to write an operation result back to the appropriate
-        # location based on the addressing mode.
+        # Common function to write an operation result back to a location.
+
+        # If this is accumulator addressing mode write the value back to the
+        # accumulator, otherwise, write to the effective address.
         if self._addressing_mode == self._acc:
-            self.a = self.operation_value
+            self.a = value
         else:
-            self._write(self.effective_address, self.operation_value)
+            self._write(self.effective_address, value)
 
     def _set_negative_flag(self, value: int):
         # Set the negative flag if the two's complement MSB is 1.
@@ -515,16 +517,10 @@ class CPU(object):
         # Arithmetic shift left. Shifts in a zero bit on the right.
 
         # The 7th bit of the operation value is preserved in the carry flag.
-        self.status.flags.carry = (self.operation_value & 0x80) != 0
+        self._set_carry_flag(self.operation_value)
 
         self.operation_value = (self.operation_value << 1) & 0x00FF
-
-        # If this is accumulator addressing mode write the value back to the
-        # accumulator, otherwise, write to the effective address.
-        if self._addressing_mode == self._acc:
-            self.a = self.operation_value
-        else:
-            self._write(self.effective_address, self.operation_value)
+        self._write_operation_result(self.operation_value)
 
         self._set_negative_flag(self.operation_value)
         self._set_zero_flag(self.operation_value)
