@@ -7,28 +7,43 @@ import purenes.cpu
 
 
 @pytest.mark.parametrize(
-    ("opcode, operation_value, effective_address, carry_flag, negative_flag, "
-     "zero_flag, cycle_count"),
+    ("opcode, operation_value, effective_address, carry_flag, "
+     "expected_result, expected_carry_flag, expected_negative_flag, "
+     "expected_zero_flag, expected_cycle_count"),
     [
-        (0x06, 0x10, 0x0000, 0, 0, 0, 5),
-        (0x0E, 0x10, 0x0000, 0, 0, 0, 6),
-        (0x16, 0x10, 0x0000, 0, 0, 0, 6),
-        (0x1E, 0x10, 0x0000, 0, 0, 0, 7),
-        (0x06, 0x81, 0x0000, 1, 0, 0, 5),
-        (0x06, 0xFF, 0x0000, 1, 1, 0, 5),
-        (0x06, 0x00, 0x0000, 0, 0, 1, 5),
+        (0x06, 0x10, 0x0000, 0, 0x20, 0, 0, 0, 5),
+        (0x0E, 0x10, 0x0000, 0, 0x20, 0, 0, 0, 6),
+        (0x16, 0x10, 0x0000, 0, 0x20, 0, 0, 0, 6),
+        (0x1E, 0x10, 0x0000, 0, 0x20, 0, 0, 0, 7),
+        (0x26, 0x80, 0x0000, 1, 0x01, 1, 0, 0, 5),
+        (0x2E, 0x80, 0x0000, 1, 0x01, 1, 0, 0, 6),
+        (0x36, 0x80, 0x0000, 1, 0x01, 1, 0, 0, 6),
+        (0x3E, 0x80, 0x0000, 1, 0x01, 1, 0, 0, 7),
+        (0x06, 0x81, 0x0000, 0, 0x02, 1, 0, 0, 5),
+        (0x06, 0xFF, 0x0000, 0, 0xFE, 1, 1, 0, 5),
+        (0x06, 0x00, 0x0000, 0, 0x00, 0, 0, 1, 5),
+        (0x26, 0x81, 0x0000, 0, 0x02, 1, 0, 0, 5),
+        (0x26, 0x40, 0x0000, 0, 0x80, 0, 1, 0, 5),
+        (0x26, 0x00, 0x0000, 0, 0x00, 0, 0, 1, 5),
     ],
     ids=[
-        "executes_successfully_using_opcode_0x06",
-        "executes_successfully_using_opcode_0x0E",
-        "executes_successfully_using_opcode_0x16",
-        "executes_successfully_using_opcode_0x1E",
-        "sets_the_carry_flag_under_the_correct_conditions",
-        "sets_the_negative_flag_under_the_correct_conditions",
-        "sets_the_zero_flag_under_the_correct_conditions",
+        "ASL_executes_successfully_using_opcode_0x06",
+        "ASL_executes_successfully_using_opcode_0x0E",
+        "ASL_executes_successfully_using_opcode_0x16",
+        "ASL_executes_successfully_using_opcode_0x1E",
+        "ROL_executes_successfully_using_opcode_0x26",
+        "ROL_executes_successfully_using_opcode_0x2E",
+        "ROL_executes_successfully_using_opcode_0x36",
+        "ROL_executes_successfully_using_opcode_0x3E",
+        "ASL_sets_the_carry_flag_under_the_correct_conditions",
+        "ASL_sets_the_negative_flag_under_the_correct_conditions",
+        "ASL_sets_the_zero_flag_under_the_correct_conditions",
+        "ROL_sets_the_carry_flag_under_the_correct_conditions",
+        "ROL_sets_the_negative_flag_under_the_correct_conditions",
+        "ROL_sets_the_zero_flag_under_the_correct_conditions",
     ]
 )
-def test_ASL(
+def test_shift_and_rotate_instructions(
         cpu: purenes.cpu.CPU,
         mock_cpu_bus: mock.Mock,
         mocker: pytest_mock.MockFixture,
@@ -36,75 +51,98 @@ def test_ASL(
         operation_value: int,
         effective_address: int,
         carry_flag: int,
-        negative_flag: int,
-        zero_flag: int,
-        cycle_count: int,
-):
-    """Tests the ASL (Arithmetic Shift Left) operation.
+        expected_result: int,
+        expected_carry_flag: int,
+        expected_negative_flag: int,
+        expected_zero_flag: int,
+        expected_cycle_count: int):
+    """Tests shift and rotate operations.
 
-    Clocks the CPU and verifies that the following actions are performed during
-    the ASL operation.
+    Verifies the following:
 
     1. The operation is mapped to the correct opcode.
-    2. All bits in the operation value are shifted left by one bit and written
-       back to the effective address.
-    3. For operation values where bit 7 is 1, verifies that the value of bit
-       7 is shifted into the carry flag.
-    4. For results where bit 7 is 1 after the operation is performed, verifies
-       that the negative flag is set.
+    2. All bits in the operation value are shifted or rotated as expected and
+       written back to the effective address.
+    3. The carry flag is set under the correct conditions.
+    4. The negative flag is set under the correct conditions.
     5. For results that are zero, verifies the zero flag is set.
+    6. The operation completes in the correct number of clock cycles.
     """
     cpu.pc = 0x0000
+    cpu.status.flags.carry = carry_flag
     cpu.operation_value = operation_value
     cpu.effective_address = effective_address
 
     mock_cpu_bus.read.return_value = opcode
     mocker.patch.object(cpu, "_retrieve_operation_value")
 
-    for _ in range(0, cycle_count):
+    for _ in range(0, expected_cycle_count):
         cpu.clock()
 
     calls = [
-        mocker.call.write(0x0000, (operation_value << 1) & 0x00FF)
+        mocker.call.write(effective_address, expected_result)
     ]
 
     mock_cpu_bus.assert_has_calls(calls)
 
-    assert cpu.status.flags.carry == carry_flag
-    assert cpu.status.flags.negative == negative_flag
-    assert cpu.status.flags.zero == zero_flag
+    assert cpu.status.flags.carry == expected_carry_flag
+    assert cpu.status.flags.negative == expected_negative_flag
+    assert cpu.status.flags.zero == expected_zero_flag
     assert cpu.remaining_cycles == 0
 
 
-def test_ASL_with_accumulator_addressing(
+@pytest.mark.parametrize(
+    ("opcode, accumulator_value, carry_flag, expected_result, "
+     "expected_carry_flag, expected_negative_flag, expected_zero_flag, "
+     "expected_cycle_count"),
+    [
+        (0x0A, 0x10, 0, 0x20, 0, 0, 0, 2),
+        (0x2A, 0x80, 1, 0x01, 1, 0, 0, 2),
+    ],
+    ids=[
+        "ASL_executes_successfully_using_opcode_0x0A",
+        "ROL_executes_successfully_using_opcode_0x2A",
+    ]
+)
+def test_shift_and_rotate_instructions_with_accumulator_addressing(
         cpu: purenes.cpu.CPU,
         mock_cpu_bus: mock.Mock,
-        mocker: pytest_mock.MockFixture
+        mocker: pytest_mock.MockFixture,
+        opcode: int,
+        accumulator_value: int,
+        carry_flag: int,
+        expected_result: int,
+        expected_carry_flag: int,
+        expected_negative_flag: int,
+        expected_zero_flag: int,
+        expected_cycle_count: int
 ):
-    """Tests the ASL (Arithmetic Shift Left) operation using accumulator
-    addressing (opcode 0x0A).
+    """Tests shift and rotate instructions that using accumulator addressing.
 
     Placed in a separate test as the verification steps required warrant a
     separate test.
 
     Verifies the following:
 
-    1. The accumulator is set to the operation value with a zero bit shifted in
-       on the right.
-    2. The operation takes two clock cycles to complete.
+    1. The accumulator is set to the operation value with the correct bit
+       shifted in (left or right)
+    2. The operation completes in the correct number of clock cycles.
     """
     cpu.pc = 0x0000
-    cpu.a = 0x00
-    cpu.operation_value = 0x10
+    cpu.a = accumulator_value
+    cpu.status.flags.carry = carry_flag
+    cpu.operation_value = accumulator_value
 
-    mock_cpu_bus.read.return_value = 0x0A  # Opcode
+    mock_cpu_bus.read.return_value = opcode
     mocker.patch.object(cpu, "_retrieve_operation_value")
 
-    for _ in range(0, 2):
+    for _ in range(0, expected_cycle_count):
         cpu.clock()
 
-    assert cpu.a == 0x20
-    assert cpu.operation_value == 0x20
+    assert cpu.a == expected_result
+    assert cpu.status.flags.carry == expected_carry_flag
+    assert cpu.status.flags.negative == expected_negative_flag
+    assert cpu.status.flags.zero == expected_zero_flag
     assert cpu.remaining_cycles == 0
 
 

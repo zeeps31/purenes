@@ -329,6 +329,14 @@ class CPU(object):
         if (self.effective_address & 0xFF00) != (address & 0xFF00):
             self.remaining_cycles += 1
 
+    def _write_operation_result(self, value: int):
+        # Common function to write an operation result back to the appropriate
+        # location based on the addressing mode.
+        if self._addressing_mode == self._acc:
+            self.a = self.operation_value
+        else:
+            self._write(self.effective_address, self.operation_value)
+
     def _set_negative_flag(self, value: int):
         # Set the negative flag if the two's complement MSB is 1.
         self.status.flags.negative = (value & 0x80) != 0x00
@@ -336,6 +344,10 @@ class CPU(object):
     def _set_zero_flag(self, value: int):
         # Sets the zero flag if the result of an operation is 0.
         self.status.flags.zero = value == 0x00
+
+    def _set_carry_flag(self, value: int):
+        # Sets the carry flag if the MSB of the current value is 1.
+        self.status.flags.carry = (value & 0x80) != 0
 
     # Addressing Modes
 
@@ -517,6 +529,18 @@ class CPU(object):
         self._set_negative_flag(self.operation_value)
         self._set_zero_flag(self.operation_value)
 
+    def _ROL(self):
+        # Rotate One Bit Left (Memory or Accumulator). The Carry is shifted
+        # into bit 0 and the original bit 7 is shifted into the Carry.
+        carry: int = self.status.flags.carry
+        self._set_carry_flag(self.operation_value)
+
+        self.operation_value = (self.operation_value << 1 | carry) & 0x00FF
+        self._write_operation_result(self.operation_value)
+
+        self._set_negative_flag(self.operation_value)
+        self._set_zero_flag(self.operation_value)
+
     # Flag Instructions
 
     def _CLC(self):
@@ -651,16 +675,18 @@ class CPU(object):
             0x19: (op._aby, op._ORA, 4), 0x1D: (op._abx, op._ORA, 4),
             0x1E: (op._abx, op._ASL, 7), 0x20: (op._abs, op._JSR, 6),
             0x21: (op._izx, op._AND, 6), 0x24: (op._zpg, op._BIT, 3),
-            0x25: (op._zpg, op._AND, 3), 0x29: (op._imm, op._AND, 2),
+            0x25: (op._zpg, op._AND, 3), 0x26: (op._zpg, op._ROL, 5),
+            0x29: (op._imm, op._AND, 2), 0x2A: (op._acc, op._ROL, 2),
             0x2C: (op._abs, op._BIT, 4), 0x2D: (op._abs, op._AND, 4),
-            0x30: (op._rel, op._BMI, 2), 0x31: (op._izy, op._AND, 5),
-            0x35: (op._zpx, op._AND, 4), 0x38: (op._imp, op._SEC, 2),
+            0x2E: (op._abs, op._ROL, 6), 0x30: (op._rel, op._BMI, 2),
+            0x31: (op._izy, op._AND, 5), 0x35: (op._zpx, op._AND, 4),
+            0x36: (op._zpx, op._ROL, 6), 0x38: (op._imp, op._SEC, 2),
             0x39: (op._aby, op._AND, 4), 0x3D: (op._abx, op._AND, 4),
-            0x50: (op._rel, op._BVC, 2), 0x58: (op._imp, op._CLI, 2),
-            0x6C: (op._ind, op._JMP, 5), 0x70: (op._rel, op._BVS, 2),
-            0x78: (op._imp, op._SEI, 2), 0x90: (op._rel, op._BCC, 2),
-            0x96: (op._zpy, op._STX, 4), 0xB0: (op._rel, op._BCS, 2),
-            0xB8: (op._imp, op._CLV, 2), 0xD0: (op._rel, op._BNE, 2),
-            0xD8: (op._imp, op._CLD, 2), 0xF0: (op._rel, op._BEQ, 2),
-            0xF8: (op._imp, op._SED, 2),
+            0x3E: (op._abx, op._ROL, 7), 0x50: (op._rel, op._BVC, 2),
+            0x58: (op._imp, op._CLI, 2), 0x6C: (op._ind, op._JMP, 5),
+            0x70: (op._rel, op._BVS, 2), 0x78: (op._imp, op._SEI, 2),
+            0x90: (op._rel, op._BCC, 2), 0x96: (op._zpy, op._STX, 4),
+            0xB0: (op._rel, op._BCS, 2), 0xB8: (op._imp, op._CLV, 2),
+            0xD0: (op._rel, op._BNE, 2), 0xD8: (op._imp, op._CLD, 2),
+            0xF0: (op._rel, op._BEQ, 2), 0xF8: (op._imp, op._SED, 2),
         }
