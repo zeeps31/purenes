@@ -332,6 +332,83 @@ def test_branching_operations(
 
 
 @pytest.mark.parametrize(
+    "opcode, effective_address, operation_value, expected_accumulator_value, "
+    "expected_x_value, expected_y_value, expected_negative_flag, "
+    "expected_zero_flag, expected_cycle_count",
+    [
+        (0xA1, 0x0000, 0x01, 0x01, 0x00, 0x00, 0, 0, 6),  # LDA
+        (0xA5, 0x0000, 0x01, 0x01, 0x00, 0x00, 0, 0, 3),  # LDA
+        (0xA9, 0x0000, 0x01, 0x01, 0x00, 0x00, 0, 0, 2),  # LDA
+        (0xAD, 0x0000, 0x01, 0x01, 0x00, 0x00, 0, 0, 4),  # LDA
+        (0xB1, 0x0000, 0x01, 0x01, 0x00, 0x00, 0, 0, 5),  # LDA
+        (0xB5, 0x0000, 0x01, 0x01, 0x00, 0x00, 0, 0, 4),  # LDA
+        (0xB9, 0x0000, 0x01, 0x01, 0x00, 0x00, 0, 0, 4),  # LDA
+        (0xBD, 0x0000, 0x01, 0x01, 0x00, 0x00, 0, 0, 4),  # LDA
+        (0xA9, 0x0000, 0x80, 0x80, 0x00, 0x00, 1, 0, 2),  # LDA
+        (0xA9, 0x0000, 0x00, 0x00, 0x00, 0x00, 0, 1, 2),  # LDA
+    ],
+    ids=[
+        "LDA_executes_successfully_using_opcode_0xA1",
+        "LDA_executes_successfully_using_opcode_0xA5",
+        "LDA_executes_successfully_using_opcode_0xA9",
+        "LDA_executes_successfully_using_opcode_0xAD",
+        "LDA_executes_successfully_using_opcode_0xB1",
+        "LDA_executes_successfully_using_opcode_0xB5",
+        "LDA_executes_successfully_using_opcode_0xB9",
+        "LDA_executes_successfully_using_opcode_0xBD",
+        "LDA_sets_the_negative_flag_correctly",
+        "LDA_sets_the_zero_flag_correctly",
+    ]
+)
+def test_load_operations(
+        cpu: purenes.cpu.CPU,
+        mock_cpu_bus: mock.Mock,
+        mocker: pytest_mock.MockFixture,
+        opcode: int,
+        effective_address: int,
+        operation_value,
+        expected_accumulator_value: int,
+        expected_x_value: int,
+        expected_y_value,
+        expected_negative_flag: int,
+        expected_zero_flag: int,
+        expected_cycle_count: int):
+    """Test load instructions.
+
+    Common test for all load instructions.
+
+    Verifies the following:
+
+    1. The operation is mapped to the correct opcode.
+    2. The operation loads the operation value stored at the effective address
+       into the correct register
+    3. The zero and negative flags are set under the correct conditions.
+    4. The operation completes in the expected number of clock cycles.
+    """
+    cpu.effective_address = 0x0000
+    cpu.pc = 0x0000
+    cpu.operation_value = operation_value
+    cpu.x = 0x00
+    cpu.y = 0x00
+    cpu.a = 0x00
+    cpu.status.flags.negative = 0
+    cpu.status.flags.zero = 0
+
+    mock_cpu_bus.read.return_value = opcode
+    mocker.patch.object(cpu, "_retrieve_operation_value")
+
+    for _ in range(0, expected_cycle_count):
+        cpu.clock()
+
+    assert cpu.a == expected_accumulator_value
+    assert cpu.x == expected_x_value
+    assert cpu.y == expected_y_value
+    assert cpu.status.flags.negative == expected_negative_flag
+    assert cpu.status.flags.zero == expected_zero_flag
+    assert cpu.remaining_cycles == 0
+
+
+@pytest.mark.parametrize(
     "opcode, effective_address, x_value, y_value, accumulator_value, "
     "expected_value, expected_cycle_count",
     [

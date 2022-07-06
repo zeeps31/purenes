@@ -51,6 +51,7 @@ def test_accumulator_addressing_mode(
         (0x2C, 0x00, 0x01),
         (0x2D, 0x00, 0x01),
         (0x2E, 0x00, 0x01),
+        (0xAD, 0x00, 0x01),
         (0x8C, 0x00, 0x01),
         (0x8D, 0x00, 0x01),
     ],
@@ -60,6 +61,7 @@ def test_accumulator_addressing_mode(
         "executes_successfully_using_opcode_0x2C",
         "executes_successfully_using_opcode_0x2D",
         "executes_successfully_using_opcode_0x2E",
+        "executes_successfully_using_opcode_0xAD",
         "executes_successfully_using_opcode_0x8C",
         "executes_successfully_using_opcode_0x8D"
     ]
@@ -121,6 +123,8 @@ def test_absolute_addressing_mode(
         (0x3E, 0x02, 0x00, 0x04, 0x00, 0x0006, 7),
         (0x99, 0x00, 0x02, 0x04, 0x00, 0x0006, 5),
         (0x9D, 0x02, 0x00, 0x04, 0x00, 0x0006, 5),
+        (0xB9, 0x00, 0x02, 0x04, 0x00, 0x0006, 4),
+        (0xBD, 0x02, 0x00, 0x04, 0x00, 0x0006, 4),
         (0x19, 0x00, 0x01, 0xFF, 0x00, 0x0100, 5),
         (0x1D, 0x01, 0x00, 0xFF, 0x00, 0x0100, 5),
     ],
@@ -132,6 +136,8 @@ def test_absolute_addressing_mode(
         "executes_successfully_using_opcode_0x3E",
         "executes_successfully_using_opcode_0x99",
         "executes_successfully_using_opcode_0x9D",
+        "executes_successfully_using_opcode_0xB9",
+        "executes_successfully_using_opcode_0xBD",
         "adds_an_extra_cycle_if_a_page_boundary_is_crossed_y",
         "adds_an_extra_cycle_if_a_page_boundary_is_crossed_x"
     ]
@@ -200,10 +206,12 @@ def test_indexed_absolute_addressing_modes(
     [
         (0x09, 0xFF),
         (0x29, 0xFF),
+        (0xA9, 0xFF),
     ],
     ids=[
         "executes_successfully_using_opcode_0x09",
         "executes_successfully_using_opcode_0x29",
+        "executes_successfully_using_opcode_0xA9",
     ]
 )
 def test_immediate_addressing_mode(
@@ -315,12 +323,14 @@ def test_indirect_addressing_mode(
         (0x01, 0x00, 0x02, 0x04, 0x00),
         (0x21, 0x00, 0x02, 0x04, 0x00),
         (0x81, 0x00, 0x02, 0x04, 0x00),
+        (0xA1, 0x00, 0x02, 0x04, 0x00),
         (0x01, 0xFF, 0x01, 0x04, 0x00),
     ],
     ids=[
         "executes_successfully_using_opcode_0x01",
         "executes_successfully_using_opcode_0x21",
         "executes_successfully_using_opcode_0x81",
+        "executes_successfully_using_opcode_0xA1",
         "wraps_around_when_the_maximum_value_is_reached"
     ]
 )
@@ -383,6 +393,7 @@ def test_x_indexed_indirect_addressing_mode(
         (0x11, 0x00, 0x02, 0x04, 0x00, 0x0006, 5),
         (0x31, 0x00, 0x02, 0x04, 0x00, 0x0006, 5),
         (0x91, 0x00, 0x02, 0x04, 0x00, 0x0006, 6),
+        (0xB1, 0x00, 0x02, 0x04, 0x00, 0x0006, 5),
         (0x11, 0x00, 0x01, 0xFF, 0x00, 0x0100, 6),
 
     ],
@@ -390,6 +401,7 @@ def test_x_indexed_indirect_addressing_mode(
         "executes_successfully_using_opcode_0x11",
         "executes_successfully_using_opcode_0x31",
         "executes_successfully_using_opcode_0x91",
+        "executes_successfully_using_opcode_0xB1",
         "adds_an_extra_cycle_if_a_page_boundary_is_crossed"
     ]
 )
@@ -527,7 +539,8 @@ def test_relative_addressing_mode(
         (0x25, 0xFF),
         (0x26, 0xFF),
         (0x84, 0xFF),
-        (0x85, 0xFF)
+        (0x85, 0xFF),
+        (0xA5, 0xFF)
     ],
     ids=[
         "executes_successfully_using_opcode_0x05",
@@ -537,6 +550,7 @@ def test_relative_addressing_mode(
         "executes_successfully_using_opcode_0x26",
         "executes_successfully_using_opcode_0x84",
         "executes_successfully_using_opcode_0x85",
+        "executes_successfully_using_opcode_0xA5",
     ]
 )
 def test_zero_page_addressing_mode(
@@ -588,6 +602,7 @@ def test_zero_page_addressing_mode(
         (0x94, 0x01, 0x00, 0x00, 0x0001),
         (0x95, 0x01, 0x00, 0x00, 0x0001),
         (0x96, 0x00, 0x01, 0x00, 0x0001),
+        (0xB5, 0x01, 0x00, 0x00, 0x0001),
         (0x15, 0x02, 0x00, 0xFF, 0x0001),
     ],
     ids=[
@@ -598,6 +613,7 @@ def test_zero_page_addressing_mode(
         "executes_successfully_using_opcode_0x94",
         "executes_successfully_using_opcode_0x95",
         "executes_successfully_using_opcode_0x96",
+        "executes_successfully_using_opcode_0xB5",
         "wraps_around_when_the_maximum_value_is_reached"
     ]
 )
