@@ -335,22 +335,28 @@ def test_branching_operations(
     "opcode, effective_address, x_value, accumulator_value, expected_value, "
     "expected_cycle_count",
     [
-        (0x96, 0x0000, 0x01, 0x00, 0x01, 4),  # STX
         (0x81, 0x0000, 0x00, 0x01, 0x01, 6),  # STA
+        (0x84, 0x0000, 0x00, 0x01, 0x01, 3),  # STY
         (0x85, 0x0000, 0x00, 0x01, 0x01, 3),  # STA
+        (0x8C, 0x0000, 0x00, 0x01, 0x01, 4),  # STA
         (0x8D, 0x0000, 0x00, 0x01, 0x01, 4),  # STA
         (0x91, 0x0000, 0x00, 0x01, 0x01, 6),  # STA
+        (0x94, 0x0000, 0x00, 0x01, 0x01, 4),  # STY
         (0x95, 0x0000, 0x00, 0x01, 0x01, 4),  # STA
+        (0x96, 0x0000, 0x01, 0x00, 0x01, 4),  # STX
         (0x99, 0x0000, 0x00, 0x01, 0x01, 5),  # STA
         (0x9D, 0x0000, 0x00, 0x01, 0x01, 5),  # STA
     ],
     ids=[
-        "STX_executes_successfully_using_opcode_0x96",
         "STA_executes_successfully_using_opcode_0x81",
+        "STA_executes_successfully_using_opcode_0x84",
         "STA_executes_successfully_using_opcode_0x85",
+        "STA_executes_successfully_using_opcode_0x8C",
         "STA_executes_successfully_using_opcode_0x8D",
         "STA_executes_successfully_using_opcode_0x91",
+        "STY_executes_successfully_using_opcode_0x94",
         "STA_executes_successfully_using_opcode_0x95",
+        "STX_executes_successfully_using_opcode_0x96",
         "STA_executes_successfully_using_opcode_0x99",
         "STA_executes_successfully_using_opcode_0x9D",
     ]
