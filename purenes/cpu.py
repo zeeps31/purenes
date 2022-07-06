@@ -483,6 +483,10 @@ class CPU(object):
 
     # Transfer Instructions
 
+    def _STA(self):
+        # Store Accumulator in Memory
+        self._write_operation_result(self.a)
+
     def _STX(self):
         # Store Index X in Memory
         self._write(self.effective_address, self.x)
@@ -681,8 +685,12 @@ class CPU(object):
             0x3E: (op._abx, op._ROL, 7), 0x50: (op._rel, op._BVC, 2),
             0x58: (op._imp, op._CLI, 2), 0x6C: (op._ind, op._JMP, 5),
             0x70: (op._rel, op._BVS, 2), 0x78: (op._imp, op._SEI, 2),
-            0x90: (op._rel, op._BCC, 2), 0x96: (op._zpy, op._STX, 4),
-            0xB0: (op._rel, op._BCS, 2), 0xB8: (op._imp, op._CLV, 2),
-            0xD0: (op._rel, op._BNE, 2), 0xD8: (op._imp, op._CLD, 2),
-            0xF0: (op._rel, op._BEQ, 2), 0xF8: (op._imp, op._SED, 2),
+            0x81: (op._izx, op._STA, 6), 0x85: (op._zpg, op._STA, 3),
+            0x8D: (op._abs, op._STA, 4), 0x90: (op._rel, op._BCC, 2),
+            0x91: (op._izy, op._STA, 6), 0x95: (op._zpx, op._STA, 4),
+            0x96: (op._zpy, op._STX, 4), 0x99: (op._aby, op._STA, 5),
+            0x9D: (op._abx, op._STA, 5), 0xB0: (op._rel, op._BCS, 2),
+            0xB8: (op._imp, op._CLV, 2), 0xD0: (op._rel, op._BNE, 2),
+            0xD8: (op._imp, op._CLD, 2), 0xF0: (op._rel, op._BEQ, 2),
+            0xF8: (op._imp, op._SED, 2),
         }
