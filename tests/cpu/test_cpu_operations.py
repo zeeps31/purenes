@@ -332,12 +332,27 @@ def test_branching_operations(
 
 
 @pytest.mark.parametrize(
-    "opcode, effective_address, x_value, expected_value, cycle_count",
+    "opcode, effective_address, x_value, accumulator_value, expected_value, "
+    "expected_cycle_count",
     [
-        (0x96, 0x0000, 0x01, 0x01, 4),  # STX
+        (0x96, 0x0000, 0x01, 0x00, 0x01, 4),  # STX
+        (0x81, 0x0000, 0x00, 0x01, 0x01, 6),  # STA
+        (0x85, 0x0000, 0x00, 0x01, 0x01, 3),  # STA
+        (0x8D, 0x0000, 0x00, 0x01, 0x01, 4),  # STA
+        (0x91, 0x0000, 0x00, 0x01, 0x01, 6),  # STA
+        (0x95, 0x0000, 0x00, 0x01, 0x01, 4),  # STA
+        (0x99, 0x0000, 0x00, 0x01, 0x01, 5),  # STA
+        (0x9D, 0x0000, 0x00, 0x01, 0x01, 5),  # STA
     ],
     ids=[
         "STX_executes_successfully_using_opcode_0x96",
+        "STA_executes_successfully_using_opcode_0x81",
+        "STA_executes_successfully_using_opcode_0x85",
+        "STA_executes_successfully_using_opcode_0x8D",
+        "STA_executes_successfully_using_opcode_0x91",
+        "STA_executes_successfully_using_opcode_0x95",
+        "STA_executes_successfully_using_opcode_0x99",
+        "STA_executes_successfully_using_opcode_0x9D",
     ]
 )
 def test_store_operations(
@@ -347,8 +362,9 @@ def test_store_operations(
         opcode: int,
         effective_address: int,
         x_value: int,
+        accumulator_value: int,
         expected_value: int,
-        cycle_count: int):
+        expected_cycle_count: int):
     """Test store instructions.
 
     Common test for all store instructions. The individual values for registers
@@ -364,11 +380,12 @@ def test_store_operations(
     cpu.effective_address = 0x0000
     cpu.pc = 0x0000
     cpu.x = x_value
+    cpu.a = accumulator_value
 
     mock_cpu_bus.read.return_value = opcode
     mocker.patch.object(cpu, "_retrieve_operation_value")
 
-    for _ in range(0, cycle_count):
+    for _ in range(0, expected_cycle_count):
         cpu.clock()
 
     calls = [
