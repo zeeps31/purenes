@@ -493,7 +493,7 @@ class CPU(object):
 
     def _STY(self):
         # Store Index Y in Memory
-        self._write_operation_result(self.a)
+        self._write_operation_result(self.y)
 
     # Stack Instructions
 
