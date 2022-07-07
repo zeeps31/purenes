@@ -77,7 +77,7 @@ def test_absolute_addressing_mode(
         opcode: int,
         operand_lo: int,
         operand_hi: int):
-    """Tests accumulator addressing mode.
+    """Tests absolute addressing mode.
 
     Verifies the following:
 
