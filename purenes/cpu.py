@@ -497,6 +497,13 @@ class CPU(object):
         self._set_negative_flag(self.x)
         self._set_zero_flag(self.x)
 
+    def _LDY(self):
+        # Load Index Y with Memory
+        self.y = self.operation_value
+
+        self._set_negative_flag(self.y)
+        self._set_zero_flag(self.y)
+
     def _STA(self):
         # Store Accumulator in Memory
         self._write_operation_result(self.a)
@@ -709,14 +716,16 @@ class CPU(object):
             0x91: (op._izy, op._STA, 6), 0x94: (op._zpx, op._STY, 4),
             0x95: (op._zpx, op._STA, 4), 0x96: (op._zpy, op._STX, 4),
             0x99: (op._aby, op._STA, 5), 0x9D: (op._abx, op._STA, 5),
-            0xA1: (op._izx, op._LDA, 6), 0xA2: (op._imm, op._LDX, 2),
+            0xA0: (op._imm, op._LDY, 2), 0xA1: (op._izx, op._LDA, 6),
+            0xA2: (op._imm, op._LDX, 2), 0xA4: (op._zpg, op._LDY, 3),
             0xA5: (op._zpg, op._LDA, 3), 0xA6: (op._zpg, op._LDX, 3),
-            0xA9: (op._imm, op._LDA, 2), 0xAD: (op._abs, op._LDA, 4),
-            0xAE: (op._abs, op._LDX, 4), 0xB0: (op._rel, op._BCS, 2),
-            0xB1: (op._izy, op._LDA, 5), 0xB5: (op._zpx, op._LDA, 4),
+            0xA9: (op._imm, op._LDA, 2), 0xAC: (op._abs, op._LDY, 4),
+            0xAD: (op._abs, op._LDA, 4), 0xAE: (op._abs, op._LDX, 4),
+            0xB0: (op._rel, op._BCS, 2), 0xB1: (op._izy, op._LDA, 5),
+            0xB4: (op._zpx, op._LDY, 4), 0xB5: (op._zpx, op._LDA, 4),
             0xB6: (op._zpy, op._LDX, 4), 0xB8: (op._imp, op._CLV, 2),
-            0xB9: (op._aby, op._LDA, 4), 0xBD: (op._abx, op._LDA, 4),
-            0xBE: (op._aby, op._LDX, 4), 0xD0: (op._rel, op._BNE, 2),
-            0xD8: (op._imp, op._CLD, 2), 0xF0: (op._rel, op._BEQ, 2),
-            0xF8: (op._imp, op._SED, 2),
+            0xB9: (op._aby, op._LDA, 4), 0xBC: (op._abx, op._LDY, 4),
+            0xBD: (op._abx, op._LDA, 4), 0xBE: (op._aby, op._LDX, 4),
+            0xD0: (op._rel, op._BNE, 2), 0xD8: (op._imp, op._CLD, 2),
+            0xF0: (op._rel, op._BEQ, 2), 0xF8: (op._imp, op._SED, 2),
         }
