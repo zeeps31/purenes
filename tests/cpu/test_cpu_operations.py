@@ -437,6 +437,106 @@ def test_load_operations(
 
 
 @pytest.mark.parametrize(
+    "opcode, accumulator_value, x_value, y_value, stack_pointer, "
+    "expected_accumulator_value, expected_x_value, expected_y_value, "
+    "expected_stack_pointer, expected_negative_flag, expected_zero_flag",
+    [  # OP    A     X     Y     SP    EA    EX    EY    ESP   N  V
+        (0x8A, 0x00, 0x01, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00, 0, 0),  # TXA
+        (0x98, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0, 0),  # TYA
+        (0x9A, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0, 0),  # TXS
+        (0xA8, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0, 0),  # TAY
+        (0xAA, 0x01, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00, 0, 0),  # TAX
+        (0xBA, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0, 0),  # TSX
+        (0x8A, 0x00, 0x80, 0x00, 0x00, 0x80, 0x80, 0x00, 0x00, 1, 0),  # TXA
+        (0x8A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0, 1),  # TXA
+        (0x98, 0x00, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 1, 0),  # TYA
+        (0x98, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0, 1),  # TYA
+        (0xA8, 0x80, 0x00, 0x00, 0x00, 0x80, 0x00, 0x80, 0x00, 1, 0),  # TAY
+        (0xA8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0, 1),  # TAY
+        (0xAA, 0x80, 0x00, 0x00, 0x00, 0x80, 0x80, 0x00, 0x00, 1, 0),  # TAX
+        (0xAA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0, 1),  # TAX
+        (0xBA, 0x00, 0x00, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 1, 0),  # TSX
+        (0xBA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0, 1),  # TSX
+    ],
+    ids=[
+        "TXA_transfers_x_to_accumulator",
+        "TYA_transfers_y_to_accumulator",
+        "TXS_transfers_x_to_stack_pointer",
+        "TAY_transfers_accumulator_to_y",
+        "TAX_transfers_accumulator_to_x",
+        "TSX_transfers_stack_pointer_to_x",
+        "TXA_sets_the_zero_flag_correctly",
+        "TXA_sets_the_negative_flag_correctly",
+        "TYA_sets_the_zero_flag_correctly",
+        "TYA_sets_the_negative_flag_correctly",
+        "TAY_sets_the_negative_flag_correctly",
+        "TAY_sets_the_zero_flag_correctly",
+        "TAX_sets_the_negative_flag_correctly",
+        "TAX_sets_the_zero_flag_correctly",
+        "TSX_sets_the_negative_flag_correctly",
+        "TSX_sets_the_zero_flag_correctly",
+    ]
+)
+def test_transfer_operations(
+        cpu: purenes.cpu.CPU,
+        mock_cpu_bus: mock.Mock,
+        opcode: int,
+        accumulator_value: int,
+        x_value: int,
+        y_value: int,
+        stack_pointer: int,
+        expected_accumulator_value: int,
+        expected_x_value: int,
+        expected_y_value: int,
+        expected_stack_pointer: int,
+        expected_negative_flag: int,
+        expected_zero_flag: int):
+    """Test transfer instructions.
+
+    Common test for all transfer instructions.
+
+    Note:
+        A test to verify the negative and zero flags are set correctly in the
+        TXS operation is intentionally omitted, as this operation does not set
+        these flags.
+
+    Verifies the following:
+
+    1. The operation is mapped to the correct opcode.
+    2. The operation transfers the operation to the appropriate register.
+    3. The operation sets the zero and negative flags under the correct
+       conditions.
+    4. The operation completes in two clock cycles.
+    """
+    cpu.pc = 0x0000
+
+    cpu.a = accumulator_value
+    cpu.x = x_value
+    cpu.y = y_value
+    cpu.s = stack_pointer
+
+    cpu.status.flags.negative = 0
+    cpu.status.flags.zero = 0
+
+    mock_cpu_bus.read.return_value = opcode
+
+    # All transfer instructions use implied addressing and complete in two
+    # clock cycles.
+    for _ in range(0, 2):
+        cpu.clock()
+
+    assert cpu.a == expected_accumulator_value
+    assert cpu.x == expected_x_value
+    assert cpu.y == expected_y_value
+    assert cpu.s == expected_stack_pointer
+
+    assert cpu.status.flags.negative == expected_negative_flag
+    assert cpu.status.flags.zero == expected_zero_flag
+
+    assert cpu.remaining_cycles == 0
+
+
+@pytest.mark.parametrize(
     "opcode, effective_address, x_value, y_value, accumulator_value, "
     "expected_value, expected_cycle_count",
     [
