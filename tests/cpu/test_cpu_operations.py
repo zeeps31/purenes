@@ -503,7 +503,7 @@ def test_transfer_operations(
     Verifies the following:
 
     1. The operation is mapped to the correct opcode.
-    2. The operation transfers the operation to the appropriate register.
+    2. The operation transfers the value to the appropriate register.
     3. The operation sets the zero and negative flags under the correct
        conditions.
     4. The operation completes in two clock cycles.
