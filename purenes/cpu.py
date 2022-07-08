@@ -299,6 +299,14 @@ class CPU(object):
         self._write(0x0100 | self.s, data)
         self.s -= 1
 
+    def _pull_from_stack(self) -> int:
+        # Pull a value from the stack. The stack is implemented at addresses
+        # $0100 - $01FF and is a LIFO stack. A pull from the stack increments
+        # the stack pointer by 1.
+        data: int = self._read(0x0100 | self.s)
+        self.s += 1
+        return data
+
     def _execute_branch_operation(self):
         # Common function to execute branching instructions.
         self.remaining_cycles += 1
@@ -557,11 +565,26 @@ class CPU(object):
 
     # Stack Instructions
 
+    def _PHA(self):
+        # Push Accumulator on Stack
+        self._push_to_stack(self.a)
+
     def _PHP(self):
         # Push Processor Status on Stack.
         self.status.flags.brk = 1
         self._push_to_stack(self.status.reg)
         self.status.flags.brk = 0
+
+    def _PLA(self):
+        # Pull Accumulator from Stack
+        self.a = self._pull_from_stack()
+
+        self._set_negative_flag(self.a)
+        self._set_zero_flag(self.a)
+
+    def _PLP(self):
+        # Pull Processor Status from Stack.
+        self.status.reg = self._pull_from_stack()
 
     # Logical Operations
 
@@ -740,34 +763,36 @@ class CPU(object):
             0x1E: (op._abx, op._ASL, 7), 0x20: (op._abs, op._JSR, 6),
             0x21: (op._izx, op._AND, 6), 0x24: (op._zpg, op._BIT, 3),
             0x25: (op._zpg, op._AND, 3), 0x26: (op._zpg, op._ROL, 5),
-            0x29: (op._imm, op._AND, 2), 0x2A: (op._acc, op._ROL, 2),
-            0x2C: (op._abs, op._BIT, 4), 0x2D: (op._abs, op._AND, 4),
-            0x2E: (op._abs, op._ROL, 6), 0x30: (op._rel, op._BMI, 2),
-            0x31: (op._izy, op._AND, 5), 0x35: (op._zpx, op._AND, 4),
-            0x36: (op._zpx, op._ROL, 6), 0x38: (op._imp, op._SEC, 2),
-            0x39: (op._aby, op._AND, 4), 0x3D: (op._abx, op._AND, 4),
-            0x3E: (op._abx, op._ROL, 7), 0x50: (op._rel, op._BVC, 2),
-            0x58: (op._imp, op._CLI, 2), 0x6C: (op._ind, op._JMP, 5),
-            0x70: (op._rel, op._BVS, 2), 0x78: (op._imp, op._SEI, 2),
-            0x81: (op._izx, op._STA, 6), 0x84: (op._zpg, op._STY, 3),
-            0x85: (op._zpg, op._STA, 3), 0x8A: (op._imp, op._TXA, 2),
-            0x8C: (op._abs, op._STY, 4), 0x8D: (op._abs, op._STA, 4),
-            0x90: (op._rel, op._BCC, 2), 0x91: (op._izy, op._STA, 6),
-            0x94: (op._zpx, op._STY, 4), 0x95: (op._zpx, op._STA, 4),
-            0x96: (op._zpy, op._STX, 4), 0x98: (op._imp, op._TYA, 2),
-            0x99: (op._aby, op._STA, 5), 0x9A: (op._imp, op._TXS, 2),
-            0x9D: (op._abx, op._STA, 5), 0xA0: (op._imm, op._LDY, 2),
-            0xA1: (op._izx, op._LDA, 6), 0xA2: (op._imm, op._LDX, 2),
-            0xA4: (op._zpg, op._LDY, 3), 0xA5: (op._zpg, op._LDA, 3),
-            0xA6: (op._zpg, op._LDX, 3), 0xA8: (op._imp, op._TAY, 2),
-            0xA9: (op._imm, op._LDA, 2), 0xAA: (op._imp, op._TAX, 2),
-            0xAC: (op._abs, op._LDY, 4), 0xAD: (op._abs, op._LDA, 4),
-            0xAE: (op._abs, op._LDX, 4), 0xB0: (op._rel, op._BCS, 2),
-            0xB1: (op._izy, op._LDA, 5), 0xB4: (op._zpx, op._LDY, 4),
-            0xB5: (op._zpx, op._LDA, 4), 0xB6: (op._zpy, op._LDX, 4),
-            0xB8: (op._imp, op._CLV, 2), 0xB9: (op._aby, op._LDA, 4),
-            0xBA: (op._imp, op._TSX, 2), 0xBC: (op._abx, op._LDY, 4),
-            0xBD: (op._abx, op._LDA, 4), 0xBE: (op._aby, op._LDX, 4),
-            0xD0: (op._rel, op._BNE, 2), 0xD8: (op._imp, op._CLD, 2),
-            0xF0: (op._rel, op._BEQ, 2), 0xF8: (op._imp, op._SED, 2),
+            0x28: (op._imp, op._PLP, 4), 0x29: (op._imm, op._AND, 2),
+            0x2A: (op._acc, op._ROL, 2), 0x2C: (op._abs, op._BIT, 4),
+            0x2D: (op._abs, op._AND, 4), 0x2E: (op._abs, op._ROL, 6),
+            0x30: (op._rel, op._BMI, 2), 0x31: (op._izy, op._AND, 5),
+            0x35: (op._zpx, op._AND, 4), 0x36: (op._zpx, op._ROL, 6),
+            0x38: (op._imp, op._SEC, 2), 0x39: (op._aby, op._AND, 4),
+            0x3D: (op._abx, op._AND, 4), 0x3E: (op._abx, op._ROL, 7),
+            0x48: (op._imp, op._PHA, 3), 0x50: (op._rel, op._BVC, 2),
+            0x58: (op._imp, op._CLI, 2), 0x68: (op._imp, op._PLA, 4),
+            0x6C: (op._ind, op._JMP, 5), 0x70: (op._rel, op._BVS, 2),
+            0x78: (op._imp, op._SEI, 2), 0x81: (op._izx, op._STA, 6),
+            0x84: (op._zpg, op._STY, 3), 0x85: (op._zpg, op._STA, 3),
+            0x8A: (op._imp, op._TXA, 2), 0x8C: (op._abs, op._STY, 4),
+            0x8D: (op._abs, op._STA, 4), 0x90: (op._rel, op._BCC, 2),
+            0x91: (op._izy, op._STA, 6), 0x94: (op._zpx, op._STY, 4),
+            0x95: (op._zpx, op._STA, 4), 0x96: (op._zpy, op._STX, 4),
+            0x98: (op._imp, op._TYA, 2), 0x99: (op._aby, op._STA, 5),
+            0x9A: (op._imp, op._TXS, 2), 0x9D: (op._abx, op._STA, 5),
+            0xA0: (op._imm, op._LDY, 2), 0xA1: (op._izx, op._LDA, 6),
+            0xA2: (op._imm, op._LDX, 2), 0xA4: (op._zpg, op._LDY, 3),
+            0xA5: (op._zpg, op._LDA, 3), 0xA6: (op._zpg, op._LDX, 3),
+            0xA8: (op._imp, op._TAY, 2), 0xA9: (op._imm, op._LDA, 2),
+            0xAA: (op._imp, op._TAX, 2), 0xAC: (op._abs, op._LDY, 4),
+            0xAD: (op._abs, op._LDA, 4), 0xAE: (op._abs, op._LDX, 4),
+            0xB0: (op._rel, op._BCS, 2), 0xB1: (op._izy, op._LDA, 5),
+            0xB4: (op._zpx, op._LDY, 4), 0xB5: (op._zpx, op._LDA, 4),
+            0xB6: (op._zpy, op._LDX, 4), 0xB8: (op._imp, op._CLV, 2),
+            0xB9: (op._aby, op._LDA, 4), 0xBA: (op._imp, op._TSX, 2),
+            0xBC: (op._abx, op._LDY, 4), 0xBD: (op._abx, op._LDA, 4),
+            0xBE: (op._aby, op._LDX, 4), 0xD0: (op._rel, op._BNE, 2),
+            0xD8: (op._imp, op._CLD, 2), 0xF0: (op._rel, op._BEQ, 2),
+            0xF8: (op._imp, op._SED, 2),
         }
