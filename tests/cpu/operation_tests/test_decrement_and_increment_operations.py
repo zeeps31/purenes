@@ -9,21 +9,33 @@ import purenes.cpu
 @pytest.mark.parametrize(
     "opcode, effective_address, operation_value, expected_result, "
     "expected_negative_flag, expected_zero_flag, expected_cycle_count",
-    [  # OP    EA      OV    ER    EN EV EC
+    [  # OP    EA      OV    ER    EN EZ EC
         (0xC6, 0x0000, 0x02, 0x01, 0, 0, 5),  # DEC
         (0xCE, 0x0000, 0x02, 0x01, 0, 0, 6),  # DEC
         (0xD6, 0x0000, 0x02, 0x01, 0, 0, 6),  # DEC
         (0xDE, 0x0000, 0x02, 0x01, 0, 0, 7),  # DEC
+        (0xE6, 0x0000, 0x00, 0x01, 0, 0, 5),  # INC
+        (0xEE, 0x0000, 0x00, 0x01, 0, 0, 6),  # INC
+        (0xF6, 0x0000, 0x00, 0x01, 0, 0, 6),  # INC
+        (0xFE, 0x0000, 0x00, 0x01, 0, 0, 7),  # INC
         (0xC6, 0x0000, 0x81, 0x80, 1, 0, 5),  # DEC
         (0xC6, 0x0000, 0x01, 0x00, 0, 1, 5),  # DEC
+        (0xE6, 0x0000, 0x7F, 0x80, 1, 0, 5),  # DEC
+        (0xE6, 0x0000, 0xFF, 0x00, 0, 1, 5),  # DEC
     ],
     ids=[
         "DEC_executes_successfully_using_opcode_0xC6",
         "DEC_executes_successfully_using_opcode_0xCE",
         "DEC_executes_successfully_using_opcode_0xD6",
         "DEC_executes_successfully_using_opcode_0xDE",
+        "INC_executes_successfully_using_opcode_0xE6",
+        "INC_executes_successfully_using_opcode_0xEE",
+        "INC_executes_successfully_using_opcode_0xF6",
+        "INC_executes_successfully_using_opcode_0xFE",
         "DEC_sets_the_negative_flag_correctly",
         "DEC_sets_the_zero_flag_correctly",
+        "INC_sets_the_negative_flag_correctly",
+        "INC_sets_the_zero_flag_correctly",
     ]
 )
 def test_memory_increment_decrement_operations(
