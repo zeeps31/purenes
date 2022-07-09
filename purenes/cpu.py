@@ -596,6 +596,15 @@ class CPU(object):
         self._set_negative_flag(self.operation_value)
         self._set_zero_flag(self.operation_value)
 
+    def _INC(self):
+        # Increment Memory by One
+        # TODO: https://github.com/zeeps31/purenes/issues/121
+        self.operation_value = (self.operation_value + 1) & 0xFF
+        self._write_operation_result(self.operation_value)
+
+        self._set_negative_flag(self.operation_value)
+        self._set_zero_flag(self.operation_value)
+
     # Logical Operations
 
     def _AND(self):
@@ -805,6 +814,8 @@ class CPU(object):
             0xBE: (op._aby, op._LDX, 4), 0xC6: (op._zpg, op._DEC, 5),
             0xCE: (op._abs, op._DEC, 6), 0xD0: (op._rel, op._BNE, 2),
             0xD6: (op._zpx, op._DEC, 6), 0xD8: (op._imp, op._CLD, 2),
-            0xDE: (op._abx, op._DEC, 7), 0xF0: (op._rel, op._BEQ, 2),
-            0xF8: (op._imp, op._SED, 2),
+            0xDE: (op._abx, op._DEC, 7), 0xE6: (op._zpg, op._INC, 5),
+            0xEE: (op._abs, op._INC, 6), 0xF0: (op._rel, op._BEQ, 2),
+            0xF6: (op._zpx, op._INC, 6), 0xF8: (op._imp, op._SED, 2),
+            0xFE: (op._abx, op._INC, 7)
         }
