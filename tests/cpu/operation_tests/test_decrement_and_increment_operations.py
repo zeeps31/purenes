@@ -81,3 +81,77 @@ def test_memory_increment_decrement_operations(
     assert cpu.status.flags.zero == expected_zero_flag
 
     assert cpu.remaining_cycles == 0
+
+
+@pytest.mark.parametrize(
+    "opcode, x_value, y_value, expected_x_value, expected_y_value, "
+    "expected_negative_flag, expected_zero_flag",
+    [  # OP    X     Y     EX    EY    EN EZ
+        (0x88, 0x00, 0x02, 0x00, 0x01, 0, 0),  # DEY
+        (0xCA, 0x02, 0x00, 0x01, 0x00, 0, 0),  # DEX
+        (0xE8, 0x00, 0x00, 0x01, 0x00, 0, 0),  # INX
+        (0xC8, 0x00, 0x00, 0x00, 0x01, 0, 0),  # INY
+        (0x88, 0x00, 0x81, 0x00, 0x80, 1, 0),  # DEY
+        (0x88, 0x00, 0x01, 0x00, 0x00, 0, 1),  # DEY
+        (0xCA, 0x81, 0x00, 0x80, 0x00, 1, 0),  # DEX
+        (0xCA, 0x01, 0x00, 0x00, 0x00, 0, 1),  # DEX
+        (0xE8, 0x7F, 0x00, 0x80, 0x00, 1, 0),  # INX
+        (0xE8, 0xFF, 0x00, 0x00, 0x00, 0, 1),  # INX
+        (0xC8, 0x00, 0x7F, 0x00, 0x80, 1, 0),  # INY
+        (0xC8, 0x00, 0xFF, 0x00, 0x00, 0, 1)   # INY
+    ],
+    ids=[
+        "DEY_executes_successfully_using_opcode_0x88",
+        "DEX_executes_successfully_using_opcode_0xCA",
+        "INX_executes_successfully_using_opcode_0xE8",
+        "INY_executes_successfully_using_opcode_0xC8",
+        "DEY_sets_the_negative_flag_correctly",
+        "DEY_sets_the_zero_flag_correctly",
+        "DEX_sets_the_negative_flag_correctly",
+        "DEX_sets_the_zero_flag_correctly",
+        "INX_sets_the_negative_flag_correctly",
+        "INX_sets_the_zero_flag_correctly",
+        "INY_sets_the_negative_flag_correctly",
+        "INY_sets_the_zero_flag_correctly"
+    ]
+)
+def test_memory_increment_decrement_operations(
+        cpu: purenes.cpu.CPU,
+        mock_cpu_bus: mock.Mock,
+        mocker: pytest_mock.MockFixture,
+        opcode: int,
+        x_value: int,
+        y_value: int,
+        expected_x_value: int,
+        expected_y_value: int,
+        expected_negative_flag: int,
+        expected_zero_flag: int):
+    """Tests operations that increment and decrement register values.
+
+    Verifies the following:
+
+    1. The operation is mapped to the correct opcode.
+    2. The operation correctly increments or decrements the register under
+       test.
+    3. The negative and zero flags are set correctly.
+    4. The operation completes in two clock cycles.
+    """
+    cpu.pc = 0x0000
+    cpu.x = x_value
+    cpu.y = y_value
+
+    mock_cpu_bus.read.return_value = opcode
+    mocker.patch.object(cpu, "_retrieve_operation_value")
+
+    # All register decrements and increments use implied addressing and
+    # complete in two clock cycles.
+    for _ in range(0, 2):
+        cpu.clock()
+
+    assert cpu.x == expected_x_value
+    assert cpu.y == expected_y_value
+
+    assert cpu.status.flags.negative == expected_negative_flag
+    assert cpu.status.flags.zero == expected_zero_flag
+
+    assert cpu.remaining_cycles == 0
