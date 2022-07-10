@@ -610,11 +610,10 @@ class CPU(object):
 
     def _DEC(self):
         # Decrement Memory by One
-        self.operation_value -= 1
-        self._write_operation_result(self.operation_value)
+        self.operation_value = self._execute_decrement_operation(
+            self.operation_value)
 
-        self._set_negative_flag(self.operation_value)
-        self._set_zero_flag(self.operation_value)
+        self._write_operation_result(self.operation_value)
 
     def _DEX(self):
         # Decrement Index X by One
@@ -626,12 +625,10 @@ class CPU(object):
 
     def _INC(self):
         # Increment Memory by One
-        # TODO: https://github.com/zeeps31/purenes/issues/121
-        self.operation_value = (self.operation_value + 1) & 0xFF
-        self._write_operation_result(self.operation_value)
+        self.operation_value = self._execute_increment_operation(
+            self.operation_value)
 
-        self._set_negative_flag(self.operation_value)
-        self._set_zero_flag(self.operation_value)
+        self._write_operation_result(self.operation_value)
 
     def _INX(self):
         # Increment Index X by One
