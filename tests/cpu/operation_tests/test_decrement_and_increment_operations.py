@@ -115,7 +115,7 @@ def test_memory_increment_decrement_operations(
         "INY_sets_the_zero_flag_correctly"
     ]
 )
-def test_memory_increment_decrement_operations(
+def test_register_increment_decrement_operations(
         cpu: purenes.cpu.CPU,
         mock_cpu_bus: mock.Mock,
         mocker: pytest_mock.MockFixture,
