@@ -337,6 +337,26 @@ class CPU(object):
         if (self.effective_address & 0xFF00) != (address & 0xFF00):
             self.remaining_cycles += 1
 
+    def _execute_increment_operation(self, value: int) -> int:
+        # Used by increment operations to increment a value, wrap-around upon
+        # integer overflow, set negative and zero flags, and return the value.
+        value = (value + 1) & 0xFF
+
+        self._set_negative_flag(value)
+        self._set_zero_flag(value)
+
+        return value
+
+    def _execute_decrement_operation(self, value: int) -> int:
+        # Used by decrement operations to increment a value, wrap-around upon
+        # integer overflow, set negative and zero flags, and return the value.
+        value = (value - 1) & 0xFF
+
+        self._set_negative_flag(value)
+        self._set_zero_flag(value)
+
+        return value
+
     def _write_operation_result(self, value: int):
         # Common function to write an operation result back to a location.
 
@@ -596,6 +616,14 @@ class CPU(object):
         self._set_negative_flag(self.operation_value)
         self._set_zero_flag(self.operation_value)
 
+    def _DEX(self):
+        # Decrement Index X by One
+        self.x = self._execute_decrement_operation(self.x)
+
+    def _DEY(self):
+        # Decrement Index Y by One
+        self.y = self._execute_decrement_operation(self.y)
+
     def _INC(self):
         # Increment Memory by One
         # TODO: https://github.com/zeeps31/purenes/issues/121
@@ -604,6 +632,14 @@ class CPU(object):
 
         self._set_negative_flag(self.operation_value)
         self._set_zero_flag(self.operation_value)
+
+    def _INX(self):
+        # Increment Index X by One
+        self.x = self._execute_increment_operation(self.x)
+
+    def _INY(self):
+        # Increment Index Y by One
+        self.y = self._execute_increment_operation(self.y)
 
     # Logical Operations
 
@@ -794,27 +830,29 @@ class CPU(object):
             0x6C: (op._ind, op._JMP, 5), 0x70: (op._rel, op._BVS, 2),
             0x78: (op._imp, op._SEI, 2), 0x81: (op._izx, op._STA, 6),
             0x84: (op._zpg, op._STY, 3), 0x85: (op._zpg, op._STA, 3),
-            0x8A: (op._imp, op._TXA, 2), 0x8C: (op._abs, op._STY, 4),
-            0x8D: (op._abs, op._STA, 4), 0x90: (op._rel, op._BCC, 2),
-            0x91: (op._izy, op._STA, 6), 0x94: (op._zpx, op._STY, 4),
-            0x95: (op._zpx, op._STA, 4), 0x96: (op._zpy, op._STX, 4),
-            0x98: (op._imp, op._TYA, 2), 0x99: (op._aby, op._STA, 5),
-            0x9A: (op._imp, op._TXS, 2), 0x9D: (op._abx, op._STA, 5),
-            0xA0: (op._imm, op._LDY, 2), 0xA1: (op._izx, op._LDA, 6),
-            0xA2: (op._imm, op._LDX, 2), 0xA4: (op._zpg, op._LDY, 3),
-            0xA5: (op._zpg, op._LDA, 3), 0xA6: (op._zpg, op._LDX, 3),
-            0xA8: (op._imp, op._TAY, 2), 0xA9: (op._imm, op._LDA, 2),
-            0xAA: (op._imp, op._TAX, 2), 0xAC: (op._abs, op._LDY, 4),
-            0xAD: (op._abs, op._LDA, 4), 0xAE: (op._abs, op._LDX, 4),
-            0xB0: (op._rel, op._BCS, 2), 0xB1: (op._izy, op._LDA, 5),
-            0xB4: (op._zpx, op._LDY, 4), 0xB5: (op._zpx, op._LDA, 4),
-            0xB6: (op._zpy, op._LDX, 4), 0xB8: (op._imp, op._CLV, 2),
-            0xB9: (op._aby, op._LDA, 4), 0xBA: (op._imp, op._TSX, 2),
-            0xBC: (op._abx, op._LDY, 4), 0xBD: (op._abx, op._LDA, 4),
-            0xBE: (op._aby, op._LDX, 4), 0xC6: (op._zpg, op._DEC, 5),
-            0xCE: (op._abs, op._DEC, 6), 0xD0: (op._rel, op._BNE, 2),
-            0xD6: (op._zpx, op._DEC, 6), 0xD8: (op._imp, op._CLD, 2),
-            0xDE: (op._abx, op._DEC, 7), 0xE6: (op._zpg, op._INC, 5),
+            0x88: (op._imp, op._DEY, 2), 0x8A: (op._imp, op._TXA, 2),
+            0x8C: (op._abs, op._STY, 4), 0x8D: (op._abs, op._STA, 4),
+            0x90: (op._rel, op._BCC, 2), 0x91: (op._izy, op._STA, 6),
+            0x94: (op._zpx, op._STY, 4), 0x95: (op._zpx, op._STA, 4),
+            0x96: (op._zpy, op._STX, 4), 0x98: (op._imp, op._TYA, 2),
+            0x99: (op._aby, op._STA, 5), 0x9A: (op._imp, op._TXS, 2),
+            0x9D: (op._abx, op._STA, 5), 0xA0: (op._imm, op._LDY, 2),
+            0xA1: (op._izx, op._LDA, 6), 0xA2: (op._imm, op._LDX, 2),
+            0xA4: (op._zpg, op._LDY, 3), 0xA5: (op._zpg, op._LDA, 3),
+            0xA6: (op._zpg, op._LDX, 3), 0xA8: (op._imp, op._TAY, 2),
+            0xA9: (op._imm, op._LDA, 2), 0xAA: (op._imp, op._TAX, 2),
+            0xAC: (op._abs, op._LDY, 4), 0xAD: (op._abs, op._LDA, 4),
+            0xAE: (op._abs, op._LDX, 4), 0xB0: (op._rel, op._BCS, 2),
+            0xB1: (op._izy, op._LDA, 5), 0xB4: (op._zpx, op._LDY, 4),
+            0xB5: (op._zpx, op._LDA, 4), 0xB6: (op._zpy, op._LDX, 4),
+            0xB8: (op._imp, op._CLV, 2), 0xB9: (op._aby, op._LDA, 4),
+            0xBA: (op._imp, op._TSX, 2), 0xBC: (op._abx, op._LDY, 4),
+            0xBD: (op._abx, op._LDA, 4), 0xBE: (op._aby, op._LDX, 4),
+            0xC6: (op._zpg, op._DEC, 5), 0xC8: (op._imp, op._INY, 2),
+            0xCA: (op._imp, op._DEX, 2), 0xCE: (op._abs, op._DEC, 6),
+            0xD0: (op._rel, op._BNE, 2), 0xD6: (op._zpx, op._DEC, 6),
+            0xD8: (op._imp, op._CLD, 2), 0xDE: (op._abx, op._DEC, 7),
+            0xE6: (op._zpg, op._INC, 5), 0xE8: (op._imp, op._INX, 2),
             0xEE: (op._abs, op._INC, 6), 0xF0: (op._rel, op._BEQ, 2),
             0xF6: (op._zpx, op._INC, 6), 0xF8: (op._imp, op._SED, 2),
             0xFE: (op._abx, op._INC, 7)
