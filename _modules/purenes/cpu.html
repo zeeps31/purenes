@@ -805,11 +805,10 @@
 
     <span class="k">def</span> <span class="nf">_DEC</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Decrement Memory by One</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">-=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_write_operation_result</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_decrement_operation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_negative_flag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_zero_flag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_operation_result</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_DEX</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Decrement Index X by One</span>
@@ -821,12 +820,10 @@
 
     <span class="k">def</span> <span class="nf">_INC</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Increment Memory by One</span>
-        <span class="c1"># TODO: https://github.com/zeeps31/purenes/issues/121</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_write_operation_result</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_increment_operation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_negative_flag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_zero_flag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_operation_result</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_INX</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Increment Index X by One</span>
