@@ -36,7 +36,7 @@ import purenes.cpu
         "sets_the_overflow_flag_correctly",
         "sets_the_zero_flag_correctly",
         "sets_the_carry_flag_correctly",
-        "sets_the_zero_flag_when_results_exceed_maximum",
+        "sets_the_zero_flag_when_result_exceeds_maximum",
     ]
 )
 def test_ADC(
