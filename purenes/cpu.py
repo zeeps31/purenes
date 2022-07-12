@@ -379,6 +379,19 @@ class CPU(object):
         # Sets the carry flag if the MSB of the current value is 1.
         self.status.flags.carry = (value & 0x80) != 0
 
+    def _set_overflow_flag(self, x: int, y: int, result: int):
+        # Sets the overflow flag based on the condition that the signed bits
+        # of the input values (x and y) are the same and the signed bits of
+        # the input values differ from that of the result.
+        input_signs_are_the_same: bool = not ((x ^ y) & 0x80)
+        input_and_result_signs_differ: bool = ((x ^ result) & 0x80) != 0
+
+        self.status.flags.overflow = (
+            input_signs_are_the_same
+            and
+            input_and_result_signs_differ
+        )
+
     # Addressing Modes
 
     def _acc(self):
@@ -638,6 +651,22 @@ class CPU(object):
         # Increment Index Y by One
         self.y = self._execute_increment_operation(self.y)
 
+    # Arithmetic Operations
+
+    def _ADC(self):
+        # Add Memory to Accumulator with Carry
+        result: int = self.a + self.operation_value + self.status.flags.carry
+
+        # Set the carry flag if the result has exceeded the 8-bit maximum
+        self.status.flags.carry = result > 0xFF
+        self._set_overflow_flag(self.a, self.operation_value, result)
+
+        # "Cast" result to 8-bit value, store in accumulator
+        self.a = result & 0xFF
+
+        self._set_negative_flag(self.a)
+        self._set_zero_flag(self.a)
+
     # Logical Operations
 
     def _AND(self):
@@ -823,9 +852,13 @@ class CPU(object):
             0x38: (op._imp, op._SEC, 2), 0x39: (op._aby, op._AND, 4),
             0x3D: (op._abx, op._AND, 4), 0x3E: (op._abx, op._ROL, 7),
             0x48: (op._imp, op._PHA, 3), 0x50: (op._rel, op._BVC, 2),
-            0x58: (op._imp, op._CLI, 2), 0x68: (op._imp, op._PLA, 4),
-            0x6C: (op._ind, op._JMP, 5), 0x70: (op._rel, op._BVS, 2),
-            0x78: (op._imp, op._SEI, 2), 0x81: (op._izx, op._STA, 6),
+            0x58: (op._imp, op._CLI, 2), 0x61: (op._izx, op._ADC, 6),
+            0x65: (op._zpg, op._ADC, 3), 0x68: (op._imp, op._PLA, 4),
+            0x69: (op._imm, op._ADC, 2), 0x6C: (op._ind, op._JMP, 5),
+            0x6D: (op._abs, op._ADC, 4), 0x70: (op._rel, op._BVS, 2),
+            0x71: (op._izy, op._ADC, 5), 0x75: (op._zpx, op._ADC, 4),
+            0x78: (op._imp, op._SEI, 2), 0x79: (op._aby, op._ADC, 4),
+            0x7D: (op._abx, op._ADC, 4), 0x81: (op._izx, op._STA, 6),
             0x84: (op._zpg, op._STY, 3), 0x85: (op._zpg, op._STA, 3),
             0x88: (op._imp, op._DEY, 2), 0x8A: (op._imp, op._TXA, 2),
             0x8C: (op._abs, op._STY, 4), 0x8D: (op._abs, op._STA, 4),
