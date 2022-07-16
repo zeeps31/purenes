@@ -58,6 +58,7 @@ def test_accumulator_addressing_mode(
         (0xAD, 0x00, 0x01),
         (0xAE, 0x00, 0x01),
         (0xCE, 0x00, 0x01),
+        (0xED, 0x00, 0x01),
         (0xEE, 0x00, 0x01),
     ],
     ids=[
@@ -73,6 +74,7 @@ def test_accumulator_addressing_mode(
         "executes_successfully_using_opcode_0xAD",
         "executes_successfully_using_opcode_0xAE",
         "executes_successfully_using_opcode_0xCE",
+        "executes_successfully_using_opcode_0xED",
         "executes_successfully_using_opcode_0xEE"
     ]
 )
@@ -140,6 +142,8 @@ def test_absolute_addressing_mode(
         (0xBD, 0x02, 0x00, 0x04, 0x00, 0x0006, 4),
         (0xBE, 0x00, 0x02, 0x04, 0x00, 0x0006, 4),
         (0xDE, 0x02, 0x00, 0x04, 0x00, 0x0006, 7),
+        (0xF9, 0x00, 0x02, 0x04, 0x00, 0x0006, 4),
+        (0xFD, 0x02, 0x00, 0x04, 0x00, 0x0006, 4),
         (0xFE, 0x02, 0x00, 0x04, 0x00, 0x0006, 7),
         (0x19, 0x00, 0x01, 0xFF, 0x00, 0x0100, 5),
         (0x1D, 0x01, 0x00, 0xFF, 0x00, 0x0100, 5),
@@ -159,6 +163,8 @@ def test_absolute_addressing_mode(
         "executes_successfully_using_opcode_0xBD",
         "executes_successfully_using_opcode_0xBE",
         "executes_successfully_using_opcode_0xDE",
+        "executes_successfully_using_opcode_0xF9",
+        "executes_successfully_using_opcode_0xFD",
         "executes_successfully_using_opcode_0xFE",
         "adds_an_extra_cycle_if_a_page_boundary_is_crossed_y",
         "adds_an_extra_cycle_if_a_page_boundary_is_crossed_x"
@@ -232,6 +238,7 @@ def test_indexed_absolute_addressing_modes(
         (0xA0, 0xFF),
         (0xA2, 0xFF),
         (0xA9, 0xFF),
+        (0xE9, 0xFF),
     ],
     ids=[
         "executes_successfully_using_opcode_0x09",
@@ -240,6 +247,7 @@ def test_indexed_absolute_addressing_modes(
         "executes_successfully_using_opcode_0xA0",
         "executes_successfully_using_opcode_0xA2",
         "executes_successfully_using_opcode_0xA9",
+        "executes_successfully_using_opcode_0xE9",
     ]
 )
 def test_immediate_addressing_mode(
@@ -353,6 +361,7 @@ def test_indirect_addressing_mode(
         (0x61, 0x00, 0x02, 0x04, 0x00),
         (0x81, 0x00, 0x02, 0x04, 0x00),
         (0xA1, 0x00, 0x02, 0x04, 0x00),
+        (0xA1, 0x00, 0x02, 0x04, 0x00),
         (0x01, 0xFF, 0x01, 0x04, 0x00),
     ],
     ids=[
@@ -361,6 +370,7 @@ def test_indirect_addressing_mode(
         "executes_successfully_using_opcode_0x61",
         "executes_successfully_using_opcode_0x81",
         "executes_successfully_using_opcode_0xA1",
+        "executes_successfully_using_opcode_0xE1",
         "wraps_around_when_the_maximum_value_is_reached"
     ]
 )
@@ -425,6 +435,7 @@ def test_x_indexed_indirect_addressing_mode(
         (0x71, 0x00, 0x02, 0x04, 0x00, 0x0006, 5),
         (0x91, 0x00, 0x02, 0x04, 0x00, 0x0006, 6),
         (0xB1, 0x00, 0x02, 0x04, 0x00, 0x0006, 5),
+        (0xF1, 0x00, 0x02, 0x04, 0x00, 0x0006, 5),
         (0x11, 0x00, 0x01, 0xFF, 0x00, 0x0100, 6),
 
     ],
@@ -434,6 +445,7 @@ def test_x_indexed_indirect_addressing_mode(
         "executes_successfully_using_opcode_0x71",
         "executes_successfully_using_opcode_0x91",
         "executes_successfully_using_opcode_0xB1",
+        "executes_successfully_using_opcode_0xF1",
         "adds_an_extra_cycle_if_a_page_boundary_is_crossed"
     ]
 )
@@ -577,6 +589,7 @@ def test_relative_addressing_mode(
         (0xA5, 0xFF),
         (0xA6, 0xFF),
         (0xC6, 0xFF),
+        (0xE5, 0xFF),
         (0xE6, 0xFF)
     ],
     ids=[
@@ -592,6 +605,7 @@ def test_relative_addressing_mode(
         "executes_successfully_using_opcode_0xA5",
         "executes_successfully_using_opcode_0xA6",
         "executes_successfully_using_opcode_0xC6",
+        "executes_successfully_using_opcode_0xE5",
         "executes_successfully_using_opcode_0xE6",
     ]
 )
@@ -650,6 +664,7 @@ def test_zero_page_addressing_mode(
         (0xB6, 0x00, 0x01, 0x00, 0x0001),
         (0xD6, 0x01, 0x00, 0x00, 0x0001),
         (0xF6, 0x01, 0x00, 0x00, 0x0001),
+        (0xF6, 0x01, 0x00, 0x00, 0x0001),
         (0x15, 0x02, 0x00, 0xFF, 0x0001),
     ],
     ids=[
@@ -665,6 +680,7 @@ def test_zero_page_addressing_mode(
         "executes_successfully_using_opcode_0xB5",
         "executes_successfully_using_opcode_0xB6",
         "executes_successfully_using_opcode_0xD6",
+        "executes_successfully_using_opcode_0xF5",
         "executes_successfully_using_opcode_0xF6",
         "wraps_around_when_the_maximum_value_is_reached"
     ]
