@@ -8,8 +8,8 @@ import purenes.cpu
 
 @pytest.mark.parametrize(
     "opcode, accumulator_value, operation_value, expected_result, "
-    "negative_flag, zero_flag, cycle_count",
-    [
+    "expected_negative_flag, expected_zero_flag, expected_cycle_count",
+    [  # OP    A     OV    ER    EN EZ EC
         (0x01, 0x00, 0x01, 0x01, 0, 0, 6),
         (0x05, 0x00, 0x01, 0x01, 0, 0, 3),
         (0x09, 0x00, 0x01, 0x01, 0, 0, 2),
@@ -25,27 +25,47 @@ import purenes.cpu
         (0x35, 0x01, 0x01, 0x01, 0, 0, 4),
         (0x39, 0x01, 0x01, 0x01, 0, 0, 4),
         (0x3D, 0x01, 0x01, 0x01, 0, 0, 4),
+        (0x41, 0x01, 0x02, 0x03, 0, 0, 6),
+        (0x45, 0x01, 0x02, 0x03, 0, 0, 3),
+        (0x49, 0x01, 0x02, 0x03, 0, 0, 2),
+        (0x4D, 0x01, 0x02, 0x03, 0, 0, 4),
+        (0x51, 0x01, 0x02, 0x03, 0, 0, 5),
+        (0x55, 0x01, 0x02, 0x03, 0, 0, 4),
+        (0x59, 0x01, 0x02, 0x03, 0, 0, 4),
+        (0x5D, 0x01, 0x02, 0x03, 0, 0, 4),
         (0x01, 0x00, 0x00, 0x00, 0, 1, 6),
         (0x01, 0x00, 0x81, 0x81, 1, 0, 6),
+        (0x41, 0x01, 0x01, 0x00, 0, 1, 6),
+        (0x41, 0x00, 0x80, 0x80, 1, 0, 6),
     ],
     ids=[
-        "executes_successfully_using_opcode_0x01",  # ORA
-        "executes_successfully_using_opcode_0x05",  # ORA
-        "executes_successfully_using_opcode_0x09",  # ORA
-        "executes_successfully_using_opcode_0x0D",  # ORA
-        "executes_successfully_using_opcode_0x15",  # ORA
-        "executes_successfully_using_opcode_0x19",  # ORA
-        "executes_successfully_using_opcode_0x1D",  # ORA
-        "executes_successfully_using_opcode_0x21",  # AND
-        "executes_successfully_using_opcode_0x25",  # AND
-        "executes_successfully_using_opcode_0x29",  # AND
-        "executes_successfully_using_opcode_0x2D",  # AND
-        "executes_successfully_using_opcode_0x31",  # AND
-        "executes_successfully_using_opcode_0x35",  # AND
-        "executes_successfully_using_opcode_0x39",  # AND
-        "executes_successfully_using_opcode_0x3D",  # AND
-        "sets_the_zero_flag_when_the_result_is_zero",
-        "sets_the_negative_flag_if_the_result_exceeds_the_signed_8_bit_maximum"
+        "ORA_executes_successfully_using_opcode_0x01",  # ORA
+        "ORA_executes_successfully_using_opcode_0x05",  # ORA
+        "ORA_executes_successfully_using_opcode_0x09",  # ORA
+        "ORA_executes_successfully_using_opcode_0x0D",  # ORA
+        "ORA_executes_successfully_using_opcode_0x15",  # ORA
+        "ORA_executes_successfully_using_opcode_0x19",  # ORA
+        "ORA_executes_successfully_using_opcode_0x1D",  # ORA
+        "AND_executes_successfully_using_opcode_0x21",  # AND
+        "AND_executes_successfully_using_opcode_0x25",  # AND
+        "AND_executes_successfully_using_opcode_0x29",  # AND
+        "AND_executes_successfully_using_opcode_0x2D",  # AND
+        "AND_executes_successfully_using_opcode_0x31",  # AND
+        "AND_executes_successfully_using_opcode_0x35",  # AND
+        "AND_executes_successfully_using_opcode_0x39",  # AND
+        "AND_executes_successfully_using_opcode_0x3D",  # AND
+        "EOR_executes_successfully_using_opcode_0x41",  # EOR
+        "EOR_executes_successfully_using_opcode_0x45",  # EOR
+        "EOR_executes_successfully_using_opcode_0x49",  # EOR
+        "EOR_executes_successfully_using_opcode_0x4D",  # EOR
+        "EOR_executes_successfully_using_opcode_0x51",  # EOR
+        "EOR_executes_successfully_using_opcode_0x55",  # EOR
+        "EOR_executes_successfully_using_opcode_0x59",  # EOR
+        "EOR_executes_successfully_using_opcode_0x5D",  # EOR
+        "ORA_sets_the_zero_flag_correctly",
+        "ORA_sets_the_negative_flag_correctly",
+        "EOR_sets_the_zero_flag_correctly",
+        "EOR_sets_the_negative_flag_correctly"
     ]
 )
 def test_logical_operations(
@@ -56,14 +76,13 @@ def test_logical_operations(
         accumulator_value: int,
         operation_value: int,
         expected_result: int,
-        negative_flag: int,
-        zero_flag: int,
-        cycle_count: int
+        expected_negative_flag: int,
+        expected_zero_flag: int,
+        expected_cycle_count: int
 ):
     """Tests logical operations (AND, EOR, ORA).
 
-    Clocks the CPU and verifies that the following actions are performed during
-    the ORA operation.
+    Verifies the following.
 
     1. The operation is mapped to the correct opcode.
     2. The result of performing the logical operation on the accumulator is the
@@ -78,10 +97,10 @@ def test_logical_operations(
     mock_cpu_bus.read.return_value = opcode
     mocker.patch.object(cpu, "_retrieve_operation_value")
 
-    for _ in range(0, cycle_count):
+    for _ in range(0, expected_cycle_count):
         cpu.clock()
 
     assert cpu.a == expected_result
-    assert cpu.status.flags.negative == negative_flag
-    assert cpu.status.flags.zero == zero_flag
+    assert cpu.status.flags.negative == expected_negative_flag
+    assert cpu.status.flags.zero == expected_zero_flag
     assert cpu.remaining_cycles == 0

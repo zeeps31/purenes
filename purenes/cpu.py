@@ -686,6 +686,13 @@ class CPU(object):
         self._set_negative_flag(self.a)
         self._set_zero_flag(self.a)
 
+    def _EOR(self):
+        # Exclusive-OR Memory with Accumulator
+        self.a ^= self.operation_value
+
+        self._set_negative_flag(self.a)
+        self._set_zero_flag(self.a)
+
     def _ORA(self):
         # OR with the accumulator.
         self.a |= self.operation_value
@@ -861,8 +868,12 @@ class CPU(object):
             0x35: (op._zpx, op._AND, 4), 0x36: (op._zpx, op._ROL, 6),
             0x38: (op._imp, op._SEC, 2), 0x39: (op._aby, op._AND, 4),
             0x3D: (op._abx, op._AND, 4), 0x3E: (op._abx, op._ROL, 7),
-            0x48: (op._imp, op._PHA, 3), 0x50: (op._rel, op._BVC, 2),
-            0x58: (op._imp, op._CLI, 2), 0x61: (op._izx, op._ADC, 6),
+            0x41: (op._izx, op._EOR, 6), 0x45: (op._zpg, op._EOR, 3),
+            0x48: (op._imp, op._PHA, 3), 0x49: (op._imm, op._EOR, 2),
+            0x4D: (op._abs, op._EOR, 4), 0x50: (op._rel, op._BVC, 2),
+            0x51: (op._izy, op._EOR, 5), 0x55: (op._zpx, op._EOR, 4),
+            0x58: (op._imp, op._CLI, 2), 0x59: (op._aby, op._EOR, 4),
+            0x5D: (op._abx, op._EOR, 4), 0x61: (op._izx, op._ADC, 6),
             0x65: (op._zpg, op._ADC, 3), 0x68: (op._imp, op._PLA, 4),
             0x69: (op._imm, op._ADC, 2), 0x6C: (op._ind, op._JMP, 5),
             0x6D: (op._abs, op._ADC, 4), 0x70: (op._rel, op._BVS, 2),
