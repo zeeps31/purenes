@@ -5,7 +5,7 @@ Picture Processing Unit (PPU)
 |
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Topics:
 
    ppu/fetching_an_attribute_table_byte_during_rendering.rst
