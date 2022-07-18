@@ -23,6 +23,10 @@ import purenes.cpu
         (0x4E, 0x81, 0x0000, 0, 0x40, 1, 0, 0, 6),
         (0x56, 0x81, 0x0000, 0, 0x40, 1, 0, 0, 6),
         (0x5E, 0x81, 0x0000, 0, 0x40, 1, 0, 0, 7),
+        (0x66, 0x81, 0x0000, 0, 0x40, 1, 0, 0, 5),
+        (0x6E, 0x81, 0x0000, 0, 0x40, 1, 0, 0, 6),
+        (0x76, 0x81, 0x0000, 0, 0x40, 1, 0, 0, 6),
+        (0x7E, 0x81, 0x0000, 0, 0x40, 1, 0, 0, 7),
         (0x06, 0x81, 0x0000, 0, 0x02, 1, 0, 0, 5),
         (0x06, 0xFF, 0x0000, 0, 0xFE, 1, 1, 0, 5),
         (0x06, 0x00, 0x0000, 0, 0x00, 0, 0, 1, 5),
@@ -31,6 +35,9 @@ import purenes.cpu
         (0x26, 0x00, 0x0000, 0, 0x00, 0, 0, 1, 5),
         (0x46, 0x80, 0x0000, 0, 0x40, 0, 0, 0, 5),
         (0x46, 0x01, 0x0000, 0, 0x00, 1, 0, 1, 5),
+        (0x66, 0x03, 0x0000, 0, 0x01, 1, 0, 0, 5),
+        (0x66, 0x80, 0x0000, 1, 0xC0, 0, 1, 0, 5),
+        (0x66, 0x00, 0x0000, 0, 0x00, 0, 0, 1, 5),
     ],
     ids=[
         "ASL_executes_successfully_using_opcode_0x06",
@@ -45,6 +52,10 @@ import purenes.cpu
         "LSR_executes_successfully_using_opcode_0x4E",
         "LSR_executes_successfully_using_opcode_0x56",
         "LSR_executes_successfully_using_opcode_0x5E",
+        "ROR_executes_successfully_using_opcode_0x66",
+        "ROR_executes_successfully_using_opcode_0x6E",
+        "ROR_executes_successfully_using_opcode_0x76",
+        "ROR_executes_successfully_using_opcode_0x7E",
         "ASL_sets_the_carry_flag_under_the_correct_conditions",
         "ASL_sets_the_negative_flag_under_the_correct_conditions",
         "ASL_sets_the_zero_flag_under_the_correct_conditions",
@@ -53,6 +64,9 @@ import purenes.cpu
         "ROL_sets_the_zero_flag_under_the_correct_conditions",
         "LSR_sets_the_carry_flag_under_the_correct_conditions",
         "LSR_sets_the_zero_flag_under_the_correct_conditions",
+        "ROR_sets_the_carry_flag_under_the_correct_conditions",
+        "ROR_sets_the_negative_flag_under_the_correct_conditions",
+        "ROR_sets_the_zero_flag_under_the_correct_conditions",
     ]
 )
 def test_shift_and_rotate_instructions(
@@ -111,11 +125,13 @@ def test_shift_and_rotate_instructions(
         (0x0A, 0x10, 0, 0x20, 0, 0, 0, 2),
         (0x2A, 0x80, 1, 0x01, 1, 0, 0, 2),
         (0x4A, 0x81, 0, 0x40, 1, 0, 0, 2),
+        (0x6A, 0x81, 0, 0x40, 1, 0, 0, 2),
     ],
     ids=[
         "ASL_executes_successfully_using_opcode_0x0A",
         "ROL_executes_successfully_using_opcode_0x2A",
         "LSR_executes_successfully_using_opcode_0x4A",
+        "ROR_executes_successfully_using_opcode_0x6A",
     ]
 )
 def test_shift_and_rotate_instructions_with_accumulator_addressing(
