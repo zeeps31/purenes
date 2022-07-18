@@ -962,7 +962,7 @@ class CPU(object):
             0xD1: (op._izy, op._CMP, 5), 0xD5: (op._zpx, op._CMP, 4),
             0xD6: (op._zpx, op._DEC, 6), 0xD8: (op._imp, op._CLD, 2),
             0xD9: (op._aby, op._CMP, 4), 0xDD: (op._abx, op._CMP, 4),
-            0xE0: (op._imm, op._CPX, 2), 0xDE: (op._abx, op._DEC, 7),
+            0xDE: (op._abx, op._DEC, 7), 0xE0: (op._imm, op._CPX, 2),
             0xE1: (op._izx, op._SBC, 6), 0xE4: (op._zpg, op._CPX, 3),
             0xE5: (op._zpg, op._SBC, 3), 0xE6: (op._zpg, op._INC, 5),
             0xE8: (op._imp, op._INX, 2), 0xE9: (op._imm, op._SBC, 2),
