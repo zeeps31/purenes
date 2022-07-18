@@ -357,6 +357,16 @@ class CPU(object):
 
         return value
 
+    def _execute_comparison_instruction(self, value: int) -> None:
+        # Used by comparison instructions to subtract (without carry) the
+        # value of A, X or Y from the operation_value and set the carry,
+        # negative and zero flags to indicate >, < or =.
+        result: int = value - self.operation_value
+
+        self.status.flags.carry = value >= self.operation_value
+        self._set_negative_flag(result)
+        self._set_zero_flag(result)
+
     def _write_operation_result(self, value: int):
         # Common function to write an operation result back to a location.
 
@@ -669,7 +679,7 @@ class CPU(object):
 
     def _SBC(self):
         # Subtract Memory from Accumulator with Borrow.
-        #
+
         # Set the operation_value to the ones complement and perform an ADC.
         # The twos complement is obtained from the addition of the carry
         # (borrow) flag, which is required to be set before this operation is
@@ -780,6 +790,20 @@ class CPU(object):
     def _SEI(self):
         # Set interrupt disable
         self.status.flags.interrupt_disable = 1
+
+    # Comparisons
+
+    def _CMP(self):
+        # Compare Memory with Accumulator
+        self._execute_comparison_instruction(self.a)
+
+    def _CPX(self):
+        # Compare Memory and Index X
+        self._execute_comparison_instruction(self.x)
+
+    def _CPY(self):
+        # Compare Memory and Index Y
+        self._execute_comparison_instruction(self.y)
 
     # Conditional Branch Instructions
 
@@ -929,13 +953,20 @@ class CPU(object):
             0xB8: (op._imp, op._CLV, 2), 0xB9: (op._aby, op._LDA, 4),
             0xBA: (op._imp, op._TSX, 2), 0xBC: (op._abx, op._LDY, 4),
             0xBD: (op._abx, op._LDA, 4), 0xBE: (op._aby, op._LDX, 4),
+            0xC0: (op._imm, op._CPY, 2), 0xC1: (op._izx, op._CMP, 6),
+            0xC4: (op._zpg, op._CPY, 3), 0xC5: (op._zpg, op._CMP, 3),
             0xC6: (op._zpg, op._DEC, 5), 0xC8: (op._imp, op._INY, 2),
-            0xCA: (op._imp, op._DEX, 2), 0xCE: (op._abs, op._DEC, 6),
-            0xD0: (op._rel, op._BNE, 2), 0xD6: (op._zpx, op._DEC, 6),
-            0xD8: (op._imp, op._CLD, 2), 0xDE: (op._abx, op._DEC, 7),
-            0xE1: (op._izx, op._SBC, 6), 0xE5: (op._zpg, op._SBC, 3),
-            0xE6: (op._zpg, op._INC, 5), 0xE8: (op._imp, op._INX, 2),
-            0xE9: (op._imm, op._SBC, 2), 0xED: (op._abs, op._SBC, 4),
+            0xC9: (op._imm, op._CMP, 2), 0xCA: (op._imp, op._DEX, 2),
+            0xCC: (op._abs, op._CPY, 4), 0xCD: (op._abs, op._CMP, 4),
+            0xCE: (op._abs, op._DEC, 6), 0xD0: (op._rel, op._BNE, 2),
+            0xD1: (op._izy, op._CMP, 5), 0xD5: (op._zpx, op._CMP, 4),
+            0xD6: (op._zpx, op._DEC, 6), 0xD8: (op._imp, op._CLD, 2),
+            0xD9: (op._aby, op._CMP, 4), 0xDD: (op._abx, op._CMP, 4),
+            0xE0: (op._imm, op._CPX, 2), 0xDE: (op._abx, op._DEC, 7),
+            0xE1: (op._izx, op._SBC, 6), 0xE4: (op._zpg, op._CPX, 3),
+            0xE5: (op._zpg, op._SBC, 3), 0xE6: (op._zpg, op._INC, 5),
+            0xE8: (op._imp, op._INX, 2), 0xE9: (op._imm, op._SBC, 2),
+            0xEC: (op._abs, op._CPX, 4), 0xED: (op._abs, op._SBC, 4),
             0xEE: (op._abs, op._INC, 6), 0xF0: (op._rel, op._BEQ, 2),
             0xF1: (op._izy, op._SBC, 5), 0xF5: (op._zpx, op._SBC, 4),
             0xF6: (op._zpx, op._INC, 6), 0xF8: (op._imp, op._SED, 2),
