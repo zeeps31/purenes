@@ -360,7 +360,7 @@ class CPU(object):
     def _execute_comparison_instruction(self, value: int) -> None:
         # Used by comparison instructions to subtract (without carry) the
         # value of A, X or Y from the operation_value and set the carry,
-        # negative and zero flags to indicate >, < or =.
+        # negative and zero flags to indicate GT, LT or EQ conditions.
         result: int = value - self.operation_value
 
         self.status.flags.carry = value >= self.operation_value
