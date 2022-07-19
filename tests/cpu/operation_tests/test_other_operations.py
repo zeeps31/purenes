@@ -62,3 +62,21 @@ def test_BIT(
     assert cpu.status.flags.negative == expected_negative_flag
     assert cpu.status.flags.overflow == expected_overflow_flag
     assert cpu.status.flags.zero == expected_zero_flag
+
+
+def test_NOP(cpu: purenes.cpu.CPU, mock_cpu_bus: mock.Mock):
+    """Tests the NOP operation.
+
+    Verifies the following:
+
+    1. The operation is mapped to the opcode 0xEA.
+    2. The operation completes in two clock cycles.
+    """
+    cpu.pc = 0x0000
+
+    mock_cpu_bus.read.return_value = 0xEA
+
+    for _ in range(0, 2):
+        cpu.clock()
+
+    assert cpu.remaining_cycles == 0
