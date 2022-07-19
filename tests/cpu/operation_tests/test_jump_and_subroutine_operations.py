@@ -104,3 +104,65 @@ def test_JSR(
     assert cpu.s == 0xFB  # Stack pointer decremented by two
     assert cpu.remaining_cycles == 0
     assert cpu.pc == effective_address
+
+
+@pytest.mark.parametrize(
+    "pc_lo, pc_hi, stack_pointer, expected_lo_address, expected_hi_address, "
+    "expected_program_counter, expected_stack_pointer",
+    [  # PCL   PCH   S     ELA     EHA     EPC     ES
+        (0x00, 0x10, 0xFB, 0x01FB, 0x01FC, 0x1001, 0xFD),
+        (0x00, 0x00, 0xFB, 0x01FB, 0x01FC, 0x0001, 0xFD),
+    ],
+    ids=[
+        "executes_successfully_using_opcode_0x60",
+        "increments_the_pc_by_one",
+    ]
+)
+def test_RTS(
+        cpu: purenes.cpu.CPU,
+        mock_cpu_bus: mock.Mock,
+        mocker: pytest_mock.MockFixture,
+        pc_lo: int,
+        pc_hi: int,
+        stack_pointer: int,
+        expected_lo_address: int,
+        expected_hi_address: int,
+        expected_program_counter: int,
+        expected_stack_pointer: int):
+    """Tests the RTS operation.
+
+    Verifies the following:
+
+    1. The RTS operation is mapped to opcode 0x60.
+    2. The program counter is pulled from the stack in order of low to high
+       bytes
+    3. The program counter is set to the program counter pulled from the stack
+       plus one.
+    4. The operation completes in 6 clock cycles.
+    """
+    cpu.pc = 0x0000
+    cpu.s = stack_pointer
+
+    opcode: int = 0x60  # Only one opcode for this operation
+
+    mock_cpu_bus.read.side_effect = [
+        opcode,
+        pc_lo,
+        pc_hi,
+    ]
+
+    # This operation is always expected to complete in 6 clock cycles.
+    for _ in range(0, 6):
+        cpu.clock()
+
+    calls = [
+        mocker.call.read(0x0000),  # Initial PC read to get opcode
+        mocker.call.read(expected_lo_address),
+        mocker.call.read(expected_hi_address),
+    ]
+
+    mock_cpu_bus.assert_has_calls(calls)
+
+    assert cpu.s == expected_stack_pointer
+    assert cpu.remaining_cycles == 0
+    assert cpu.pc == expected_program_counter
