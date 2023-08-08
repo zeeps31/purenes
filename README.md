@@ -7,4 +7,7 @@
 
 ## Overview 
 
-PureNES is a "Pure Python" NES emulator.
+PureNES is a (work in progress) "Pure Python" NES emulator.
+
+### Documentation 
+The documentation for PureNES can be found [here](https://zeeps31.github.io/purenes/)
